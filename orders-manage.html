@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABAYRAH | Admin Order Management</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-bg: #FFFFFF;       
+            --dark-text: #1C1B1A;        
+            --muted-gray: #7A7571;       
+            --border-color: #ECEAE6;     
+            --accent-gold: #C5A880;      
+            --success-green: #4A5D4E;    
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #FAFAFA;
+            color: var(--dark-text);
+            margin: 0;
+            padding: 40px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--dark-text);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin: 0;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FFFFFF;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+        }
+
+        .orders-table th, .orders-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .orders-table th {
+            background-color: #F8F8F8;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted-gray);
+            font-size: 11px;
+        }
+
+        .status-select {
+            padding: 8px 12px;
+            font-family: var(--font-sans);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+            background: transparent;
+            cursor: pointer;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .status-select:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .item-list {
+            margin: 0;
+            padding-left: 15px;
+            color: var(--muted-gray);
+            font-size: 12px;
+        }
+
+        .customer-info {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <h1>ABAYRAH | Order Management</h1>
+        <span style="font-size: 12px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase;">Real-Time Sync Active ✦</span>
+    </div>
+
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Order ID / Date</th>
+                <th>Customer Details</th>
+                <th>Order Items</th>
+                <th>Total Paid</th>
+                <th>Update Status</th>
+            </tr>
+        </thead>
+        <tbody id="admin-orders-body">
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--muted-gray);">Connecting to secure vault...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collectionGroup, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Your existing Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
+            authDomain: "abayrah-9df21.firebaseapp.com",
+            projectId: "abayrah-9df21",
+            storageBucket: "abayrah-9df21.firebasestorage.app",
+            messagingSenderId: "789725334313",
+            appId: "1:789725334313:web:b37408f42add9611730538",
+            measurementId: "G-NLJJVVE32M"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const tbody = document.getElementById('admin-orders-body');
+
+        // 1. Listen to ALL orders across ALL users in real-time
+        const allOrdersQuery = collectionGroup(db, 'orders');
+        
+        onSnapshot(allOrdersQuery, (snapshot) => {
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No orders found.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            
+            // Sort orders by date (newest first)
+            const orders = [];
+            snapshot.forEach(docSnap => orders.push({
+                docId: docSnap.id, // The document ID
+                ref: docSnap.ref,  // The exact path to the document (users/USER_ID/orders/ORDER_ID)
+                ...docSnap.data()
+            }));
+            
+            orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            orders.forEach(order => {
+                const date = new Date(order.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                const ship = order.shippingInfo || {};
+                const displayId = order.orderNumber || order.docId.substring(0,8).toUpperCase();
+                
+                let itemsHtml = '<ul class="item-list">';
+                if (order.items) {
+                    order.items.forEach(item => {
+                        itemsHtml += `<li>${item.quantity}x ${item.title} (${item.size})</li>`;
+                    });
+                }
+                itemsHtml += '</ul>';
+
+                // Ensure the path is safely stored as a string so we can pass it to the update function
+                const docPath = order.ref.path;
+
+                html += `
+                    <tr>
+                        <td>
+                            <strong style="color: var(--dark-text);">#${displayId}</strong><br>
+                            <span style="color: var(--muted-gray); font-size: 11px;">${date}</span>
+                        </td>
+                        <td class="customer-info">
+                            <strong>${ship.firstName || 'Guest'} ${ship.lastName || ''}</strong><br>
+                            ${ship.email || 'N/A'}<br>
+                            ${ship.phone || 'N/A'}<br>
+                            <span style="color: var(--muted-gray); font-size: 11px;">${ship.city || ''}, ${ship.state || ''} ${ship.zip || ''}</span>
+                        </td>
+                        <td>${itemsHtml}</td>
+                        <td><strong>₹${parseFloat(order.amount).toFixed(2)}</strong></td>
+                        <td>
+                            <select class="status-select" onchange="updateOrderStatus('${docPath}', this.value)">
+                                <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                                <option value="Confirmed" ${order.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        });
+
+        // 2. Global function to push the new status back to Firestore
+        window.updateOrderStatus = async function(docPath, newStatus) {
+            try {
+                const orderRef = doc(db, docPath);
+                await updateDoc(orderRef, { status: newStatus });
+                // The onSnapshot will automatically catch this change and flash the update!
+            } catch (error) {
+                console.error("Error updating order status:", error);
+                alert("Failed to update status. Check your Firebase security rules.");
+            }
+        };
+    </script>
+</body>
+</html>
