@@ -3,198 +3,537 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABAYRAH | Admin Order Management</title>
+    <title>Abayrah | Secure Order Management</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="star-logo.png">
+
     <style>
         :root {
-            --primary-bg: #FFFFFF;       
-            --dark-text: #1C1B1A;        
-            --muted-gray: #7A7571;       
-            --border-color: #ECEAE6;     
-            --accent-gold: #C5A880;      
-            --success-green: #4A5D4E;    
-            --font-serif: 'Cormorant Garamond', serif;
-            --font-sans: 'Montserrat', sans-serif;
+            --primary-brand: #4A152B; /* Deep Burgundy from the design */
+            --bg-color: #F8F9FA;
+            --surface-white: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-light: #E5E7EB;
+            
+            /* Status Colors */
+            --status-processing-bg: #FEF3C7; --status-processing-text: #B45309;
+            --status-confirmed-bg: #DBEAFE; --status-confirmed-text: #1D4ED8;
+            --status-shipped-bg: #F3E8FF; --status-shipped-text: #6D28D9;
+            --status-delivered-bg: #D1FAE5; --status-delivered-text: #047857;
+            --status-cancelled-bg: #FEE2E2; --status-cancelled-text: #B91C1C;
         }
 
-        body {
-            font-family: var(--font-sans);
-            background-color: #FAFAFA;
-            color: var(--dark-text);
-            margin: 0;
-            padding: 40px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--dark-text);
-            padding-bottom: 20px;
-        }
+        /* --- AUTH SCREEN --- */
+        #auth-screen { position: fixed; inset: 0; background: var(--surface-white); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .auth-logo { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--primary-brand); margin-bottom: 10px; }
+        .auth-btn { background: var(--primary-brand); color: #fff; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; margin-top: 20px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .auth-btn:hover { background: #330e1d; }
 
-        h1 {
-            font-family: var(--font-serif);
-            font-size: 32px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            margin: 0;
-        }
+        /* --- LAYOUT --- */
+        #app-layout { display: none; width: 100%; height: 100%; flex-direction: column; }
+        
+        /* Top Navbar */
+        .top-navbar { height: 70px; background: var(--surface-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
+        .brand-logo { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--primary-brand); font-weight: 600; text-decoration: none; }
+        .top-nav-links { display: flex; gap: 30px; }
+        .top-nav-links a { text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .top-nav-links a.active { color: var(--primary-brand); border-bottom: 2px solid var(--primary-brand); padding-bottom: 24px; margin-bottom: -24px; }
+        .top-actions { display: flex; align-items: center; gap: 20px; }
+        .admin-profile { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+        .admin-avatar { width: 32px; height: 32px; background: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
 
-        .orders-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #FFFFFF;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            border: 1px solid var(--border-color);
-        }
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
 
-        .orders-table th, .orders-table td {
-            padding: 15px 20px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 13px;
-        }
+        /* Left Sidebar */
+        .sidebar { width: 240px; background: var(--surface-white); border-right: 1px solid var(--border-light); padding: 20px 0; display: flex; flex-direction: column; overflow-y: auto; }
+        .side-nav { display: flex; flex-direction: column; gap: 5px; padding: 0 15px; margin-bottom: 30px; }
+        .side-nav a { padding: 10px 15px; text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; border-radius: 6px; display: flex; align-items: center; gap: 12px; }
+        .side-nav a:hover { background: var(--bg-color); }
+        .side-nav a.active { background: var(--primary-brand); color: #fff; }
+        
+        .quick-stats { padding: 0 20px; }
+        .quick-stats-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600; margin-bottom: 15px; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; font-weight: 500; }
+        .stat-item:last-child { border: none; }
+        .stat-label { display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+        .stat-val { font-weight: 600; }
 
-        .orders-table th {
-            background-color: #F8F8F8;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--muted-gray);
-            font-size: 11px;
-        }
+        /* Main Content Area */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .page-header { margin-bottom: 20px; }
+        .page-title { font-size: 24px; font-weight: 600; margin-bottom: 5px; }
+        .page-subtitle { color: var(--text-muted); font-size: 14px; }
 
-        .status-select {
-            padding: 8px 12px;
-            font-family: var(--font-sans);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid var(--border-color);
-            border-radius: 2px;
-            background: transparent;
-            cursor: pointer;
-            outline: none;
-            font-weight: 500;
-        }
+        /* Filters */
+        .filter-bar { background: var(--surface-white); padding: 15px; border-radius: 8px; border: 1px solid var(--border-light); display: flex; gap: 15px; margin-bottom: 20px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .search-box { flex: 1; position: relative; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-box input { width: 100%; padding: 10px 10px 10px 40px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; outline: none; }
+        .search-box input:focus { border-color: var(--primary-brand); }
+        .filter-select { padding: 10px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; color: var(--text-main); outline: none; background: #fff; cursor: pointer; }
+        .btn-export { background: var(--primary-brand); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 
-        .status-select:focus {
-            border-color: var(--accent-gold);
-        }
+        /* Table */
+        .table-container { background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 30px;}
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px 20px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border-light); }
+        th { background: #F9FAFB; font-weight: 600; color: var(--text-muted); }
+        tr:hover { background: #F9FAFB; }
+        
+        .customer-cell { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #F3E8FF; color: #6D28D9; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; }
+        .product-cell { display: flex; align-items: center; gap: 10px; }
+        .product-img { width: 40px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light); }
+        
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; cursor: pointer; border: none; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%236B7280" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position-x: 95%; background-position-y: 5px; padding-right: 25px;}
+        .status-processing { background-color: var(--status-processing-bg); color: var(--status-processing-text); }
+        .status-confirmed { background-color: var(--status-confirmed-bg); color: var(--status-confirmed-text); }
+        .status-shipped { background-color: var(--status-shipped-bg); color: var(--status-shipped-text); }
+        .status-delivered { background-color: var(--status-delivered-bg); color: var(--status-delivered-text); }
+        .status-cancelled { background-color: var(--status-cancelled-bg); color: var(--status-cancelled-text); }
 
-        .item-list {
-            margin: 0;
-            padding-left: 15px;
-            color: var(--muted-gray);
-            font-size: 12px;
-        }
+        .payment-badge { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; display: inline-block; }
+        .pay-paid { background: #D1FAE5; color: #047857; }
+        .pay-failed { background: #FEE2E2; color: #B91C1C; }
 
-        .customer-info {
-            line-height: 1.6;
-        }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-icon { width: 30px; height: 30px; border-radius: 4px; border: 1px solid var(--border-light); background: #fff; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-icon:hover { border-color: var(--text-main); color: var(--text-main); }
+
+        /* Diagrams Section */
+        .diagrams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .diagram-card { background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .diagram-title { font-size: 14px; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--primary-brand); text-transform: uppercase; letter-spacing: 1px;}
+        .flow-container { display: flex; align-items: center; justify-content: space-between; text-align: center; font-size: 11px; color: var(--text-muted); }
+        .flow-step { padding: 15px 10px; border-radius: 8px; border: 1px solid var(--border-light); width: 22%; }
+        .flow-arrow { color: var(--border-light); }
+
+        /* --- SIDE PANEL (ORDER DETAILS) --- */
+        .side-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 2000; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .side-panel-overlay.active { opacity: 1; visibility: visible; }
+        
+        .side-panel { position: fixed; top: 0; right: 0; width: 450px; height: 100vh; background: var(--surface-white); box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2001; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+        .side-panel.active { transform: translateX(0); }
+        
+        .panel-header { padding: 20px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 15px; }
+        .close-panel { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
+        
+        .panel-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .panel-section { margin-bottom: 25px; border-bottom: 1px solid var(--border-light); padding-bottom: 20px; }
+        .panel-section:last-child { border: none; }
+        .section-title { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 15px; }
+        
+        .info-grid { display: grid; grid-template-columns: 120px 1fr; gap: 10px; font-size: 13px; }
+        .info-label { color: var(--text-muted); }
+        .info-value { font-weight: 500; color: var(--text-main); }
+
+        .panel-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px; }
+        .panel-item-left { display: flex; align-items: center; gap: 12px; }
+        
+        .totals-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: var(--text-muted); }
+        .totals-row.grand { font-size: 15px; font-weight: 600; color: var(--text-main); margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 10px; }
+
+        .panel-actions { padding: 20px; background: #F9FAFB; border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 10px; }
+        .btn-full { width: 100%; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-primary { background: var(--primary-brand); color: #fff; border: none; }
+        .btn-primary:hover { background: #330e1d; }
+        .btn-danger { background: transparent; color: #B91C1C; border: 1px solid #FCA5A5; }
+        .btn-danger:hover { background: #FEE2E2; }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border-light); }
+        .btn-outline:hover { background: #F3F4F6; }
+
     </style>
 </head>
 <body>
 
-    <div class="admin-header">
-        <h1>ABAYRAH | Order Management</h1>
-        <span style="font-size: 12px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase;">Real-Time Sync Active ✦</span>
+    <div id="auth-screen">
+        <div class="auth-logo">Abayrah</div>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 10px;">Restricted Administrative Console</p>
+        <button class="auth-btn" id="loginBtn"><i class="fa-brands fa-google"></i> Secure Login via Google</button>
+        <div id="auth-error" style="color: #B91C1C; margin-top: 15px; font-size: 14px; font-weight: 500;"></div>
     </div>
 
-    <table class="orders-table">
-        <thead>
-            <tr>
-                <th>Order ID / Date</th>
-                <th>Customer Details</th>
-                <th>Order Items</th>
-                <th>Total Paid</th>
-                <th>Update Status</th>
-            </tr>
-        </thead>
-        <tbody id="admin-orders-body">
-            <tr>
-                <td colspan="5" style="text-align: center; color: var(--muted-gray);">Connecting to secure vault...</td>
-            </tr>
-        </tbody>
-    </table>
+    <div id="app-layout">
+        
+        <header class="top-navbar">
+            <div style="display: flex; align-items: center; gap: 50px;">
+                <a href="#" class="brand-logo">Abayrah</a>
+                <nav class="top-nav-links">
+                    <a href="#"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a href="#" class="active"><i class="fa-solid fa-box"></i> Orders</a>
+                    <a href="#"><i class="fa-solid fa-tags"></i> Products</a>
+                    <a href="#"><i class="fa-solid fa-users"></i> Customers</a>
+                    <a href="#"><i class="fa-solid fa-ticket"></i> Coupons</a>
+                    <a href="#"><i class="fa-solid fa-chart-simple"></i> Reports</a>
+                    <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+                </nav>
+            </div>
+            <div class="top-actions">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); cursor: pointer;"></i>
+                <i class="fa-regular fa-bell" style="color: var(--text-muted); cursor: pointer; position: relative;">
+                    <span style="position: absolute; top:-5px; right:-5px; background:#EF4444; color:#fff; font-size:9px; width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center;">5</span>
+                </i>
+                <div class="admin-profile" id="logoutBtn" title="Click to Logout">
+                    <div class="admin-avatar">A</div>
+                    Admin <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted);"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-wrapper">
+            
+            <aside class="sidebar">
+                <nav class="side-nav">
+                    <a href="#"><i class="fa-solid fa-house fa-fw"></i> Dashboard</a>
+                    <a href="#" class="active"><i class="fa-solid fa-box fa-fw"></i> Orders</a>
+                    <a href="#"><i class="fa-solid fa-tags fa-fw"></i> Products</a>
+                    <a href="#"><i class="fa-solid fa-users fa-fw"></i> Customers</a>
+                    <a href="#"><i class="fa-solid fa-ticket fa-fw"></i> Coupons</a>
+                    <a href="#"><i class="fa-solid fa-chart-simple fa-fw"></i> Reports</a>
+                    <a href="#"><i class="fa-regular fa-comment fa-fw"></i> Reviews</a>
+                    <a href="#"><i class="fa-solid fa-gear fa-fw"></i> Settings</a>
+                </nav>
+
+                <div class="quick-stats">
+                    <div class="quick-stats-title">Quick Stats</div>
+                    <div class="stat-item">
+                        <span class="stat-label"><i class="fa-solid fa-bullseye" style="color:#EF4444;"></i> Total Orders</span>
+                        <span class="stat-val" id="stat-total">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label"><i class="fa-solid fa-clock" style="color:#F59E0B;"></i> Processing</span>
+                        <span class="stat-val" id="stat-processing">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label"><i class="fa-solid fa-truck-fast" style="color:#3B82F6;"></i> Shipped</span>
+                        <span class="stat-val" id="stat-shipped">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label"><i class="fa-solid fa-circle-check" style="color:#10B981;"></i> Delivered</span>
+                        <span class="stat-val" id="stat-delivered">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label"><i class="fa-solid fa-circle-xmark" style="color:#EF4444;"></i> Cancelled</span>
+                        <span class="stat-val" id="stat-cancelled">0</span>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="page-header">
+                    <h1 class="page-title">Manage Orders</h1>
+                    <p class="page-subtitle">View and manage all customer orders</p>
+                </div>
+
+                <div class="filter-bar">
+                    <div style="flex: 1; display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; font-weight: 500;">
+                        <i class="fa-solid fa-lightbulb" style="color: #EF4444;"></i> SEARCH & FILTER
+                    </div>
+                    <div class="search-box" style="flex: 2;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" placeholder="Search by Order ID, Customer Name, Email or Phone...">
+                    </div>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="All">All Status</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                    <button class="btn-export" onclick="alert('Export functionality connecting to backend...')"><i class="fa-solid fa-download"></i> Export</button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer Details</th>
+                                <th>Product(s)</th>
+                                <th>Subtotal</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr><td colspan="8" style="text-align: center;">Loading real-time data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="diagrams-grid">
+                    <div class="diagram-card">
+                        <div class="diagram-title"><i class="fa-solid fa-arrows-rotate"></i> Order Status Flow</div>
+                        <div class="flow-container">
+                            <div class="flow-step" style="border-color: #FCD34D; background: #FEF3C7;"><i class="fa-solid fa-gear" style="color: #B45309; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#B45309;">Processing</strong><br>Order is received and is being processed</div>
+                            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="flow-step" style="border-color: #93C5FD; background: #DBEAFE;"><i class="fa-solid fa-circle-check" style="color: #1D4ED8; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#1D4ED8;">Confirmed</strong><br>Order is confirmed and will be prepared</div>
+                            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="flow-step" style="border-color: #C4B5FD; background: #F3E8FF;"><i class="fa-solid fa-truck" style="color: #6D28D9; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#6D28D9;">Shipped</strong><br>Order is shipped and on the way</div>
+                            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="flow-step" style="border-color: #6EE7B7; background: #D1FAE5;"><i class="fa-solid fa-box-open" style="color: #047857; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#047857;">Delivered</strong><br>Order is delivered successfully</div>
+                        </div>
+                    </div>
+                    <div class="diagram-card">
+                        <div class="diagram-title"><i class="fa-regular fa-envelope"></i> Automatic Email Notifications</div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Emails are dispatched securely via Nodemailer API upon status update.</p>
+                        <div class="flow-container">
+                             <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Processing to Confirmed</strong><br>Email sent to customer</div>
+                             <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                             <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Confirmed to Shipped</strong><br>Tracking Link Sent</div>
+                             <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                             <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Shipped to Delivered</strong><br>Delivery Confirmed</div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="side-panel-overlay" id="sidePanelOverlay" onclick="closeSidePanel()"></div>
+    <div class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <div class="panel-title" id="sp-order-id">#ABY1001 <span class="status-badge status-processing">Processing</span></div>
+            <button class="close-panel" onclick="closeSidePanel()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="panel-content">
+            <div class="panel-section">
+                <div class="section-title">Customer Information</div>
+                <div style="font-size: 13px; line-height: 1.6;">
+                    <strong id="sp-cust-name">Sarah Ahmed</strong><br>
+                    <span id="sp-cust-email" style="color: var(--text-muted);">sarah.ahmed@email.com</span><br>
+                    <span id="sp-cust-phone" style="color: var(--text-muted);">+91 98765 43210</span><br>
+                    <div style="margin-top: 10px; color: var(--text-muted);" id="sp-cust-address">
+                        Address line 1, City, State ZIP
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">Order Information</div>
+                <div class="info-grid">
+                    <span class="info-label">Order Date</span> <span class="info-value" id="sp-order-date">20 May 2024, 10:30 AM</span>
+                    <span class="info-label">Payment Method</span> <span class="info-value">Secure Checkout (Razorpay)</span>
+                    <span class="info-label">Payment Status</span> <span class="info-value" style="color: #047857;">Paid <span id="sp-txn" style="font-weight: normal; color: var(--text-muted); font-size: 10px; margin-left: 5px;"></span></span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">Order Items</div>
+                <div id="sp-items-container">
+                    </div>
+            </div>
+
+            <div class="panel-section" style="border: none;">
+                <div class="totals-row"><span>Subtotal</span> <span id="sp-subtotal">₹0</span></div>
+                <div class="totals-row"><span>Shipping</span> <span>₹0</span></div>
+                <div class="totals-row"><span>Discount</span> <span>- ₹0</span></div>
+                <div class="totals-row grand"><span>Total</span> <span id="sp-total">₹0</span></div>
+            </div>
+        </div>
+
+        <div class="panel-actions">
+            <input type="hidden" id="sp-current-doc-path">
+            <input type="hidden" id="sp-current-email">
+            <input type="hidden" id="sp-current-name">
+            <input type="hidden" id="sp-current-number">
+
+            <button class="btn-full btn-primary" onclick="quickUpdateStatus('Confirmed')"><i class="fa-regular fa-circle-check"></i> Confirm Order</button>
+            <button class="btn-full btn-outline" onclick="quickUpdateStatus('Shipped')"><i class="fa-solid fa-truck-fast"></i> Mark as Shipped</button>
+            <button class="btn-full btn-danger" onclick="quickUpdateStatus('Cancelled')"><i class="fa-regular fa-circle-xmark"></i> Cancel Order</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collectionGroup, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Your existing Firebase Config
+        // IMPORTANT: Ensure this config matches your index.html exactly
         const firebaseConfig = {
             apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
             authDomain: "abayrah-9df21.firebaseapp.com",
             projectId: "abayrah-9df21",
             storageBucket: "abayrah-9df21.firebasestorage.app",
             messagingSenderId: "789725334313",
-            appId: "1:789725334313:web:b37408f42add9611730538",
-            measurementId: "G-NLJJVVE32M"
+            appId: "1:789725334313:web:b37408f42add9611730538"
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
 
-        const tbody = document.getElementById('admin-orders-body');
+        const ADMIN_EMAIL = "abayrah.18@gmail.com";
+        let allOrdersData = []; // Store orders for search/filter
 
-        // 1. Listen to ALL orders across ALL users in real-time
-        const allOrdersQuery = collectionGroup(db, 'orders');
-        
-        onSnapshot(allOrdersQuery, (snapshot) => {
-            if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No orders found.</td></tr>';
+        // DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const appLayout = document.getElementById('app-layout');
+        const errorMsg = document.getElementById('auth-error');
+        const tbody = document.getElementById('ordersTableBody');
+
+        // --- AUTHENTICATION ---
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            errorMsg.textContent = "";
+            signInWithPopup(auth, provider).catch(() => errorMsg.textContent = "Google Sign-In Failed.");
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                authScreen.style.display = 'none';
+                appLayout.style.display = 'flex';
+                initRealTimeOrders(); // Start Firebase Listener
+            } else if (user) {
+                signOut(auth);
+                authScreen.style.display = 'flex';
+                appLayout.style.display = 'none';
+                errorMsg.textContent = `Access Denied. ${user.email} is not authorized.`;
+            } else {
+                authScreen.style.display = 'flex';
+                appLayout.style.display = 'none';
+            }
+        });
+
+        // --- REAL-TIME DATA FETCHING ---
+        function initRealTimeOrders() {
+            const query = collectionGroup(db, 'orders');
+            
+            onSnapshot(query, (snapshot) => {
+                allOrdersData = [];
+                let stats = { total: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0 };
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    data.docPath = docSnap.ref.path;
+                    data.rawId = docSnap.id;
+                    allOrdersData.push(data);
+
+                    // Calc Stats
+                    stats.total++;
+                    if(data.status === 'Processing') stats.processing++;
+                    if(data.status === 'Shipped') stats.shipped++;
+                    if(data.status === 'Delivered') stats.delivered++;
+                    if(data.status === 'Cancelled') stats.cancelled++;
+                });
+
+                // Update Stats UI
+                document.getElementById('stat-total').textContent = stats.total;
+                document.getElementById('stat-processing').textContent = stats.processing;
+                document.getElementById('stat-shipped').textContent = stats.shipped;
+                document.getElementById('stat-delivered').textContent = stats.delivered;
+                document.getElementById('stat-cancelled').textContent = stats.cancelled;
+
+                renderTable(); // Draw table
+            }, (error) => {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="8" style="color:red; text-align:center;">Database connection failed. Check Firebase Rules.</td></tr>';
+            });
+        }
+
+        // --- TABLE RENDERING & FILTERING ---
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+
+        searchInput.addEventListener('input', renderTable);
+        statusFilter.addEventListener('change', renderTable);
+
+        function renderTable() {
+            const term = searchInput.value.toLowerCase();
+            const filterStat = statusFilter.value;
+            
+            // Sort newest first
+            let filtered = allOrdersData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Apply Filters
+            filtered = filtered.filter(order => {
+                const s = order.shippingInfo || {};
+                const name = `${s.firstName||''} ${s.lastName||''}`.toLowerCase();
+                const num = (order.orderNumber || order.rawId).toLowerCase();
+                const phone = (s.phone || '').toLowerCase();
+                const email = (s.email || '').toLowerCase();
+
+                const matchesSearch = name.includes(term) || num.includes(term) || phone.includes(term) || email.includes(term);
+                const matchesStatus = filterStat === 'All' || order.status === filterStat;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: var(--text-muted);">No matching orders found.</td></tr>';
                 return;
             }
 
             let html = '';
-            
-            // Sort orders by date (newest first)
-            const orders = [];
-            snapshot.forEach(docSnap => orders.push({
-                docId: docSnap.id, // The document ID
-                ref: docSnap.ref,  // The exact path to the document (users/USER_ID/orders/ORDER_ID)
-                ...docSnap.data()
-            }));
-            
-            orders.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            orders.forEach(order => {
-                const date = new Date(order.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
-                const ship = order.shippingInfo || {};
-                const displayId = order.orderNumber || order.docId.substring(0,8).toUpperCase();
+            filtered.forEach(order => {
+                const dateObj = new Date(order.date);
+                const dateStr = dateObj.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+                const timeStr = dateObj.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
                 
-                let itemsHtml = '<ul class="item-list">';
-                if (order.items) {
-                    order.items.forEach(item => {
-                        itemsHtml += `<li>${item.quantity}x ${item.title} (${item.size})</li>`;
-                    });
+                const ship = order.shippingInfo || {};
+                const initials = (ship.firstName?.[0]||'') + (ship.lastName?.[0]||'');
+                const displayId = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
+                
+                // Construct products preview
+                let prodHtml = '';
+                if(order.items && order.items[0]) {
+                    const i = order.items[0];
+                    const extra = order.items.length > 1 ? `<div style="font-size:10px; color:var(--text-muted);">+${order.items.length - 1} more</div>` : '';
+                    prodHtml = `
+                        <div class="product-cell">
+                            <img src="${i.image || 'star-logo.png'}" class="product-img">
+                            <div>
+                                <div style="font-weight:500;">${i.title.length > 15 ? i.title.substring(0,15)+'...' : i.title}</div>
+                                <div style="color:var(--text-muted); font-size:11px;">Qty: ${i.quantity}</div>
+                                ${extra}
+                            </div>
+                        </div>
+                    `;
                 }
-                itemsHtml += '</ul>';
 
-                // Ensure the path is safely stored as a string so we can pass it to the update function
-                const docPath = order.ref.path;
+                // Status mapping for dropdown classes
+                const statusClassMap = {
+                    'Processing': 'status-processing', 'Confirmed': 'status-confirmed',
+                    'Shipped': 'status-shipped', 'Delivered': 'status-delivered', 'Cancelled': 'status-cancelled'
+                };
 
                 html += `
                     <tr>
+                        <td style="font-weight:600; color:var(--primary-brand);">#${displayId}</td>
                         <td>
-                            <strong style="color: var(--dark-text);">#${displayId}</strong><br>
-                            <span style="color: var(--muted-gray); font-size: 11px;">${date}</span>
+                            <div class="customer-cell">
+                                <div class="avatar">${initials.toUpperCase()}</div>
+                                <div>
+                                    <div style="font-weight:500; color:var(--text-main);">${ship.firstName||'Guest'} ${ship.lastName||''}</div>
+                                    <div style="color:var(--text-muted); font-size:11px;">${ship.email||''}</div>
+                                    <div style="color:var(--text-muted); font-size:11px;">${ship.phone||''}</div>
+                                </div>
+                            </div>
                         </td>
-                        <td class="customer-info">
-                            <strong>${ship.firstName || 'Guest'} ${ship.lastName || ''}</strong><br>
-                            ${ship.email || 'N/A'}<br>
-                            ${ship.phone || 'N/A'}<br>
-                            <span style="color: var(--muted-gray); font-size: 11px;">${ship.city || ''}, ${ship.state || ''} ${ship.zip || ''}</span>
-                        </td>
-                        <td>${itemsHtml}</td>
-                        <td><strong>₹${parseFloat(order.amount).toFixed(2)}</strong></td>
+                        <td>${prodHtml}</td>
+                        <td style="font-weight:500;">₹${parseFloat(order.amount).toFixed(2)}</td>
                         <td>
-                            <select class="status-select" onchange="updateOrderStatus('${docPath}', this.value)">
+                            <span class="payment-badge ${order.status === 'Failed' ? 'pay-failed' : 'pay-paid'}">
+                                ${order.status === 'Failed' ? 'Failed' : 'Paid'}
+                            </span><br>
+                            <span style="font-size:11px; color:var(--text-muted);">Online</span>
+                        </td>
+                        <td>
+                            <select class="status-badge ${statusClassMap[order.status] || 'status-processing'}" onchange="triggerUpdate('${order.docPath}', this.value, '${ship.email}', '${ship.firstName}', '${displayId}')">
                                 <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
                                 <option value="Confirmed" ${order.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
                                 <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
@@ -202,21 +541,123 @@
                                 <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                             </select>
                         </td>
+                        <td>
+                            <div>${dateStr}</div>
+                            <div style="color:var(--text-muted); font-size:11px;">${timeStr}</div>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-icon" onclick="openSidePanel('${order.rawId}')" title="View Details"><i class="fa-regular fa-eye"></i></button>
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
             tbody.innerHTML = html;
-        });
+        }
 
-        // 2. Global function to push the new status back to Firestore
-        window.updateOrderStatus = async function(docPath, newStatus) {
+        // --- STATUS UPDATE & EMAIL NOTIFICATION LOGIC ---
+        // Expose globally so inline HTML handlers can call it
+        window.triggerUpdate = async function(docPath, newStatus, custEmail, custName, orderIdStr) {
             try {
-                const orderRef = doc(db, docPath);
-                await updateDoc(orderRef, { status: newStatus });
-                // The onSnapshot will automatically catch this change and flash the update!
+                // 1. Update Firebase (This instantly syncs the customer's page!)
+                await updateDoc(doc(db, docPath), { status: newStatus });
+                
+                // 2. Trigger your Render Backend to send the automated Nodemailer email
+                // Note: Ensure your backend endpoint expects these fields
+                fetch("https://abayrah-backend.onrender.com/send-status-email", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        orderId: orderIdStr,
+                        email: custEmail,
+                        name: custName,
+                        newStatus: newStatus
+                    })
+                }).catch(err => console.log("Email dispatch silently failed/ignored for now.", err));
+
+                // If side panel is open and matches this order, update its UI instantly
+                if(document.getElementById('sp-current-doc-path').value === docPath) {
+                    const badge = document.querySelector('#sp-order-id .status-badge');
+                    badge.className = `status-badge status-${newStatus.toLowerCase()}`;
+                    badge.textContent = newStatus;
+                }
+
             } catch (error) {
-                console.error("Error updating order status:", error);
-                alert("Failed to update status. Check your Firebase security rules.");
+                console.error("Status Update Error:", error);
+                alert("Failed to update status. Check permissions.");
+            }
+        };
+
+        // --- SIDE PANEL LOGIC ---
+        window.openSidePanel = function(rawId) {
+            const order = allOrdersData.find(o => o.rawId === rawId);
+            if(!order) return;
+
+            const ship = order.shippingInfo || {};
+            const displayId = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
+            const dateObj = new Date(order.date);
+
+            // Populate Hidden Inputs for the action buttons
+            document.getElementById('sp-current-doc-path').value = order.docPath;
+            document.getElementById('sp-current-email').value = ship.email || '';
+            document.getElementById('sp-current-name').value = ship.firstName || 'Customer';
+            document.getElementById('sp-current-number').value = displayId;
+
+            // Populate Info
+            document.getElementById('sp-order-id').innerHTML = `#${displayId} <span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span>`;
+            document.getElementById('sp-cust-name').textContent = `${ship.firstName||''} ${ship.lastName||''}`;
+            document.getElementById('sp-cust-email').textContent = ship.email || 'N/A';
+            document.getElementById('sp-cust-phone').textContent = ship.phone || 'N/A';
+            document.getElementById('sp-cust-address').innerHTML = `${ship.houseNo||''} ${ship.street||''}<br>${ship.city||''}, ${ship.state||''} ${ship.zip||''}`;
+            
+            document.getElementById('sp-order-date').textContent = dateObj.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+            document.getElementById('sp-txn').textContent = order.paymentId ? `(TXN: ${order.paymentId})` : '';
+
+            // Populate Items
+            let itemsHtml = '';
+            if(order.items) {
+                order.items.forEach(i => {
+                    itemsHtml += `
+                        <div class="panel-item">
+                            <div class="panel-item-left">
+                                <img src="${i.image || 'star-logo.png'}" style="width: 50px; height: 65px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light);">
+                                <div>
+                                    <div style="font-weight: 500; color: var(--text-main); margin-bottom: 4px;">${i.title}</div>
+                                    <div style="color: var(--text-muted); font-size: 11px;">Variant: ${i.size}</div>
+                                    <div style="color: var(--text-muted); font-size: 11px;">Qty: ${i.quantity}</div>
+                                </div>
+                            </div>
+                            <div style="font-weight: 500;">₹${parseFloat(order.amount).toFixed(2)}</div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('sp-items-container').innerHTML = itemsHtml;
+
+            // Populate Totals
+            const amt = parseFloat(order.amount).toFixed(2);
+            document.getElementById('sp-subtotal').textContent = `₹${amt}`;
+            document.getElementById('sp-total').textContent = `₹${amt}`;
+
+            // Slide In
+            document.getElementById('sidePanelOverlay').classList.add('active');
+            document.getElementById('sidePanel').classList.add('active');
+        };
+
+        window.closeSidePanel = function() {
+            document.getElementById('sidePanelOverlay').classList.remove('active');
+            document.getElementById('sidePanel').classList.remove('active');
+        };
+
+        window.quickUpdateStatus = function(newStatus) {
+            const docPath = document.getElementById('sp-current-doc-path').value;
+            const email = document.getElementById('sp-current-email').value;
+            const name = document.getElementById('sp-current-name').value;
+            const orderIdStr = document.getElementById('sp-current-number').value;
+            
+            if(confirm(`Are you sure you want to mark this order as ${newStatus}?`)) {
+                window.triggerUpdate(docPath, newStatus, email, name, orderIdStr);
             }
         };
     </script>
