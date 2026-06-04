@@ -7,11 +7,10 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="star-logo.png">
 
     <style>
         :root {
-            --primary-brand: #4A152B; /* Deep Burgundy from the design */
+            --primary-brand: #4A152B; 
             --bg-color: #F8F9FA;
             --surface-white: #FFFFFF;
             --text-main: #1F2937;
@@ -39,22 +38,38 @@
         #app-layout { display: none; width: 100%; height: 100%; flex-direction: column; }
         
         /* Top Navbar */
-        .top-navbar { height: 70px; background: var(--surface-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
-        .brand-logo { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--primary-brand); font-weight: 600; text-decoration: none; }
+        .top-navbar { height: 70px; background: var(--surface-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; position: relative; z-index: 50; }
+        .brand-logo { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--primary-brand); font-weight: 600; text-decoration: none; cursor: pointer; }
         .top-nav-links { display: flex; gap: 30px; }
-        .top-nav-links a { text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .top-nav-links a { text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
+        .top-nav-links a:hover { color: var(--primary-brand); }
         .top-nav-links a.active { color: var(--primary-brand); border-bottom: 2px solid var(--primary-brand); padding-bottom: 24px; margin-bottom: -24px; }
-        .top-actions { display: flex; align-items: center; gap: 20px; }
-        .admin-profile { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+        
+        .top-actions { display: flex; align-items: center; gap: 20px; position: relative; }
+        .action-icon-btn { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; transition: 0.2s; position: relative; }
+        .action-icon-btn:hover { color: var(--primary-brand); }
+        .badge { position: absolute; top:-5px; right:-5px; background:#EF4444; color:#fff; font-size:9px; width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+        
+        .admin-profile { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; cursor: pointer; padding: 5px; border-radius: 6px; transition: 0.2s; }
+        .admin-profile:hover { background: var(--bg-color); }
         .admin-avatar { width: 32px; height: 32px; background: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+
+        /* Notifications Dropdown */
+        .notifications-dropdown { position: absolute; top: 50px; right: 100px; width: 300px; background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: none; flex-direction: column; overflow: hidden; z-index: 100; }
+        .notifications-dropdown.active { display: flex; }
+        .noti-header { padding: 15px; border-bottom: 1px solid var(--border-light); font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .noti-body { max-height: 300px; overflow-y: auto; }
+        .noti-item { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 12px; transition: 0.2s; cursor: pointer; display: flex; gap: 10px; }
+        .noti-item:hover { background: var(--bg-color); }
+        .noti-item i { margin-top: 3px; }
 
         .main-wrapper { display: flex; flex: 1; overflow: hidden; }
 
         /* Left Sidebar */
         .sidebar { width: 240px; background: var(--surface-white); border-right: 1px solid var(--border-light); padding: 20px 0; display: flex; flex-direction: column; overflow-y: auto; }
         .side-nav { display: flex; flex-direction: column; gap: 5px; padding: 0 15px; margin-bottom: 30px; }
-        .side-nav a { padding: 10px 15px; text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; border-radius: 6px; display: flex; align-items: center; gap: 12px; }
-        .side-nav a:hover { background: var(--bg-color); }
+        .side-nav a { padding: 10px 15px; text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 500; border-radius: 6px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
+        .side-nav a:hover { background: var(--bg-color); color: var(--primary-brand); }
         .side-nav a.active { background: var(--primary-brand); color: #fff; }
         
         .quick-stats { padding: 0 20px; }
@@ -65,10 +80,21 @@
         .stat-val { font-weight: 600; }
 
         /* Main Content Area */
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        
+        /* View Switching Classes */
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         .page-header { margin-bottom: 20px; }
         .page-title { font-size: 24px; font-weight: 600; margin-bottom: 5px; }
         .page-subtitle { color: var(--text-muted); font-size: 14px; }
+
+        /* Placeholder Content for Non-Order Views */
+        .placeholder-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; color: var(--text-muted); }
+        .placeholder-content i { font-size: 48px; color: var(--border-light); margin-bottom: 15px; }
+        .placeholder-content h2 { font-size: 20px; color: var(--text-main); margin-bottom: 8px; }
 
         /* Filters */
         .filter-bar { background: var(--surface-white); padding: 15px; border-radius: 8px; border: 1px solid var(--border-light); display: flex; gap: 15px; margin-bottom: 20px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -77,7 +103,8 @@
         .search-box input { width: 100%; padding: 10px 10px 10px 40px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; outline: none; }
         .search-box input:focus { border-color: var(--primary-brand); }
         .filter-select { padding: 10px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; color: var(--text-main); outline: none; background: #fff; cursor: pointer; }
-        .btn-export { background: var(--primary-brand); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-export { background: var(--primary-brand); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-export:hover { background: #330e1d; }
 
         /* Table */
         .table-container { background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 30px;}
@@ -148,7 +175,6 @@
         .btn-danger:hover { background: #FEE2E2; }
         .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border-light); }
         .btn-outline:hover { background: #F3F4F6; }
-
     </style>
 </head>
 <body>
@@ -164,22 +190,35 @@
         
         <header class="top-navbar">
             <div style="display: flex; align-items: center; gap: 50px;">
-                <a href="#" class="brand-logo">Abayrah</a>
-                <nav class="top-nav-links">
-                    <a href="#"><i class="fa-solid fa-house"></i> Dashboard</a>
-                    <a href="#" class="active"><i class="fa-solid fa-box"></i> Orders</a>
-                    <a href="#"><i class="fa-solid fa-tags"></i> Products</a>
-                    <a href="#"><i class="fa-solid fa-users"></i> Customers</a>
-                    <a href="#"><i class="fa-solid fa-ticket"></i> Coupons</a>
-                    <a href="#"><i class="fa-solid fa-chart-simple"></i> Reports</a>
-                    <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+                <a onclick="navigate('dashboard')" class="brand-logo">Abayrah</a>
+                <nav class="top-nav-links" id="topNavLinks">
+                    <a data-target="dashboard" onclick="navigate('dashboard')"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a data-target="orders" onclick="navigate('orders')" class="active"><i class="fa-solid fa-box"></i> Orders</a>
+                    <a data-target="products" onclick="navigate('products')"><i class="fa-solid fa-tags"></i> Products</a>
+                    <a data-target="customers" onclick="navigate('customers')"><i class="fa-solid fa-users"></i> Customers</a>
+                    <a data-target="coupons" onclick="navigate('coupons')"><i class="fa-solid fa-ticket"></i> Coupons</a>
+                    <a data-target="reports" onclick="navigate('reports')"><i class="fa-solid fa-chart-simple"></i> Reports</a>
+                    <a data-target="settings" onclick="navigate('settings')"><i class="fa-solid fa-gear"></i> Settings</a>
                 </nav>
             </div>
             <div class="top-actions">
-                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); cursor: pointer;"></i>
-                <i class="fa-regular fa-bell" style="color: var(--text-muted); cursor: pointer; position: relative;">
-                    <span style="position: absolute; top:-5px; right:-5px; background:#EF4444; color:#fff; font-size:9px; width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center;">5</span>
-                </i>
+                <button class="action-icon-btn" onclick="focusSearch()" title="Search Orders"><i class="fa-solid fa-magnifying-glass"></i></button>
+                
+                <button class="action-icon-btn" onclick="toggleNotifications()" title="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge" id="notiBadge">0</span>
+                </button>
+                
+                <div class="notifications-dropdown" id="notificationsDropdown">
+                    <div class="noti-header">
+                        Recent Activity
+                        <i class="fa-solid fa-check-double" style="color: var(--primary-brand); cursor: pointer;" title="Mark all as read" onclick="clearNotifications()"></i>
+                    </div>
+                    <div class="noti-body" id="notiBody">
+                        <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No new notifications.</div>
+                    </div>
+                </div>
+
                 <div class="admin-profile" id="logoutBtn" title="Click to Logout">
                     <div class="admin-avatar">A</div>
                     Admin <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted);"></i>
@@ -190,15 +229,15 @@
         <div class="main-wrapper">
             
             <aside class="sidebar">
-                <nav class="side-nav">
-                    <a href="#"><i class="fa-solid fa-house fa-fw"></i> Dashboard</a>
-                    <a href="#" class="active"><i class="fa-solid fa-box fa-fw"></i> Orders</a>
-                    <a href="#"><i class="fa-solid fa-tags fa-fw"></i> Products</a>
-                    <a href="#"><i class="fa-solid fa-users fa-fw"></i> Customers</a>
-                    <a href="#"><i class="fa-solid fa-ticket fa-fw"></i> Coupons</a>
-                    <a href="#"><i class="fa-solid fa-chart-simple fa-fw"></i> Reports</a>
-                    <a href="#"><i class="fa-regular fa-comment fa-fw"></i> Reviews</a>
-                    <a href="#"><i class="fa-solid fa-gear fa-fw"></i> Settings</a>
+                <nav class="side-nav" id="sideNavLinks">
+                    <a data-target="dashboard" onclick="navigate('dashboard')"><i class="fa-solid fa-house fa-fw"></i> Dashboard</a>
+                    <a data-target="orders" onclick="navigate('orders')" class="active"><i class="fa-solid fa-box fa-fw"></i> Orders</a>
+                    <a data-target="products" onclick="navigate('products')"><i class="fa-solid fa-tags fa-fw"></i> Products</a>
+                    <a data-target="customers" onclick="navigate('customers')"><i class="fa-solid fa-users fa-fw"></i> Customers</a>
+                    <a data-target="coupons" onclick="navigate('coupons')"><i class="fa-solid fa-ticket fa-fw"></i> Coupons</a>
+                    <a data-target="reports" onclick="navigate('reports')"><i class="fa-solid fa-chart-simple fa-fw"></i> Reports</a>
+                    <a data-target="reviews" onclick="navigate('reviews')"><i class="fa-regular fa-comment fa-fw"></i> Reviews</a>
+                    <a data-target="settings" onclick="navigate('settings')"><i class="fa-solid fa-gear fa-fw"></i> Settings</a>
                 </nav>
 
                 <div class="quick-stats">
@@ -227,73 +266,126 @@
             </aside>
 
             <main class="main-content">
-                <div class="page-header">
-                    <h1 class="page-title">Manage Orders</h1>
-                    <p class="page-subtitle">View and manage all customer orders</p>
-                </div>
-
-                <div class="filter-bar">
-                    <div style="flex: 1; display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; font-weight: 500;">
-                        <i class="fa-solid fa-lightbulb" style="color: #EF4444;"></i> SEARCH & FILTER
+                
+                <div id="view-orders" class="view-section active">
+                    <div class="page-header">
+                        <h1 class="page-title">Manage Orders</h1>
+                        <p class="page-subtitle">View and manage all customer orders</p>
                     </div>
-                    <div class="search-box" style="flex: 2;">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="searchInput" placeholder="Search by Order ID, Customer Name, Email or Phone...">
+
+                    <div class="filter-bar">
+                        <div style="flex: 1; display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; font-weight: 500;">
+                            <i class="fa-solid fa-lightbulb" style="color: #EF4444;"></i> SEARCH & FILTER
+                        </div>
+                        <div class="search-box" style="flex: 2;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" placeholder="Search by Order ID, Customer Name, Email or Phone...">
+                        </div>
+                        <select class="filter-select" id="statusFilter">
+                            <option value="All">All Status</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                        <button class="btn-export" onclick="exportOrdersToCSV()"><i class="fa-solid fa-download"></i> Export</button>
                     </div>
-                    <select class="filter-select" id="statusFilter">
-                        <option value="All">All Status</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                    <button class="btn-export" onclick="alert('Export functionality connecting to backend...')"><i class="fa-solid fa-download"></i> Export</button>
-                </div>
 
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer Details</th>
-                                <th>Product(s)</th>
-                                <th>Subtotal</th>
-                                <th>Payment</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ordersTableBody">
-                            <tr><td colspan="8" style="text-align: center;">Loading real-time data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer Details</th>
+                                    <th>Product(s)</th>
+                                    <th>Subtotal</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <tr><td colspan="8" style="text-align: center;">Loading real-time data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                <div class="diagrams-grid">
-                    <div class="diagram-card">
-                        <div class="diagram-title"><i class="fa-solid fa-arrows-rotate"></i> Order Status Flow</div>
-                        <div class="flow-container">
-                            <div class="flow-step" style="border-color: #FCD34D; background: #FEF3C7;"><i class="fa-solid fa-gear" style="color: #B45309; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#B45309;">Processing</strong><br>Order is received and is being processed</div>
-                            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                            <div class="flow-step" style="border-color: #93C5FD; background: #DBEAFE;"><i class="fa-solid fa-circle-check" style="color: #1D4ED8; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#1D4ED8;">Confirmed</strong><br>Order is confirmed and will be prepared</div>
-                            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                            <div class="flow-step" style="border-color: #C4B5FD; background: #F3E8FF;"><i class="fa-solid fa-truck" style="color: #6D28D9; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#6D28D9;">Shipped</strong><br>Order is shipped and on the way</div>
-                            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                            <div class="flow-step" style="border-color: #6EE7B7; background: #D1FAE5;"><i class="fa-solid fa-box-open" style="color: #047857; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#047857;">Delivered</strong><br>Order is delivered successfully</div>
+                    <div class="diagrams-grid">
+                        <div class="diagram-card">
+                            <div class="diagram-title"><i class="fa-solid fa-arrows-rotate"></i> Order Status Flow</div>
+                            <div class="flow-container">
+                                <div class="flow-step" style="border-color: #FCD34D; background: #FEF3C7;"><i class="fa-solid fa-gear" style="color: #B45309; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#B45309;">Processing</strong><br>Order is received and is being processed</div>
+                                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                                <div class="flow-step" style="border-color: #93C5FD; background: #DBEAFE;"><i class="fa-solid fa-circle-check" style="color: #1D4ED8; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#1D4ED8;">Confirmed</strong><br>Order is confirmed and will be prepared</div>
+                                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                                <div class="flow-step" style="border-color: #C4B5FD; background: #F3E8FF;"><i class="fa-solid fa-truck" style="color: #6D28D9; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#6D28D9;">Shipped</strong><br>Order is shipped and on the way</div>
+                                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                                <div class="flow-step" style="border-color: #6EE7B7; background: #D1FAE5;"><i class="fa-solid fa-box-open" style="color: #047857; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#047857;">Delivered</strong><br>Order is delivered successfully</div>
+                            </div>
+                        </div>
+                        <div class="diagram-card">
+                            <div class="diagram-title"><i class="fa-regular fa-envelope"></i> Automatic Email Notifications</div>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Emails are dispatched securely via Nodemailer API upon status update.</p>
+                            <div class="flow-container">
+                                 <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Processing to Confirmed</strong><br>Email sent to customer</div>
+                                 <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                                 <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Confirmed to Shipped</strong><br>Tracking Link Sent</div>
+                                 <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                                 <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Shipped to Delivered</strong><br>Delivery Confirmed</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="diagram-card">
-                        <div class="diagram-title"><i class="fa-regular fa-envelope"></i> Automatic Email Notifications</div>
-                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Emails are dispatched securely via Nodemailer API upon status update.</p>
-                        <div class="flow-container">
-                             <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Processing to Confirmed</strong><br>Email sent to customer</div>
-                             <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                             <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Confirmed to Shipped</strong><br>Tracking Link Sent</div>
-                             <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                             <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Shipped to Delivered</strong><br>Delivery Confirmed</div>
-                        </div>
+                </div>
+
+                <div id="view-dashboard" class="view-section">
+                    <div class="placeholder-content">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <h2>Dashboard Overview</h2>
+                        <p>Detailed analytics and charts module will be configured here.</p>
+                    </div>
+                </div>
+                <div id="view-products" class="view-section">
+                    <div class="placeholder-content">
+                        <i class="fa-solid fa-tags"></i>
+                        <h2>Product Management</h2>
+                        <p>Inventory, pricing, and catalog management module.</p>
+                    </div>
+                </div>
+                <div id="view-customers" class="view-section">
+                    <div class="placeholder-content">
+                        <i class="fa-solid fa-users"></i>
+                        <h2>Customer Database</h2>
+                        <p>User profiles, purchase history, and segmentation.</p>
+                    </div>
+                </div>
+                <div id="view-coupons" class="view-section">
+                    <div class="placeholder-content">
+                        <i class="fa-solid fa-ticket"></i>
+                        <h2>Coupon Engine</h2>
+                        <p>Create and manage discount codes and promotional events.</p>
+                    </div>
+                </div>
+                <div id="view-reports" class="view-section">
+                    <div class="placeholder-content">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <h2>Financial Reports</h2>
+                        <p>Tax, revenue, and settlement reporting.</p>
+                    </div>
+                </div>
+                <div id="view-reviews" class="view-section">
+                    <div class="placeholder-content">
+                        <i class="fa-regular fa-comment"></i>
+                        <h2>Review Moderation</h2>
+                        <p>Approve or moderate customer feedback.</p>
+                    </div>
+                </div>
+                <div id="view-settings" class="view-section">
+                    <div class="placeholder-content">
+                        <i class="fa-solid fa-gear"></i>
+                        <h2>System Settings</h2>
+                        <p>Configure API keys, store policies, and admin permissions.</p>
                     </div>
                 </div>
 
@@ -356,6 +448,53 @@
         </div>
     </div>
 
+    <script>
+        // --- NAVIGATION ROUTING ---
+        function navigate(targetId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            // Show target view
+            const targetView = document.getElementById('view-' + targetId);
+            if(targetView) targetView.classList.add('active');
+
+            // Update active states on Top Nav
+            document.querySelectorAll('#topNavLinks a').forEach(link => {
+                if(link.getAttribute('data-target') === targetId) link.classList.add('active');
+                else link.classList.remove('active');
+            });
+
+            // Update active states on Side Nav
+            document.querySelectorAll('#sideNavLinks a').forEach(link => {
+                if(link.getAttribute('data-target') === targetId) link.classList.add('active');
+                else link.classList.remove('active');
+            });
+        }
+
+        // --- UTILITY BUTTONS ---
+        function focusSearch() {
+            navigate('orders'); // Jump to orders view
+            setTimeout(() => document.getElementById('searchInput').focus(), 100);
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notificationsDropdown').classList.toggle('active');
+        }
+
+        function clearNotifications() {
+            document.getElementById('notiBody').innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">All caught up.</div>';
+            document.getElementById('notiBadge').textContent = '0';
+        }
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const bellBtn = document.querySelector('button[title="Notifications"]');
+            if (dropdown.classList.contains('active') && !dropdown.contains(event.target) && !bellBtn.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -377,7 +516,8 @@
         const provider = new GoogleAuthProvider();
 
         const ADMIN_EMAIL = "abayrah.18@gmail.com";
-        let allOrdersData = []; // Store orders for search/filter
+        let allOrdersData = []; // Store raw orders globally
+        let currentFilteredOrders = []; // Store filtered orders for CSV export
 
         // DOM Elements
         const authScreen = document.getElementById('auth-screen');
@@ -397,7 +537,7 @@
             if (user && user.email === ADMIN_EMAIL) {
                 authScreen.style.display = 'none';
                 appLayout.style.display = 'flex';
-                initRealTimeOrders(); // Start Firebase Listener
+                initRealTimeOrders(); 
             } else if (user) {
                 signOut(auth);
                 authScreen.style.display = 'flex';
@@ -416,6 +556,7 @@
             onSnapshot(query, (snapshot) => {
                 allOrdersData = [];
                 let stats = { total: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0 };
+                let recentNotifications = []; // For the bell icon
 
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
@@ -423,9 +564,8 @@
                     data.rawId = docSnap.id;
                     allOrdersData.push(data);
 
-                    // Calc Stats
                     stats.total++;
-                    if(data.status === 'Processing') stats.processing++;
+                    if(data.status === 'Processing') { stats.processing++; recentNotifications.push(data); }
                     if(data.status === 'Shipped') stats.shipped++;
                     if(data.status === 'Delivered') stats.delivered++;
                     if(data.status === 'Cancelled') stats.cancelled++;
@@ -438,11 +578,42 @@
                 document.getElementById('stat-delivered').textContent = stats.delivered;
                 document.getElementById('stat-cancelled').textContent = stats.cancelled;
 
-                renderTable(); // Draw table
+                // Update Notifications Dropdown (Showing newest 'Processing' orders)
+                recentNotifications.sort((a,b) => new Date(b.date) - new Date(a.date));
+                updateNotifications(recentNotifications.slice(0, 5));
+
+                renderTable(); 
             }, (error) => {
                 console.error(error);
                 tbody.innerHTML = '<tr><td colspan="8" style="color:red; text-align:center;">Database connection failed. Check Firebase Rules.</td></tr>';
             });
+        }
+
+        function updateNotifications(newOrders) {
+            const notiBody = document.getElementById('notiBody');
+            const badge = document.getElementById('notiBadge');
+            
+            if(newOrders.length === 0) {
+                notiBody.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No new action required.</div>';
+                badge.textContent = '0';
+                return;
+            }
+
+            badge.textContent = newOrders.length;
+            let html = '';
+            newOrders.forEach(order => {
+                const id = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
+                html += `
+                    <div class="noti-item" onclick="openSidePanel('${order.rawId}')">
+                        <i class="fa-solid fa-circle-exclamation" style="color: #F59E0B;"></i>
+                        <div>
+                            <strong style="color: var(--text-main);">New Order #${id}</strong><br>
+                            <span style="color: var(--text-muted);">Awaiting processing. Click to review.</span>
+                        </div>
+                    </div>
+                `;
+            });
+            notiBody.innerHTML = html;
         }
 
         // --- TABLE RENDERING & FILTERING ---
@@ -473,6 +644,9 @@
                 return matchesSearch && matchesStatus;
             });
 
+            // Store filtered data globally so the Export CSV button can access it
+            currentFilteredOrders = filtered;
+
             if(filtered.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: var(--text-muted);">No matching orders found.</td></tr>';
                 return;
@@ -488,7 +662,6 @@
                 const initials = (ship.firstName?.[0]||'') + (ship.lastName?.[0]||'');
                 const displayId = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
                 
-                // Construct products preview
                 let prodHtml = '';
                 if(order.items && order.items[0]) {
                     const i = order.items[0];
@@ -505,7 +678,6 @@
                     `;
                 }
 
-                // Status mapping for dropdown classes
                 const statusClassMap = {
                     'Processing': 'status-processing', 'Confirmed': 'status-confirmed',
                     'Shipped': 'status-shipped', 'Delivered': 'status-delivered', 'Cancelled': 'status-cancelled'
@@ -556,33 +728,77 @@
             tbody.innerHTML = html;
         }
 
+        // --- CSV EXPORT LOGIC ---
+        window.exportOrdersToCSV = function() {
+            if(currentFilteredOrders.length === 0) {
+                alert("No orders to export!");
+                return;
+            }
+
+            // Define CSV Headers
+            let csvContent = "Order ID,Date,Customer Name,Email,Phone,Address,Items Summary,Total Amount,Payment Status,Order Status\n";
+
+            currentFilteredOrders.forEach(order => {
+                const s = order.shippingInfo || {};
+                const displayId = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
+                const dateObj = new Date(order.date).toLocaleString('en-IN').replace(/,/g, '');
+                const name = `${s.firstName||''} ${s.lastName||''}`.trim();
+                const address = `${s.houseNo||''} ${s.street||''} ${s.city||''} ${s.state||''} ${s.zip||''}`.trim();
+                
+                // Summarize items into a string
+                let itemsSummary = "";
+                if(order.items) {
+                    itemsSummary = order.items.map(i => `${i.quantity}x ${i.title} (${i.size})`).join(" | ");
+                }
+
+                // Escape fields to prevent CSV breaking
+                const row = [
+                    displayId,
+                    dateObj,
+                    `"${name}"`,
+                    s.email || '',
+                    s.phone || '',
+                    `"${address}"`,
+                    `"${itemsSummary}"`,
+                    parseFloat(order.amount).toFixed(2),
+                    order.status === 'Failed' ? 'Failed' : 'Paid',
+                    order.status
+                ];
+
+                csvContent += row.join(",") + "\n";
+            });
+
+            // Trigger File Download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Abayrah_Orders_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
         // --- STATUS UPDATE & EMAIL NOTIFICATION LOGIC ---
-        // Expose globally so inline HTML handlers can call it
         window.triggerUpdate = async function(docPath, newStatus, custEmail, custName, orderIdStr) {
             try {
-                // 1. Update Firebase (This instantly syncs the customer's page!)
+                // Update Firebase
                 await updateDoc(doc(db, docPath), { status: newStatus });
                 
-                // 2. Trigger your Render Backend to send the automated Nodemailer email
-                // Note: Ensure your backend endpoint expects these fields
+                // Trigger Node.js Email Backend
                 fetch("https://abayrah-backend.onrender.com/send-status-email", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        orderId: orderIdStr,
-                        email: custEmail,
-                        name: custName,
-                        newStatus: newStatus
-                    })
-                }).catch(err => console.log("Email dispatch silently failed/ignored for now.", err));
+                    body: JSON.stringify({ orderId: orderIdStr, email: custEmail, name: custName, newStatus: newStatus })
+                }).catch(err => console.log("Backend email API call failed/ignored.", err));
 
-                // If side panel is open and matches this order, update its UI instantly
+                // Sync side panel if open
                 if(document.getElementById('sp-current-doc-path').value === docPath) {
                     const badge = document.querySelector('#sp-order-id .status-badge');
                     badge.className = `status-badge status-${newStatus.toLowerCase()}`;
                     badge.textContent = newStatus;
                 }
-
             } catch (error) {
                 console.error("Status Update Error:", error);
                 alert("Failed to update status. Check permissions.");
@@ -598,13 +814,11 @@
             const displayId = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
             const dateObj = new Date(order.date);
 
-            // Populate Hidden Inputs for the action buttons
             document.getElementById('sp-current-doc-path').value = order.docPath;
             document.getElementById('sp-current-email').value = ship.email || '';
             document.getElementById('sp-current-name').value = ship.firstName || 'Customer';
             document.getElementById('sp-current-number').value = displayId;
 
-            // Populate Info
             document.getElementById('sp-order-id').innerHTML = `#${displayId} <span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span>`;
             document.getElementById('sp-cust-name').textContent = `${ship.firstName||''} ${ship.lastName||''}`;
             document.getElementById('sp-cust-email').textContent = ship.email || 'N/A';
@@ -614,7 +828,6 @@
             document.getElementById('sp-order-date').textContent = dateObj.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
             document.getElementById('sp-txn').textContent = order.paymentId ? `(TXN: ${order.paymentId})` : '';
 
-            // Populate Items
             let itemsHtml = '';
             if(order.items) {
                 order.items.forEach(i => {
@@ -635,12 +848,10 @@
             }
             document.getElementById('sp-items-container').innerHTML = itemsHtml;
 
-            // Populate Totals
             const amt = parseFloat(order.amount).toFixed(2);
             document.getElementById('sp-subtotal').textContent = `₹${amt}`;
             document.getElementById('sp-total').textContent = `₹${amt}`;
 
-            // Slide In
             document.getElementById('sidePanelOverlay').classList.add('active');
             document.getElementById('sidePanel').classList.add('active');
         };
