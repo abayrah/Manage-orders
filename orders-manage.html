@@ -466,157 +466,124 @@
                     </div>
                 </div>
 
-                <div id="view-reports" class="view-section">
-                    
-                    <div class="page-header">
-                        <div>
-                            <h1 class="page-title">Reports & Analytics <i class="fa-solid fa-chart-line" style="color: var(--primary-brand); font-size: 18px;"></i></h1>
-                            <p class="page-subtitle">Detailed insights and advanced analytics of your store performance.</p>
-                        </div>
-                        <div class="header-controls">
-                            <div class="control-btn" style="background: #fff; cursor: pointer;">
-                                May 30, 2026 - Jun 6, 2026 <i class="fa-regular fa-calendar" style="margin-left: 10px; color: var(--text-muted);"></i>
-                            </div>
-                            <button class="control-btn"><i class="fa-solid fa-filter"></i> Filter</button>
-                            <button class="btn-export-dark"><i class="fa-solid fa-download"></i> Export Report <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i></button>
-                        </div>
+               <div id="view-reports" class="view-section">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Reports & Analytics <i class="fa-solid fa-chart-line" style="color: var(--primary-brand); font-size: 18px;"></i></h1>
+            <p class="page-subtitle">Detailed insights and advanced analytics of your store performance.</p>
+        </div>
+        <div class="header-controls">
+            <div class="control-btn" style="background: #fff; cursor: pointer;">
+                <span id="rep-date-range">Last 7 Days</span> <i class="fa-regular fa-calendar" style="margin-left: 10px; color: var(--text-muted);"></i>
+            </div>
+            <button class="btn-export-dark" onclick="exportOrdersToCSV()"><i class="fa-solid fa-download"></i> Export Data</button>
+        </div>
+    </div>
+
+    <div class="dash-grid grid-cols-6">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #FEE2E2; color: #EF4444;"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                <div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="rep-kpi-sales">₹0</div></div>
+            </div>
+            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #FEF3C7; color: #F59E0B;"><i class="fa-solid fa-bag-shopping"></i></div>
+                <div><div class="kpi-title">Total Orders</div><div class="kpi-value" id="rep-kpi-orders">0</div></div>
+            </div>
+            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #E0E7FF; color: #6D28D9;"><i class="fa-regular fa-clock"></i></div>
+                <div><div class="kpi-title">Average Order Value</div><div class="kpi-value" id="rep-kpi-aov">₹0</div></div>
+            </div>
+            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #FEE2E2; color: #EF4444;"><i class="fa-solid fa-arrow-rotate-left"></i></div>
+                <div><div class="kpi-title">Total Refunds</div><div class="kpi-value" id="rep-kpi-refunds">₹0</div></div>
+            </div>
+            <div class="kpi-trend"><span class="trend-muted">Cancelled Orders</span></div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #D1FAE5; color: #10B981;"><i class="fa-solid fa-wallet"></i></div>
+                <div><div class="kpi-title">Net Revenue</div><div class="kpi-value" id="rep-kpi-net">₹0</div></div>
+            </div>
+            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+        </div>
+    </div>
+
+    <div class="dash-grid grid-row-2">
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">Sales Overview</div>
+                <select class="minimal-select"><option>Last 7 Days</option></select>
+            </div>
+            <div style="display:flex; justify-content:center; gap: 20px; font-size: 11px; color: var(--text-main); margin-top: -5px; font-weight: 500;">
+                <div><span style="display:inline-block; width:12px; height:8px; background:#4A152B; border-radius:2px; margin-right:5px;"></span>Revenue (₹)</div>
+                <div><span style="display:inline-block; width:8px; height:8px; background:#EC4899; border-radius:50%; margin-right:5px;"></span>Orders</div>
+            </div>
+            <div class="chart-wrapper" style="height: 220px;">
+                <canvas id="fullSalesOverviewChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">Sales by Category</div>
+            </div>
+            <div style="display: flex; align-items: center; height: 100%;">
+                <div style="position: relative; width: 160px; height: 160px;">
+                    <canvas id="detailedCategoryChart"></canvas>
+                    <div style="position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); text-align: center;">
+                        <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="rep-cat-total-center">₹0</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">Total Sales</div>
                     </div>
-                    
-                    <div class="reports-subnav-container">
-                        <div class="reports-subnav">
-                            <a class="active"><i class="fa-solid fa-chart-simple"></i> Sales Reports</a>
-                            <a><i class="fa-solid fa-box"></i> Orders Reports</a>
-                            <a><i class="fa-solid fa-tags"></i> Product Reports</a>
-                            <a><i class="fa-solid fa-users"></i> Customer Reports</a>
-                            <a><i class="fa-regular fa-credit-card"></i> Payment Reports</a>
-                            <a><i class="fa-solid fa-truck"></i> Shipping Reports</a>
-                            <a><i class="fa-solid fa-file-invoice-dollar"></i> Tax Reports</a>
-                            <a><i class="fa-solid fa-bullseye"></i> Marketing Reports</a>
-                        </div>
-                    </div>
+                </div>
+                <div style="flex: 1; padding-left: 20px; font-size: 12px; display: flex; flex-direction: column; gap: 12px;" id="rep-cat-list">
+                    <!-- Dynamic Categories Insert Here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <div class="dash-grid grid-cols-6">
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <div class="kpi-icon" style="background: #FEE2E2; color: #EF4444;"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-                                <div><div class="kpi-title">Total Sales</div><div class="kpi-value">₹12,45,890</div></div>
-                            </div>
-                            <div class="kpi-trend"><span class="trend-muted">vs last 7 days</span><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 24.5%</span></div>
-                        </div>
-                        
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <div class="kpi-icon" style="background: #FEF3C7; color: #F59E0B;"><i class="fa-solid fa-bag-shopping"></i></div>
-                                <div><div class="kpi-title">Total Orders</div><div class="kpi-value">1,248</div></div>
-                            </div>
-                            <div class="kpi-trend"><span class="trend-muted">vs last 7 days</span><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 18.6%</span></div>
-                        </div>
+    <div class="dash-grid grid-row-2">
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">Sales Summary</div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="report-table">
+                    <thead><tr><th>Date</th><th>Orders</th><th>Gross Sales</th><th>Net Sales</th></tr></thead>
+                    <tbody id="rep-summary-body">
+                        <!-- Dynamic Summary Rows Insert Here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <div class="kpi-icon" style="background: #E0E7FF; color: #6D28D9;"><i class="fa-regular fa-clock"></i></div>
-                                <div><div class="kpi-title">Average Order Value</div><div class="kpi-value">₹3,245</div></div>
-                            </div>
-                            <div class="kpi-trend"><span class="trend-muted">vs last 7 days</span><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 12.4%</span></div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <div class="kpi-icon" style="background: #FEE2E2; color: #EF4444;"><i class="fa-solid fa-arrow-rotate-left"></i></div>
-                                <div><div class="kpi-title">Total Refunds</div><div class="kpi-value">₹45,320</div></div>
-                            </div>
-                            <div class="kpi-trend"><span class="trend-muted">vs last 7 days</span><span class="trend-down"><i class="fa-solid fa-arrow-down"></i> 6.2%</span></div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <div class="kpi-icon" style="background: #FFEDD5; color: #F59E0B;"><i class="fa-solid fa-ticket"></i></div>
-                                <div><div class="kpi-title">Total Discounts</div><div class="kpi-value">₹1,25,450</div></div>
-                            </div>
-                            <div class="kpi-trend"><span class="trend-muted">vs last 7 days</span><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 10.3%</span></div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-header">
-                                <div class="kpi-icon" style="background: #D1FAE5; color: #10B981;"><i class="fa-solid fa-wallet"></i></div>
-                                <div><div class="kpi-title">Net Revenue</div><div class="kpi-value">₹11,20,570</div></div>
-                            </div>
-                            <div class="kpi-trend"><span class="trend-muted">vs last 7 days</span><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 22.8%</span></div>
-                        </div>
-                    </div>
-
-                    <div class="dash-grid grid-row-3">
-                        
-                        <div class="dash-card">
-                            <div class="dash-card-header">
-                                <div class="dash-card-title">Sales Overview</div>
-                                <select class="minimal-select"><option>This Week</option></select>
-                            </div>
-                            <div style="display:flex; justify-content:center; gap: 20px; font-size: 11px; color: var(--text-main); margin-top: -5px; font-weight: 500;">
-                                <div><span style="display:inline-block; width:12px; height:8px; background:#4A152B; border-radius:2px; margin-right:5px;"></span>Revenue (₹)</div>
-                                <div><span style="display:inline-block; width:8px; height:8px; background:#EC4899; border-radius:50%; margin-right:5px;"></span>Orders</div>
-                            </div>
-                            <div class="chart-wrapper" style="height: 220px;">
-                                <canvas id="fullSalesOverviewChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="dash-card">
-                            <div class="dash-card-header">
-                                <div class="dash-card-title">Sales by Category</div>
-                            </div>
-                            <div style="display: flex; align-items: center; height: 100%;">
-                                <div style="position: relative; width: 160px; height: 160px;">
-                                    <canvas id="detailedCategoryChart"></canvas>
-                                    <div style="position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); text-align: center;">
-                                        <div style="font-size: 16px; font-weight: 700; color: var(--text-main);">₹12,45,890</div>
-                                        <div style="font-size: 10px; color: var(--text-muted);">Total Sales</div>
-                                    </div>
-                                </div>
-                                <div style="flex: 1; padding-left: 20px; font-size: 12px; display: flex; flex-direction: column; gap: 12px;">
-                                    <div style="display:flex; justify-content:space-between;"><span><span style="display:inline-block; width:8px; height:8px; background:#4A152B; border-radius:2px; margin-right:8px;"></span>Abayas</span> <span>34.1% (₹4,25,000)</span></div>
-                                    <div style="display:flex; justify-content:space-between;"><span><span style="display:inline-block; width:8px; height:8px; background:#EC4899; border-radius:2px; margin-right:8px;"></span>Hijabs</span> <span>22.5% (₹2,80,000)</span></div>
-                                    <div style="display:flex; justify-content:space-between;"><span><span style="display:inline-block; width:8px; height:8px; background:#D97706; border-radius:2px; margin-right:8px;"></span>Dresses</span> <span>17.4% (₹2,15,000)</span></div>
-                                    <div style="display:flex; justify-content:space-between;"><span><span style="display:inline-block; width:8px; height:8px; background:#10B981; border-radius:2px; margin-right:8px;"></span>Accessories</span> <span>11.6% (₹1,45,000)</span></div>
-                                    <div style="display:flex; justify-content:space-between;"><span><span style="display:inline-block; width:8px; height:8px; background:#8B5CF6; border-radius:2px; margin-right:8px;"></span>Others</span> <span>6.4% (₹80,890)</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="dash-card">
-                            <div class="dash-card-header">
-                                <div class="dash-card-title">Sales Heatmap (Hourly)</div>
-                                <select class="minimal-select"><option>This Week</option></select>
-                            </div>
-                            <div class="heatmap-container" id="heatmapBuilder">
-                                </div>
-                        </div>
-                    </div>
-
-                    <div class="dash-grid grid-row-3">
-                        
-                        <div class="dash-card">
-                            <div class="dash-card-header">
-                                <div class="dash-card-title">Sales Summary</div>
-                                <select class="minimal-select"><option>This Week</option></select>
-                            </div>
-                            <div style="overflow-x: auto;">
-                                <table class="report-table">
-                                    <thead><tr><th>Date</th><th>Orders</th><th>Gross Sales</th><th>Discounts</th><th>Refunds</th><th>Net Sales</th></tr></thead>
-                                    <tbody>
-                                        <tr><td>May 30, 2026</td><td>168</td><td>₹1,45,230</td><td>₹12,450</td><td>₹4,230</td><td>₹1,28,550</td></tr>
-                                        <tr><td>May 31, 2026</td><td>142</td><td>₹1,20,890</td><td>₹10,230</td><td>₹3,450</td><td>₹1,07,210</td></tr>
-                                        <tr><td>Jun 1, 2026</td><td>156</td><td>₹1,28,450</td><td>₹11,200</td><td>₹2,780</td><td>₹1,14,470</td></tr>
-                                        <tr><td>Jun 2, 2026</td><td>178</td><td>₹1,56,780</td><td>₹13,450</td><td>₹3,670</td><td>₹1,39,660</td></tr>
-                                        <tr><td>Jun 3, 2026</td><td>201</td><td>₹1,78,320</td><td>₹14,890</td><td>₹5,120</td><td>₹1,58,310</td></tr>
-                                        <tr><td>Jun 4, 2026</td><td>189</td><td>₹1,65,430</td><td>₹13,320</td><td>₹4,230</td><td>₹1,47,880</td></tr>
-                                        <tr><td>Jun 5, 2026</td><td>168</td><td>₹1,48,760</td><td>₹12,250</td><td>₹3,980</td><td>₹1,32,530</td></tr>
-                                        <tr><td>Jun 6, 2026</td><td>146</td><td>₹1,25,030</td><td>₹8,450</td><td>₹2,860</td><td>₹1,13,720</td></tr>
-                                        <tr class="totals-row"><td>Total</td><td>1,248</td><td>₹12,45,890</td><td>₹96,240</td><td>₹29,320</td><td>₹11,20,570</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">Top Selling Products</div>
+            </div>
+            <table class="report-table" style="margin-top: 0;">
+                <thead><tr><th>Product</th><th>Orders</th><th>Revenue</th><th>% Share</th></tr></thead>
+                <tbody id="rep-top-prods-body">
+                    <!-- Dynamic Top Products Insert Here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
                         <div class="dash-card">
                             <div class="dash-card-header">
@@ -872,46 +839,34 @@
             }
         });
 
-        // --- NEW REPORTS VISUALS LOGIC ---
-        let repOverviewChart, repCatChart;
+    let repOverviewChart, repCatChart;
         
         function initReportVisuals() {
-            // 1. Render Combo Chart
+            // 1. Render Empty Combo Chart
             const ctxOver = document.getElementById('fullSalesOverviewChart');
             if(ctxOver && !repOverviewChart) {
                 repOverviewChart = new Chart(ctxOver.getContext('2d'), {
                     type: 'bar',
-                    data: { 
-                        labels: ['May 30', 'May 31', 'Jun 1', 'Jun 2', 'Jun 3', 'Jun 5', 'Jun 6'], 
-                        datasets: [
-                            { type: 'line', label: 'Orders', data: [110, 160, 120, 150, 160, 100, 120], borderColor: '#EC4899', backgroundColor: '#EC4899', pointBackgroundColor: '#EC4899', tension: 0.4, yAxisID: 'y1', borderWidth: 2, pointRadius: 4 },
-                            { type: 'bar', label: 'Revenue (₹)', data: [90000, 150000, 100000, 140000, 200000, 150000, 160000], backgroundColor: '#4A152B', borderRadius: 4, yAxisID: 'y', barPercentage: 0.4 }
-                        ]
-                    },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false, 
-                        plugins: { legend: { display: false } },
-                        scales: { 
-                            x: { grid: { display: false } },
-                            y: { beginAtZero: true, max: 250000, ticks: { callback: function(value) { return value/1000 + 'K'; } } }, 
-                            y1: { type: 'linear', position: 'right', max: 250, grid: { drawOnChartArea: false } } 
-                        } 
+                    data: { labels: [], datasets: [
+                            { type: 'line', label: 'Orders', data: [], borderColor: '#EC4899', backgroundColor: '#EC4899', pointBackgroundColor: '#EC4899', tension: 0.4, yAxisID: 'y1', borderWidth: 2, pointRadius: 4 },
+                            { type: 'bar', label: 'Revenue (₹)', data: [], backgroundColor: '#4A152B', borderRadius: 4, yAxisID: 'y', barPercentage: 0.4 }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                        scales: { x: { grid: { display: false } }, y: { beginAtZero: true }, y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } } } 
                     }
                 });
             }
 
-            // 2. Render Detailed Category Doughnut
+            // 2. Render Empty Category Doughnut
             const ctxCat = document.getElementById('detailedCategoryChart');
             if(ctxCat && !repCatChart) {
                 repCatChart = new Chart(ctxCat.getContext('2d'), {
                     type: 'doughnut',
-                    data: { 
-                        labels: ['Abayas', 'Hijabs', 'Dresses', 'Accessories', 'Others'], 
-                        datasets: [{ data: [34.1, 22.5, 17.4, 11.6, 6.4], backgroundColor: ['#4A152B', '#EC4899', '#D97706', '#10B981', '#8B5CF6'], borderWidth: 0 }] 
-                    },
+                    data: { labels: ['Abayas', 'Hijabs', 'Niqabs', 'Accessories', 'Hampers'], datasets: [{ data: [], backgroundColor: ['#4A152B', '#EC4899', '#34D399', '#FBBF24', '#8B5CF6'], borderWidth: 0 }] },
                     options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false }, tooltip: { enabled: true } } }
                 });
             }
+        }
 
             // 3. Render HTML Grid Heatmap
             const hmBuilder = document.getElementById('heatmapBuilder');
@@ -1289,6 +1244,67 @@
 
                 recentNotifications.sort((a,b) => new Date(b.date) - new Date(a.date));
                 updateNotifications(recentNotifications.slice(0, 5));
+                
+                // REAL-TIME REPORTS SYNC LOGIC
+       
+                // 1. Update KPI Cards
+                const d7Str = d7.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+                const todayStr = today.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+                
+                if(document.getElementById('rep-date-range')) document.getElementById('rep-date-range').textContent = `${d7Str} - ${todayStr}`;
+                if(document.getElementById('rep-kpi-sales')) document.getElementById('rep-kpi-sales').textContent = `₹${revenue.toLocaleString('en-IN')}`;
+                if(document.getElementById('rep-kpi-orders')) document.getElementById('rep-kpi-orders').textContent = stats.total.toLocaleString();
+                if(document.getElementById('rep-kpi-aov')) document.getElementById('rep-kpi-aov').textContent = `₹${stats.total > 0 ? Math.round(revenue/stats.total).toLocaleString('en-IN') : 0}`;
+                if(document.getElementById('rep-kpi-refunds')) document.getElementById('rep-kpi-refunds').textContent = `₹${cancelledRevenue.toLocaleString('en-IN')}`;
+                if(document.getElementById('rep-kpi-net')) document.getElementById('rep-kpi-net').textContent = `₹${revenue.toLocaleString('en-IN')}`;
+
+                // 2. Update Report Charts
+                if(repOverviewChart) {
+                    repOverviewChart.data.labels = Object.keys(dailyRevMap);
+                    repOverviewChart.data.datasets[0].data = Object.values(dailyOrdMap);
+                    repOverviewChart.data.datasets[1].data = Object.values(dailyRevMap);
+                    repOverviewChart.update();
+                }
+                if(repCatChart) {
+                    repCatChart.data.datasets[0].data = [categoryMap['Abayas'].r, categoryMap['Hijabs'].r, categoryMap['Niqabs'].r, categoryMap['Accessories'].r, categoryMap['Hampers'].r];
+                    repCatChart.update();
+                }
+
+                // 3. Update Category Breakdown List
+                let totalCatRev = Object.values(categoryMap).reduce((sum, cat) => sum + cat.r, 0);
+                if(document.getElementById('rep-cat-total-center')) document.getElementById('rep-cat-total-center').textContent = `₹${totalCatRev.toLocaleString('en-IN')}`;
+                
+                let rCatHtml = '';
+                const catColors = {'Abayas':'#4A152B', 'Hijabs':'#EC4899', 'Niqabs':'#34D399', 'Accessories':'#FBBF24', 'Hampers':'#8B5CF6'};
+                Object.entries(categoryMap).forEach(([name, data]) => {
+                    let pct = totalCatRev > 0 ? ((data.r / totalCatRev) * 100).toFixed(1) : 0;
+                    rCatHtml += `<div style="display:flex; justify-content:space-between;"><span><span style="display:inline-block; width:8px; height:8px; background:${catColors[name]||'#ccc'}; border-radius:2px; margin-right:8px;"></span>${name}</span> <span>${pct}% (₹${data.r.toLocaleString('en-IN')})</span></div>`;
+                });
+                if(document.getElementById('rep-cat-list')) document.getElementById('rep-cat-list').innerHTML = rCatHtml;
+
+                // 4. Update Sales Summary Table
+                let sumHtml = '';
+                let tOrd = 0, tRev = 0;
+                Object.keys(dailyRevMap).forEach(date => {
+                    let o = dailyOrdMap[date];
+                    let r = dailyRevMap[date];
+                    tOrd += o; tRev += r;
+                    sumHtml += `<tr><td>${date}</td><td>${o}</td><td>₹${r.toLocaleString('en-IN')}</td><td>₹${r.toLocaleString('en-IN')}</td></tr>`;
+                });
+                sumHtml += `<tr class="totals-row"><td>Total</td><td>${tOrd}</td><td>₹${tRev.toLocaleString('en-IN')}</td><td>₹${tRev.toLocaleString('en-IN')}</td></tr>`;
+                if(document.getElementById('rep-summary-body')) document.getElementById('rep-summary-body').innerHTML = sumHtml;
+
+                // 5. Update Top Products Table
+                let topRepProds = Object.entries(productSales).sort((a,b) => b[1].qty - a[1].qty).slice(0,5);
+                let trpHtml = '';
+                let totalProdRev = Object.values(productSales).reduce((sum, p) => sum + p.rev, 0);
+                topRepProds.forEach(p => {
+                    let pct = totalProdRev > 0 ? ((p[1].rev / totalProdRev) * 100).toFixed(1) : 0;
+                    trpHtml += `<tr><td><div style="display:flex; align-items:center; gap:10px;"><img src="${p[1].img || 'star-logo.png'}" style="width:20px; height:24px; border-radius:2px; object-fit:cover;"> ${p[0].length > 25 ? p[0].substring(0,25)+'...' : p[0]}</div></td><td>${p[1].qty}</td><td>₹${p[1].rev.toLocaleString('en-IN')}</td><td>${pct}%</td></tr>`;
+                });
+                if(document.getElementById('rep-top-prods-body')) document.getElementById('rep-top-prods-body').innerHTML = trpHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
+
+                
 
                 currentPage = 1; 
                 renderTable(); 
