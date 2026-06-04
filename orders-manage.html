@@ -343,9 +343,12 @@
                 <div id="view-dashboard" class="view-section active">
                     <div class="page-header">
                         <div><h1 class="page-title">Good morning, Admin! 👋</h1><p class="page-subtitle">Here's what's happening with your store today.</p></div>
-                        <div style="background: var(--surface-white); border: 1px solid var(--border-light); padding: 8px 15px; border-radius: 8px; font-size: 13px; color: var(--text-main); display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <i class="fa-regular fa-calendar"></i> <span id="dash-date-range">Last 7 Days</span> <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i>
+                        
+                        <div class="control-btn" style="background: var(--surface-white); border: 1px solid var(--border-light); padding: 0; border-radius: 8px;">
+                            <i class="fa-regular fa-calendar" style="margin-left: 15px; color: var(--text-muted);"></i>
+                            <input type="text" id="dashboardDatePicker" placeholder="Select Date Range" style="border: none; outline: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-main); padding: 8px 15px 8px 10px; width: 200px; cursor: pointer;">
                         </div>
+                        
                     </div>
                     <div class="dash-grid grid-cols-5">
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-icon-box" style="background:#FEE2E2; color:#EF4444;"><i class="fa-solid fa-indian-rupee-sign"></i></div></div><div class="dash-card-title">Total Revenue</div><div class="dash-value" id="dash-rev">₹0</div><div class="trend-up"><i class="fa-solid fa-arrow-up"></i> Live</div></div>
@@ -355,7 +358,7 @@
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-icon-box" style="background:#FFEDD5; color:#F97316;"><i class="fa-solid fa-cube"></i></div></div><div class="dash-card-title">Low Stock Items</div><div class="dash-value">23</div><div class="trend-down"><i class="fa-solid fa-arrow-down"></i> Needs Restock</div></div>
                     </div>
                     <div class="dash-grid grid-row-2">
-                        <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Revenue Overview</div><select class="filter-select" style="padding: 4px 8px; font-size: 11px;"><option>This Week</option></select></div><div class="chart-wrapper"><canvas id="revenueChart"></canvas></div></div>
+                        <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Revenue Overview</div><select class="filter-select" style="padding: 4px 8px; font-size: 11px;"><option>Selected Range</option></select></div><div class="chart-wrapper"><canvas id="revenueChart"></canvas></div></div>
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Orders by Status</div></div><div class="chart-wrapper" style="height: 200px; display:flex; justify-content:center;"><canvas id="statusChart"></canvas></div></div>
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Live Activity</div><a class="dash-card-link" onclick="toggleNotifications()">View All</a></div><ul class="live-activity-list" id="live-activity"></ul></div>
                     </div>
@@ -365,7 +368,7 @@
                     </div>
                     <div class="dash-grid grid-row-4">
                         <div class="dash-card">
-                            <div class="dash-card-header"><div class="dash-card-title">Customer Overview</div><select class="filter-select" style="padding: 4px 8px; font-size: 11px;"><option>This Week</option></select></div>
+                            <div class="dash-card-header"><div class="dash-card-title">Customer Overview</div><select class="filter-select" style="padding: 4px 8px; font-size: 11px;"><option>Selected Range</option></select></div>
                             <div style="display: flex; gap: 20px; align-items: center; margin-top: 10px;">
                                 <div class="small-chart-wrapper" style="width: 120px; height: 120px;"><canvas id="customerOverviewChart"></canvas></div>
                                 <div class="cust-overview-stats"><div class="cust-stat-row"><div style="font-size: 12px; color: var(--text-muted);"><span class="cust-dot" style="background: #3B82F6;"></span>New</div><div style="font-size: 12px; font-weight: 600;" id="cust-new-val">0</div></div><div class="cust-stat-row"><div style="font-size: 12px; color: var(--text-muted);"><span class="cust-dot" style="background: #4A152B;"></span>Returning</div><div style="font-size: 12px; font-weight: 600;" id="cust-ret-val">0</div></div></div>
@@ -708,8 +711,37 @@
         let globalReportEndDate = new Date();
         globalReportEndDate.setHours(23,59,59,999);
 
-        // 🔥 INITIALIZE FLATPICKR DATE RANGE PICKER 🔥
+        // 🔥 GLOBAL DASHBOARD DATE VARIABLES 🔥
+        let globalDashStartDate = new Date();
+        globalDashStartDate.setDate(globalDashStartDate.getDate() - 6);
+        globalDashStartDate.setHours(0,0,0,0);
+        
+        let globalDashEndDate = new Date();
+        globalDashEndDate.setHours(23,59,59,999);
+
+        // 🔥 INITIALIZE FLATPICKR DATE RANGE PICKERS 🔥
         document.addEventListener("DOMContentLoaded", function() {
+            // Dashboard Date Picker
+            flatpickr("#dashboardDatePicker", {
+                mode: "range",
+                dateFormat: "M j, Y",
+                defaultDate: [globalDashStartDate, globalDashEndDate],
+                onChange: function(selectedDates) {
+                    if (selectedDates.length === 2) {
+                        globalDashStartDate = selectedDates[0];
+                        globalDashStartDate.setHours(0,0,0,0);
+                        globalDashEndDate = selectedDates[1];
+                        globalDashEndDate.setHours(23,59,59,999);
+                        
+                        // Instantly recalculate dashboard whenever dates change
+                        if (window.calculateDashboardData) {
+                            window.calculateDashboardData(globalDashStartDate, globalDashEndDate);
+                        }
+                    }
+                }
+            });
+
+            // Reports Date Picker
             flatpickr("#reportDatePicker", {
                 mode: "range",
                 dateFormat: "M j, Y",
@@ -721,7 +753,7 @@
                         globalReportEndDate = selectedDates[1];
                         globalReportEndDate.setHours(23,59,59,999);
                         
-                        // Instantly recalculate whenever dates change
+                        // Instantly recalculate reports whenever dates change
                         window.calculateReportsData(globalReportStartDate, globalReportEndDate);
                     }
                 }
@@ -785,7 +817,6 @@
                 });
             }
 
-            // Populate charts immediately upon opening the tab based on current selected date
             if (window.calculateReportsData) {
                 window.calculateReportsData(globalReportStartDate, globalReportEndDate);
             }
@@ -827,7 +858,7 @@
         const provider = new GoogleAuthProvider();
 
         const ADMIN_EMAIL = "abayrah.18@gmail.com";
-        window.allOrdersData = []; // Made global to be accessible by report calculations
+        window.allOrdersData = []; 
         let currentFilteredOrders = []; 
         
         let currentPage = 1;
@@ -892,15 +923,6 @@
                     options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
                 });
             }
-
-            const ctxCat = document.getElementById('categoryChart');
-            if(ctxCat) {
-                catChartInstance = new Chart(ctxCat.getContext('2d'), {
-                    type: 'doughnut',
-                    data: { labels: ['Abayas', 'Hijabs', 'Niqabs', 'Accessories', 'Hampers'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#4A152B', '#EC4899', '#34D399', '#FBBF24', '#8B5CF6'], borderWidth: 0 }] },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } } }
-                });
-            }
         }
 
         function getAvatarUrl(name, photoURL) {
@@ -909,7 +931,240 @@
             return `https://ui-avatars.com/api/?name=${cleanName}&background=FDF2F8&color=4A152B&bold=true&font-size=0.4`;
         }
 
-        // 🔥 THE NEW, DEDICATED REPORT CALCULATOR 🔥
+        // 🔥 THE DASHBOARD CALCULATOR 🔥
+        window.calculateDashboardData = function(startDate, endDate) {
+            if (!startDate || !endDate || !window.allOrdersData) return;
+
+            let stats = { total: 0, processing: 0, confirmed: 0, shipped: 0, delivered: 0, cancelled: 0 };
+            let revenue = 0; let cancelledRevenue = 0;
+            let customerEmailCounts = {};
+            
+            let dailyRevMap = {}; let dailyOrdMap = {};
+            let categoryMap = { 'Abayas': {q:0, r:0, ic:'<i class="fa-solid fa-person-dress"></i>'}, 'Hijabs': {q:0, r:0, ic:'<i class="fa-solid fa-masks-theater"></i>'}, 'Niqabs': {q:0, r:0, ic:'<i class="fa-solid fa-mask"></i>'}, 'Accessories': {q:0, r:0, ic:'<i class="fa-solid fa-ring"></i>'}, 'Hampers': {q:0, r:0, ic:'<i class="fa-solid fa-gift"></i>'} };
+            let productSales = {};
+            let recentOrdersList = [];
+
+            // Pre-fill dates so empty days still show on charts
+            let tempDate = new Date(startDate);
+            let endD = new Date(endDate);
+            let dayDiff = Math.ceil((endD - tempDate) / (1000 * 60 * 60 * 24));
+
+            if (dayDiff > 90) dayDiff = 90; 
+
+            while(tempDate <= endD && Object.keys(dailyRevMap).length <= 90) {
+                const dStr = tempDate.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                dailyRevMap[dStr] = 0;
+                dailyOrdMap[dStr] = 0;
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
+
+            // Process Orders
+            window.allOrdersData.forEach(data => {
+                const dObj = new Date(data.date);
+                if (dObj >= startDate && dObj <= endD) {
+                    recentOrdersList.push(data);
+                    const amt = parseFloat(data.amount || 0);
+
+                    stats.total++;
+                    if(data.status === 'Processing') stats.processing++;
+                    if(data.status === 'Confirmed') stats.confirmed++;
+                    if(data.status === 'Shipped') stats.shipped++;
+                    if(data.status === 'Delivered') stats.delivered++;
+                    if(data.status === 'Cancelled') { stats.cancelled++; cancelledRevenue += amt; }
+                    
+                    if(data.status !== 'Cancelled' && data.status !== 'Failed') revenue += amt;
+                    
+                    if(data.shippingInfo && data.shippingInfo.email) {
+                        const em = data.shippingInfo.email;
+                        if(customerEmailCounts[em]) customerEmailCounts[em]++;
+                        else customerEmailCounts[em] = 1;
+                    }
+
+                    if(data.status !== 'Cancelled') {
+                        const dStr = dObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                        if(dailyRevMap[dStr] !== undefined) {
+                            dailyRevMap[dStr] += amt;
+                            dailyOrdMap[dStr] += 1;
+                        }
+
+                        if(data.items) {
+                            data.items.forEach(item => {
+                                const itemRev = (parseFloat(item.price || (amt/item.quantity)) * item.quantity);
+                                const t = item.title.toLowerCase();
+                                if(t.includes('abaya') || t.includes('dress')) { categoryMap['Abayas'].q += item.quantity; categoryMap['Abayas'].r += itemRev; }
+                                else if(t.includes('hijab') || t.includes('scarf')) { categoryMap['Hijabs'].q += item.quantity; categoryMap['Hijabs'].r += itemRev; }
+                                else if(t.includes('niqab') || t.includes('naqab')) { categoryMap['Niqabs'].q += item.quantity; categoryMap['Niqabs'].r += itemRev; }
+                                else if(t.includes('hamper') || t.includes('gift')) { categoryMap['Hampers'].q += item.quantity; categoryMap['Hampers'].r += itemRev; }
+                                else { categoryMap['Accessories'].q += item.quantity; categoryMap['Accessories'].r += itemRev; }
+
+                                if(!productSales[item.title]) productSales[item.title] = { qty: 0, rev: 0, img: item.image };
+                                productSales[item.title].qty += item.quantity;
+                                productSales[item.title].rev += itemRev;
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Update Quick Stats in Sidebar
+            if(document.getElementById('stat-total')) document.getElementById('stat-total').textContent = stats.total;
+            if(document.getElementById('stat-processing')) document.getElementById('stat-processing').textContent = stats.processing;
+            if(document.getElementById('stat-confirmed')) document.getElementById('stat-confirmed').textContent = stats.confirmed;
+            if(document.getElementById('stat-shipped')) document.getElementById('stat-shipped').textContent = stats.shipped;
+            if(document.getElementById('stat-delivered')) document.getElementById('stat-delivered').textContent = stats.delivered;
+            if(document.getElementById('stat-cancelled')) document.getElementById('stat-cancelled').textContent = stats.cancelled;
+            
+            let newCustCount = 0; let retCustCount = 0;
+            Object.values(customerEmailCounts).forEach(count => { if(count > 1) retCustCount++; else newCustCount++; });
+            
+            // Update Dashboard Top KPIs
+            if(document.getElementById('dash-rev')) document.getElementById('dash-rev').textContent = `₹${revenue.toLocaleString('en-IN')}`;
+            if(document.getElementById('dash-orders')) document.getElementById('dash-orders').textContent = stats.total.toLocaleString();
+            if(document.getElementById('dash-pending')) document.getElementById('dash-pending').textContent = stats.processing;
+            if(document.getElementById('dash-cust')) document.getElementById('dash-cust').textContent = (newCustCount + retCustCount).toLocaleString();
+            
+            if(document.getElementById('cust-new-val')) document.getElementById('cust-new-val').textContent = newCustCount.toLocaleString();
+            if(document.getElementById('cust-ret-val')) document.getElementById('cust-ret-val').textContent = retCustCount.toLocaleString();
+            
+            // Update Charts
+            if(custChartInstance) {
+                custChartInstance.data.datasets[0].data = [newCustCount, retCustCount];
+                custChartInstance.update();
+            }
+
+            if(revChartInstance) {
+                revChartInstance.data.labels = Object.keys(dailyRevMap);
+                revChartInstance.data.datasets[0].data = Object.values(dailyOrdMap);
+                revChartInstance.data.datasets[1].data = Object.values(dailyRevMap);
+                revChartInstance.update();
+            }
+
+            if(statChartInstance) {
+                statChartInstance.data.datasets[0].data = [stats.processing, stats.confirmed, stats.shipped, stats.delivered, stats.cancelled];
+                statChartInstance.update();
+            }
+
+            // Update Dashboard Recent Orders Table
+            let recentSorted = [...recentOrdersList].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+            let rwHtml = '';
+            recentSorted.forEach(o => {
+                const id = o.orderNumber || o.rawId.substring(0,8).toUpperCase();
+                const ship = o.shippingInfo || {};
+                const name = (ship.firstName||'') + " " + (ship.lastName||'');
+                const avatarUrl = getAvatarUrl(name, ship.photoURL);
+                const statusClass = `status-${o.status.toLowerCase()}`;
+                
+                const dateObj = new Date(o.date);
+                const dStr = dateObj.toLocaleDateString('en-IN', {month:'short', day:'numeric', year:'numeric'});
+                const tStr = dateObj.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+
+                let prodHtml = '';
+                if(o.items && o.items[0]) {
+                    const i = o.items[0];
+                    const extra = o.items.length > 1 ? `<div style="font-size:10px; color:var(--text-muted);">+${o.items.length - 1} more</div>` : '';
+                    prodHtml = `
+                        <div class="dash-product-cell" style="display:flex; align-items:center; gap:10px;">
+                            <img src="${i.image || 'star-logo.png'}" class="dash-product-img">
+                            <div>
+                                <div style="font-weight:500; color:var(--text-main); font-size:12px;">${i.title.length > 18 ? i.title.substring(0,18)+'...' : i.title}</div>
+                                <div style="color:var(--text-muted); font-size:11px;">Qty: ${i.quantity}</div>
+                                ${extra}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                rwHtml += `
+                    <tr style="cursor:pointer;" onclick="navigate('orders'); openSidePanel('${o.rawId}')">
+                        <td style="font-weight:600; font-size:12px; color:var(--text-main);">#${id}</td>
+                        <td>
+                            <div class="dash-customer-cell" style="display:flex; align-items:center; gap:12px;">
+                                <div class="avatar-container"><img src="${avatarUrl}" class="dash-avatar" onclick="event.stopPropagation(); alert('Customer Profile integration ready.')"></div>
+                                <div>
+                                    <div style="font-weight:500; font-size:12px; color:var(--text-main);">${name}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${prodHtml}</td>
+                        <td style="font-weight:500; font-size:12px;">₹${parseFloat(o.amount).toLocaleString('en-IN')}</td>
+                        <td><span class="payment-badge ${o.status === 'Failed' ? 'pay-failed' : 'pay-paid'}">${o.status === 'Failed' ? 'Failed' : 'Paid'}</span></td>
+                        <td><span class="status-badge-static ${statusClass}">${o.status}</span></td>
+                        <td>
+                            <div style="font-size:12px;">${dStr}</div>
+                            <div style="font-size:11px; color:var(--text-muted);">${tStr}</div>
+                        </td>
+                        <td><button class="btn-icon"><i class="fa-regular fa-eye"></i></button></td>
+                    </tr>
+                `;
+            });
+            if(document.getElementById('dash-recent-orders-body')) document.getElementById('dash-recent-orders-body').innerHTML = rwHtml || '<tr><td colspan="8" style="text-align: center;">No orders in this range</td></tr>';
+
+            // Update Top Products List
+            let topProds = Object.entries(productSales).sort((a,b) => b[1].qty - a[1].qty).slice(0,4);
+            let tpHtml = '';
+            topProds.forEach(p => {
+                tpHtml += `
+                    <div class="compact-list-item">
+                        <div class="cl-left">
+                            <img src="${p[1].img || 'star-logo.png'}" style="width: 32px; height: 40px; min-width: 32px; max-width: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light);">
+                            <div>
+                                <div class="cl-title">${p[0].length > 20 ? p[0].substring(0,20)+'...' : p[0]}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="cl-val">₹${p[1].rev.toLocaleString('en-IN')}</div>
+                            <div class="cl-sub">${p[1].qty} Sold</div>
+                        </div>
+                    </div>
+                `;
+            });
+            if(document.getElementById('dash-top-products')) document.getElementById('dash-top-products').innerHTML = tpHtml || '<div style="font-size:12px; color:var(--text-muted);">Not enough data.</div>';
+
+            // Update Best Categories List
+            let catArray = Object.entries(categoryMap).sort((a,b) => b[1].q - a[1].q).slice(0,4);
+            let catHtml = '';
+            catArray.forEach(c => {
+                if(c[1].q > 0) {
+                    catHtml += `
+                        <div class="compact-list-item">
+                            <div class="cl-left">
+                                <div class="cl-icon">${c[1].ic}</div>
+                                <div>
+                                    <div class="cl-title">${c[0]}</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="cl-val">₹${c[1].r.toLocaleString('en-IN')}</div>
+                                <div class="cl-sub">${c[1].q} Orders</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            if(document.getElementById('dash-best-categories')) document.getElementById('dash-best-categories').innerHTML = catHtml || '<div style="font-size:12px; color:var(--text-muted);">Not enough data.</div>';
+
+            // Update Live Activity List
+            let actHtml = '';
+            recentSorted.forEach(o => {
+                const id = o.orderNumber || o.rawId.substring(0,8).toUpperCase();
+                const name = o.shippingInfo?.firstName||'Customer';
+                let text = `New order placed by ${name}`; let icon = '<i class="fa-solid fa-basket-shopping"></i>'; let bg = '#DBEAFE'; let col = '#1D4ED8';
+                if(o.status === 'Confirmed') { text = `Order #${id} confirmed`; icon = '<i class="fa-solid fa-check"></i>'; bg = '#D1FAE5'; col = '#047857';}
+                if(o.status === 'Shipped') { text = `Order #${id} shipped`; icon = '<i class="fa-solid fa-truck"></i>'; bg = '#F3E8FF'; col = '#6D28D9';}
+                
+                actHtml += `
+                    <li class="activity-item">
+                        <div class="activity-icon" style="background:${bg}; color:${col};">${icon}</div>
+                        <div>
+                            <div class="activity-text">${text}</div>
+                            <div class="activity-time">${new Date(o.date).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    </li>
+                `;
+            });
+            if(document.getElementById('live-activity')) document.getElementById('live-activity').innerHTML = actHtml || '<div style="font-size:12px; color:var(--text-muted);">No activity in this range.</div>';
+        }
+
         window.calculateReportsData = function(startDate, endDate) {
             if (!startDate || !endDate || !window.allOrdersData) return;
 
@@ -918,12 +1173,10 @@
             let repCategoryMap = { 'Abayas': {q:0, r:0}, 'Hijabs': {q:0, r:0}, 'Niqabs': {q:0, r:0}, 'Accessories': {q:0, r:0}, 'Hampers': {q:0, r:0} };
             let repProductSales = {};
 
-            // Pre-fill dates so empty days still show on charts
             let tempDate = new Date(startDate);
             let endD = new Date(endDate);
             let dayDiff = Math.ceil((endD - tempDate) / (1000 * 60 * 60 * 24));
 
-            // Prevent huge loops if someone selects a massive year range
             if (dayDiff > 90) dayDiff = 90; 
 
             while(tempDate <= endD && Object.keys(repDailyRevMap).length <= 90) {
@@ -933,7 +1186,6 @@
                 tempDate.setDate(tempDate.getDate() + 1);
             }
 
-            // Process Orders
             window.allOrdersData.forEach(order => {
                 const dObj = new Date(order.date);
                 if (dObj >= startDate && dObj <= endD) {
@@ -950,7 +1202,6 @@
                             repDailyRevMap[dStr] += amt;
                             repDailyOrdMap[dStr] += 1;
                         } else {
-                            // Catch bounds
                             repDailyRevMap[dStr] = amt;
                             repDailyOrdMap[dStr] = 1;
                         }
@@ -974,14 +1225,12 @@
                 }
             });
 
-            // 1. Update KPI Cards
             if(document.getElementById('rep-kpi-sales')) document.getElementById('rep-kpi-sales').textContent = `₹${repRevenue.toLocaleString('en-IN')}`;
             if(document.getElementById('rep-kpi-orders')) document.getElementById('rep-kpi-orders').textContent = repOrders.toLocaleString();
             if(document.getElementById('rep-kpi-aov')) document.getElementById('rep-kpi-aov').textContent = `₹${repOrders > 0 ? Math.round(repRevenue/repOrders).toLocaleString('en-IN') : 0}`;
             if(document.getElementById('rep-kpi-refunds')) document.getElementById('rep-kpi-refunds').textContent = `₹${repRefunds.toLocaleString('en-IN')}`;
             if(document.getElementById('rep-kpi-net')) document.getElementById('rep-kpi-net').textContent = `₹${repRevenue.toLocaleString('en-IN')}`;
 
-            // 2. Update Charts
             if(window.repOverviewChart) {
                 window.repOverviewChart.data.labels = Object.keys(repDailyRevMap);
                 window.repOverviewChart.data.datasets[0].data = Object.values(repDailyOrdMap);
@@ -993,7 +1242,6 @@
                 window.repCatChart.update();
             }
 
-            // 3. Update Category List
             let totalCatRev = Object.values(repCategoryMap).reduce((sum, cat) => sum + cat.r, 0);
             if(document.getElementById('rep-cat-total-center')) document.getElementById('rep-cat-total-center').textContent = `₹${totalCatRev.toLocaleString('en-IN')}`;
             
@@ -1016,7 +1264,6 @@
             });
             if(document.getElementById('rep-cat-list')) document.getElementById('rep-cat-list').innerHTML = rCatHtml;
 
-            // 4. Update Table
             let sumHtml = '';
             let tOrd = 0, tRev = 0;
             Object.keys(repDailyRevMap).forEach(date => {
@@ -1028,7 +1275,6 @@
             sumHtml += `<tr class="totals-row"><td>Total</td><td>${tOrd}</td><td>₹${tRev.toLocaleString('en-IN')}</td><td>₹${tRev.toLocaleString('en-IN')}</td></tr>`;
             if(document.getElementById('rep-summary-body')) document.getElementById('rep-summary-body').innerHTML = sumHtml;
 
-            // 5. Update Top Products
             let topRepProds = Object.entries(repProductSales).sort((a,b) => b[1].qty - a[1].qty).slice(0,5);
             let trpHtml = '';
             let totalProdRev = Object.values(repProductSales).reduce((sum, p) => sum + p.rev, 0);
@@ -1039,248 +1285,36 @@
             if(document.getElementById('rep-top-prods-body')) document.getElementById('rep-top-prods-body').innerHTML = trpHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
         };
 
-
         function initRealTimeOrders() {
             const query = collectionGroup(db, 'orders');
             
             onSnapshot(query, (snapshot) => {
                 window.allOrdersData = [];
-                let stats = { total: 0, processing: 0, confirmed: 0, shipped: 0, delivered: 0, cancelled: 0 };
-                let revenue = 0; let cancelledRevenue = 0;
-                let recentNotifications = []; 
-                let customerEmailCounts = {};
-                
-                let dailyRevMap = {}; let dailyOrdMap = {};
-                let categoryMap = { 'Abayas': {q:0, r:0, ic:'<i class="fa-solid fa-person-dress"></i>'}, 'Hijabs': {q:0, r:0, ic:'<i class="fa-solid fa-masks-theater"></i>'}, 'Niqabs': {q:0, r:0, ic:'<i class="fa-solid fa-mask"></i>'}, 'Accessories': {q:0, r:0, ic:'<i class="fa-solid fa-ring"></i>'}, 'Hampers': {q:0, r:0, ic:'<i class="fa-solid fa-gift"></i>'} };
-                let productSales = {};
-
-                const today = new Date();
-                const d7 = new Date(today); d7.setDate(d7.getDate() - 6);
-                if(document.getElementById('dash-date-range')) {
-                    document.getElementById('dash-date-range').textContent = `${d7.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} - ${today.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}`;
-                }
-
-                for(let i=6; i>=0; i--) {
-                    const d = new Date(today); d.setDate(d.getDate() - i);
-                    const dStr = d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
-                    dailyRevMap[dStr] = 0; dailyOrdMap[dStr] = 0;
-                }
+                let recentNotifications = [];
 
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     data.docPath = docSnap.ref.path;
                     data.rawId = docSnap.id;
                     window.allOrdersData.push(data);
-
-                    const amt = parseFloat(data.amount || 0);
-
-                    stats.total++;
-                    if(data.status === 'Processing') { stats.processing++; recentNotifications.push(data); }
-                    if(data.status === 'Confirmed') stats.confirmed++;
-                    if(data.status === 'Shipped') stats.shipped++;
-                    if(data.status === 'Delivered') stats.delivered++;
-                    if(data.status === 'Cancelled') { stats.cancelled++; cancelledRevenue += amt; }
                     
-                    if(data.status !== 'Cancelled' && data.status !== 'Failed') revenue += amt;
-                    
-                    if(data.shippingInfo && data.shippingInfo.email) {
-                        const em = data.shippingInfo.email;
-                        if(customerEmailCounts[em]) customerEmailCounts[em]++;
-                        else customerEmailCounts[em] = 1;
-                    }
-
-                    const dObj = new Date(data.date);
-                    const diffTime = Math.abs(today - dObj);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    
-                    if(diffDays <= 7 && data.status !== 'Cancelled') {
-                        const dStr = dObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
-                        if(dailyRevMap[dStr] !== undefined) {
-                            dailyRevMap[dStr] += amt;
-                            dailyOrdMap[dStr] += 1;
-                        }
-                    }
-
-                    if(data.items && data.status !== 'Cancelled') {
-                        data.items.forEach(item => {
-                            const itemRev = (parseFloat(item.price || (amt/item.quantity)) * item.quantity);
-                            const t = item.title.toLowerCase();
-                            if(t.includes('abaya') || t.includes('dress')) { categoryMap['Abayas'].q += item.quantity; categoryMap['Abayas'].r += itemRev; }
-                            else if(t.includes('hijab') || t.includes('scarf')) { categoryMap['Hijabs'].q += item.quantity; categoryMap['Hijabs'].r += itemRev; }
-                            else if(t.includes('niqab') || t.includes('naqab')) { categoryMap['Niqabs'].q += item.quantity; categoryMap['Niqabs'].r += itemRev; }
-                            else if(t.includes('hamper') || t.includes('gift')) { categoryMap['Hampers'].q += item.quantity; categoryMap['Hampers'].r += itemRev; }
-                            else { categoryMap['Accessories'].q += item.quantity; categoryMap['Accessories'].r += itemRev; }
-
-                            if(!productSales[item.title]) productSales[item.title] = { qty: 0, rev: 0, img: item.image };
-                            productSales[item.title].qty += item.quantity;
-                            productSales[item.title].rev += itemRev;
-                        });
-                    }
+                    // We only need to gather notifications from the live snapshot, ignoring the date filter
+                    if(data.status === 'Processing') { recentNotifications.push(data); }
                 });
 
-                if(document.getElementById('stat-total')) document.getElementById('stat-total').textContent = stats.total;
-                if(document.getElementById('stat-processing')) document.getElementById('stat-processing').textContent = stats.processing;
-                if(document.getElementById('stat-confirmed')) document.getElementById('stat-confirmed').textContent = stats.confirmed;
-                if(document.getElementById('stat-shipped')) document.getElementById('stat-shipped').textContent = stats.shipped;
-                if(document.getElementById('stat-delivered')) document.getElementById('stat-delivered').textContent = stats.delivered;
-                if(document.getElementById('stat-cancelled')) document.getElementById('stat-cancelled').textContent = stats.cancelled;
-                
-                let newCustCount = 0; let retCustCount = 0;
-                Object.values(customerEmailCounts).forEach(count => { if(count > 1) retCustCount++; else newCustCount++; });
-                
-                if(document.getElementById('dash-rev')) document.getElementById('dash-rev').textContent = `₹${revenue.toLocaleString('en-IN')}`;
-                if(document.getElementById('dash-orders')) document.getElementById('dash-orders').textContent = stats.total.toLocaleString();
-                if(document.getElementById('dash-pending')) document.getElementById('dash-pending').textContent = stats.processing;
-                if(document.getElementById('dash-cust')) document.getElementById('dash-cust').textContent = (newCustCount + retCustCount).toLocaleString();
-                
-                if(document.getElementById('cust-new-val')) document.getElementById('cust-new-val').textContent = newCustCount.toLocaleString();
-                if(document.getElementById('cust-ret-val')) document.getElementById('cust-ret-val').textContent = retCustCount.toLocaleString();
-                
-                if(custChartInstance) {
-                    custChartInstance.data.datasets[0].data = [newCustCount, retCustCount];
-                    custChartInstance.update();
+                // Trigger Dashboard calculations with the selected dates
+                if (window.calculateDashboardData) {
+                    window.calculateDashboardData(globalDashStartDate, globalDashEndDate);
                 }
 
-                if(revChartInstance) {
-                    revChartInstance.data.labels = Object.keys(dailyRevMap);
-                    revChartInstance.data.datasets[0].data = Object.values(dailyOrdMap);
-                    revChartInstance.data.datasets[1].data = Object.values(dailyRevMap);
-                    revChartInstance.update();
-                }
-
-                if(statChartInstance) {
-                    statChartInstance.data.datasets[0].data = [stats.processing, stats.confirmed, stats.shipped, stats.delivered, stats.cancelled];
-                    statChartInstance.update();
-                }
-
-                if(catChartInstance) {
-                    catChartInstance.data.datasets[0].data = [categoryMap['Abayas'].q, categoryMap['Hijabs'].q, categoryMap['Niqabs'].q, categoryMap['Accessories'].q, categoryMap['Hampers'].q];
-                    catChartInstance.update();
-                }
-
-                let recentSorted = [...window.allOrdersData].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-                let rwHtml = '';
-                recentSorted.forEach(o => {
-                    const id = o.orderNumber || o.rawId.substring(0,8).toUpperCase();
-                    const ship = o.shippingInfo || {};
-                    const name = (ship.firstName||'') + " " + (ship.lastName||'');
-                    const avatarUrl = getAvatarUrl(name, ship.photoURL);
-                    const statusClass = `status-${o.status.toLowerCase()}`;
-                    
-                    const dateObj = new Date(o.date);
-                    const dStr = dateObj.toLocaleDateString('en-IN', {month:'short', day:'numeric', year:'numeric'});
-                    const tStr = dateObj.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-
-                    let prodHtml = '';
-                    if(o.items && o.items[0]) {
-                        const i = o.items[0];
-                        const extra = o.items.length > 1 ? `<div style="font-size:10px; color:var(--text-muted);">+${o.items.length - 1} more</div>` : '';
-                        prodHtml = `
-                            <div class="dash-product-cell">
-                                <img src="${i.image || 'star-logo.png'}" class="dash-product-img">
-                                <div>
-                                    <div style="font-weight:500; color:var(--text-main); font-size:12px;">${i.title.length > 18 ? i.title.substring(0,18)+'...' : i.title}</div>
-                                    <div style="color:var(--text-muted); font-size:11px;">Qty: ${i.quantity}</div>
-                                    ${extra}
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    rwHtml += `
-                        <tr style="cursor:pointer;" onclick="navigate('orders'); openSidePanel('${o.rawId}')">
-                            <td style="font-weight:600; font-size:12px; color:var(--text-main);">#${id}</td>
-                            <td>
-                                <div class="dash-customer-cell">
-                                    <div class="avatar-container"><img src="${avatarUrl}" class="dash-avatar" onclick="event.stopPropagation(); alert('Customer Profile integration ready.')"></div>
-                                    <div>
-                                        <div style="font-weight:500; font-size:12px; color:var(--text-main);">${name}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>${prodHtml}</td>
-                            <td style="font-weight:500; font-size:12px;">₹${parseFloat(o.amount).toLocaleString('en-IN')}</td>
-                            <td><span class="payment-badge ${o.status === 'Failed' ? 'pay-failed' : 'pay-paid'}">${o.status === 'Failed' ? 'Failed' : 'Paid'}</span></td>
-                            <td><span class="status-badge-static ${statusClass}">${o.status}</span></td>
-                            <td>
-                                <div style="font-size:12px;">${dStr}</div>
-                                <div style="font-size:11px; color:var(--text-muted);">${tStr}</div>
-                            </td>
-                            <td><button class="btn-icon"><i class="fa-regular fa-eye"></i></button></td>
-                        </tr>
-                    `;
-                });
-                if(document.getElementById('dash-recent-orders-body')) document.getElementById('dash-recent-orders-body').innerHTML = rwHtml;
-
-                let topProds = Object.entries(productSales).sort((a,b) => b[1].qty - a[1].qty).slice(0,4);
-                let tpHtml = '';
-                topProds.forEach(p => {
-                    tpHtml += `
-                        <div class="compact-list-item">
-                            <div class="cl-left">
-                                <img src="${p[1].img || 'star-logo.png'}" style="width: 32px; height: 40px; min-width: 32px; max-width: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light);">
-                                <div>
-                                    <div class="cl-title">${p[0].length > 20 ? p[0].substring(0,20)+'...' : p[0]}</div>
-                                </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div class="cl-val">₹${p[1].rev.toLocaleString('en-IN')}</div>
-                                <div class="cl-sub">${p[1].qty} Sold</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                if(document.getElementById('dash-top-products')) document.getElementById('dash-top-products').innerHTML = tpHtml;
-
-                let catArray = Object.entries(categoryMap).sort((a,b) => b[1].q - a[1].q).slice(0,4);
-                let catHtml = '';
-                catArray.forEach(c => {
-                    if(c[1].q > 0) {
-                        catHtml += `
-                            <div class="compact-list-item">
-                                <div class="cl-left">
-                                    <div class="cl-icon">${c[1].ic}</div>
-                                    <div>
-                                        <div class="cl-title">${c[0]}</div>
-                                    </div>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div class="cl-val">₹${c[1].r.toLocaleString('en-IN')}</div>
-                                    <div class="cl-sub">${c[1].q} Orders</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-                if(document.getElementById('dash-best-categories')) document.getElementById('dash-best-categories').innerHTML = catHtml || '<div style="font-size:12px; color:var(--text-muted);">Not enough data.</div>';
-
-                let actHtml = '';
-                recentSorted.forEach(o => {
-                    const id = o.orderNumber || o.rawId.substring(0,8).toUpperCase();
-                    const name = o.shippingInfo?.firstName||'Customer';
-                    let text = `New order placed by ${name}`; let icon = '<i class="fa-solid fa-basket-shopping"></i>'; let bg = '#DBEAFE'; let col = '#1D4ED8';
-                    if(o.status === 'Confirmed') { text = `Order #${id} confirmed`; icon = '<i class="fa-solid fa-check"></i>'; bg = '#D1FAE5'; col = '#047857';}
-                    if(o.status === 'Shipped') { text = `Order #${id} shipped`; icon = '<i class="fa-solid fa-truck"></i>'; bg = '#F3E8FF'; col = '#6D28D9';}
-                    
-                    actHtml += `
-                        <li class="activity-item">
-                            <div class="activity-icon" style="background:${bg}; color:${col};">${icon}</div>
-                            <div>
-                                <div class="activity-text">${text}</div>
-                                <div class="activity-time">${new Date(o.date).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</div>
-                            </div>
-                        </li>
-                    `;
-                });
-                if(document.getElementById('live-activity')) document.getElementById('live-activity').innerHTML = actHtml;
-
-                recentNotifications.sort((a,b) => new Date(b.date) - new Date(a.date));
-                updateNotifications(recentNotifications.slice(0, 5));
-                
-                // 🔥 TRIGGER REPORTS RECALCULATION USING FLATPICKR DATES 🔥
+                // Trigger Reports calculations with the selected dates
                 if (window.calculateReportsData) {
                     window.calculateReportsData(globalReportStartDate, globalReportEndDate);
                 }
+
+                // Update the Bell Notifications
+                recentNotifications.sort((a,b) => new Date(b.date) - new Date(a.date));
+                updateNotifications(recentNotifications.slice(0, 5));
 
                 currentPage = 1; 
                 renderTable(); 
@@ -1597,8 +1631,8 @@
             if(order.items) {
                 order.items.forEach(i => {
                     itemsHtml += `
-                        <div class="panel-item">
-                            <div class="panel-item-left">
+                        <div class="panel-item" style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                            <div class="panel-item-left" style="display:flex; gap:10px;">
                                 <img src="${i.image || 'star-logo.png'}" style="width: 40px; height: 50px; min-width:40px; max-width:40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light);">
                                 <div>
                                     <div style="font-weight: 500; color: var(--text-main); font-size: 13px;">${i.title}</div>
