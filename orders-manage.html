@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="star-logo.png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -98,9 +97,9 @@
         .dash-grid { display: grid; gap: 20px; margin-bottom: 20px; }
         .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
         .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-        .grid-row-2 { grid-template-columns: 2fr 1fr 1fr; } /* Revenue, Status, Live Activity */
-        .grid-row-3 { grid-template-columns: 2fr 1fr; } /* Recent Orders, Top Products */
-        .grid-row-4 { grid-template-columns: 1fr 1fr 2fr; } /* Customer, Category, Quick Actions */
+        .grid-row-2 { grid-template-columns: 2fr 1fr 1fr; } 
+        .grid-row-3 { grid-template-columns: 2fr 1fr; } 
+        .grid-row-4 { grid-template-columns: 1fr 1fr 2fr; } 
 
         .dash-card { background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .dash-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -1044,6 +1043,33 @@
             });
         }
 
+        function updateNotifications(newOrders) {
+            const notiBody = document.getElementById('notiBody');
+            const badge = document.getElementById('notiBadge');
+            
+            if(newOrders.length === 0) {
+                notiBody.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No new action required.</div>';
+                badge.textContent = '0';
+                return;
+            }
+
+            badge.textContent = newOrders.length;
+            let html = '';
+            newOrders.forEach(order => {
+                const id = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
+                html += `
+                    <div class="noti-item" onclick="navigate('orders'); openSidePanel('${order.rawId}')">
+                        <i class="fa-solid fa-circle-exclamation" style="color: #F59E0B;"></i>
+                        <div>
+                            <strong style="color: var(--text-main);">New Order #${id}</strong><br>
+                            <span style="color: var(--text-muted);">Awaiting processing. Click to review.</span>
+                        </div>
+                    </div>
+                `;
+            });
+            notiBody.innerHTML = html;
+        }
+
         // ... (The rest of the code for main Orders view rendering, Export, and Side Panel remains functionally identical, reusing the CSS rules above) ...
         
         const searchInput = document.getElementById('searchInput');
@@ -1244,4 +1270,4 @@
         };
     </script>
 </body>
-</html>
+</html>   i want to add this side panel to be changed to as same as it is in the screenshot uploaded page design .png
