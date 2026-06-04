@@ -139,7 +139,7 @@
         .status-legend-right { font-weight: 600; color: var(--text-main); text-align: right; }
 
         /* --- NEW CUSTOMER OVERVIEW CSS --- */
-        .cust-overview-layout { display: flex; gap: 20px; align-items: center; margin-top: 10px; width: 100%; }
+        .cust-overview-layout { display: flex; gap: 20px; align-items: center; justify-content: center; margin-top: 10px; width: 100%; flex: 1; }
         .cust-left { flex: 1; display: flex; flex-direction: column; gap: 20px; }
         .cust-right { display: flex; align-items: center; gap: 15px; flex: 1.2; justify-content: flex-end;}
         .cust-stat-item { width: 100%; }
@@ -421,8 +421,7 @@
                         <div class="dash-card">
                             <div class="dash-card-header">
                                 <div class="dash-card-title">Customer Overview</div>
-                                <select class="minimal-select"><option>This Range</option></select>
-                            </div>
+                                </div>
                             <div class="cust-overview-layout">
                                 <div class="cust-left">
                                     <div class="cust-stat-item">
@@ -688,7 +687,14 @@
         
         <div style="padding: 20px 20px 10px 20px; display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 24px; font-weight: 600;" id="sp-order-id">#ABY1001</div>
-            <span class="status-badge status-processing" id="sp-status-badge">Processing <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></span>
+            
+            <select class="status-badge" id="sp-status-badge" onchange="updateStatusFromPanel(this.value)">
+                <option value="Processing">Processing</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
         </div>
 
         <div class="panel-content">
@@ -732,8 +738,8 @@
                 </div>
             </div>
 
-            <button class="btn-full btn-confirm" onclick="quickUpdateStatus('Confirmed')"><i class="fa-regular fa-circle-check"></i> Confirm Order</button>
-            <button class="btn-full btn-cancel" onclick="quickUpdateStatus('Cancelled')"><i class="fa-regular fa-circle-xmark"></i> Cancel Order</button>
+            <button class="btn-full btn-confirm" onclick="updateStatusFromPanel('Confirmed')"><i class="fa-regular fa-circle-check"></i> Confirm Order</button>
+            <button class="btn-full btn-cancel" onclick="updateStatusFromPanel('Cancelled')"><i class="fa-regular fa-circle-xmark"></i> Cancel Order</button>
             <button class="btn-full btn-more" onclick="handleInvoiceFromPanel()"><i class="fa-solid fa-file-invoice-dollar"></i> View Invoice</button>
             
             <input type="hidden" id="sp-current-doc-path">
@@ -1001,7 +1007,6 @@
                 });
             }
 
-            // 🌟 UPDATED ORDERS BY STATUS CHART 🌟
             const ctxStat = document.getElementById('statusChart');
             if(ctxStat) {
                 statChartInstance = new Chart(ctxStat.getContext('2d'), {
@@ -1017,8 +1022,8 @@
                     options: { 
                         responsive: true, 
                         maintainAspectRatio: false, 
-                        cutout: '75%', // Thick donut design matching screenshot
-                        plugins: { legend: { display: false }, tooltip: { enabled: true } } // Using Custom HTML Legend instead
+                        cutout: '75%', 
+                        plugins: { legend: { display: false }, tooltip: { enabled: true } }
                     }
                 });
             }
@@ -1152,12 +1157,11 @@
                 custChartInstance.update();
             }
             
-            // 🌟 TOP 6 KPI CARDS UPDATE 🌟
             if(document.getElementById('dash-rev')) document.getElementById('dash-rev').textContent = `₹${revenue.toLocaleString('en-IN')}`;
             if(document.getElementById('dash-orders')) document.getElementById('dash-orders').textContent = stats.total.toLocaleString();
             if(document.getElementById('dash-pending')) document.getElementById('dash-pending').textContent = stats.processing;
-            if(document.getElementById('dash-confirmed')) document.getElementById('dash-confirmed').textContent = stats.confirmed; // NEW
-            if(document.getElementById('dash-delivered')) document.getElementById('dash-delivered').textContent = stats.delivered; // NEW
+            if(document.getElementById('dash-confirmed')) document.getElementById('dash-confirmed').textContent = stats.confirmed; 
+            if(document.getElementById('dash-delivered')) document.getElementById('dash-delivered').textContent = stats.delivered; 
             if(document.getElementById('dash-cust')) document.getElementById('dash-cust').textContent = totalCustCount.toLocaleString();
             
             if(revChartInstance) {
@@ -1167,7 +1171,6 @@
                 revChartInstance.update();
             }
 
-            // 🌟 ORDERS BY STATUS UPDATE & CUSTOM HTML LEGEND 🌟
             if(statChartInstance) {
                 statChartInstance.data.datasets[0].data = [stats.processing, stats.confirmed, stats.shipped, stats.delivered, stats.cancelled];
                 statChartInstance.update();
@@ -1711,6 +1714,21 @@
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         };
 
+        // 🌟 NEW/UPDATED: Update Status directly from the Side Panel 🌟
+        window.updateStatusFromPanel = function(newStatus) {
+            const docPath = document.getElementById('sp-current-doc-path').value;
+            const custEmail = document.getElementById('sp-current-email').value;
+            const custName = document.getElementById('sp-current-name').value;
+            const orderIdStr = document.getElementById('sp-current-number').value;
+
+            // Immediately reflect the visual change in the dropdown inside the side panel
+            const badge = document.getElementById('sp-status-badge');
+            badge.className = `status-badge status-${newStatus.toLowerCase()}`;
+
+            // Trigger the actual database update
+            triggerUpdate(docPath, newStatus, custEmail, custName, orderIdStr);
+        };
+
         window.triggerUpdate = async function(docPath, newStatus, custEmail, custName, orderIdStr) {
             try {
                 await updateDoc(doc(db, docPath), { status: newStatus });
@@ -1719,10 +1737,11 @@
                     body: JSON.stringify({ orderId: orderIdStr, email: custEmail, name: custName, newStatus: newStatus })
                 }).catch(err => console.log("Backend email API call failed/ignored.", err));
 
+                // Sync the side panel badge if it's currently open
                 if(document.getElementById('sp-current-doc-path').value === docPath) {
                     const badge = document.getElementById('sp-status-badge');
                     badge.className = `status-badge status-${newStatus.toLowerCase()}`;
-                    badge.innerHTML = `${newStatus} <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i>`;
+                    badge.value = newStatus;
                 }
             } catch (error) { alert("Failed to update status. Check permissions."); }
         };
@@ -1787,9 +1806,11 @@
             document.getElementById('sp-current-rawid').value = rawId;
 
             document.getElementById('sp-order-id').textContent = `#${displayId}`;
+            
+            // Sync Side Panel Select Dropdown
             const badge = document.getElementById('sp-status-badge');
             badge.className = `status-badge status-${order.status.toLowerCase()}`;
-            badge.innerHTML = `${order.status} <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i>`;
+            badge.value = order.status; // Actually selects the correct option
 
             document.getElementById('sp-cust-name').textContent = `${ship.firstName||''} ${ship.lastName||''}`;
             document.getElementById('sp-cust-email').textContent = ship.email || 'N/A';
