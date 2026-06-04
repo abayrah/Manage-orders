@@ -133,14 +133,6 @@
         .btn-icon { width: 30px; height: 30px; border-radius: 4px; border: 1px solid var(--border-light); background: #fff; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-icon:hover { border-color: var(--text-main); color: var(--text-main); }
 
-        /* Diagrams Section */
-        .diagrams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .diagram-card { background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .diagram-title { font-size: 14px; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--primary-brand); text-transform: uppercase; letter-spacing: 1px;}
-        .flow-container { display: flex; align-items: center; justify-content: space-between; text-align: center; font-size: 11px; color: var(--text-muted); }
-        .flow-step { padding: 15px 10px; border-radius: 8px; border: 1px solid var(--border-light); width: 22%; }
-        .flow-arrow { color: var(--border-light); }
-
         /* --- SIDE PANEL (ORDER DETAILS) --- */
         .side-panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 2000; opacity: 0; visibility: hidden; transition: 0.3s; }
         .side-panel-overlay.active { opacity: 1; visibility: visible; }
@@ -179,6 +171,7 @@
 </head>
 <body>
 
+    <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-logo">Abayrah</div>
         <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 10px;">Restricted Administrative Console</p>
@@ -186,8 +179,10 @@
         <div id="auth-error" style="color: #B91C1C; margin-top: 15px; font-size: 14px; font-weight: 500;"></div>
     </div>
 
+    <!-- MAIN APP LAYOUT -->
     <div id="app-layout">
         
+        <!-- TOP NAVBAR -->
         <header class="top-navbar">
             <div style="display: flex; align-items: center; gap: 50px;">
                 <a onclick="navigate('dashboard')" class="brand-logo">Abayrah</a>
@@ -209,6 +204,7 @@
                     <span class="badge" id="notiBadge">0</span>
                 </button>
                 
+                <!-- Notifications Dropdown -->
                 <div class="notifications-dropdown" id="notificationsDropdown">
                     <div class="noti-header">
                         Recent Activity
@@ -228,6 +224,7 @@
 
         <div class="main-wrapper">
             
+            <!-- LEFT SIDEBAR -->
             <aside class="sidebar">
                 <nav class="side-nav" id="sideNavLinks">
                     <a data-target="dashboard" onclick="navigate('dashboard')"><i class="fa-solid fa-house fa-fw"></i> Dashboard</a>
@@ -265,14 +262,17 @@
                 </div>
             </aside>
 
+            <!-- MAIN CONTENT AREA (ROUTER) -->
             <main class="main-content">
                 
+                <!-- VIEW: ORDERS (Active by Default) -->
                 <div id="view-orders" class="view-section active">
                     <div class="page-header">
                         <h1 class="page-title">Manage Orders</h1>
                         <p class="page-subtitle">View and manage all customer orders</p>
                     </div>
 
+                    <!-- Filters -->
                     <div class="filter-bar">
                         <div style="flex: 1; display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; font-weight: 500;">
                             <i class="fa-solid fa-lightbulb" style="color: #EF4444;"></i> SEARCH & FILTER
@@ -292,6 +292,7 @@
                         <button class="btn-export" onclick="exportOrdersToCSV()"><i class="fa-solid fa-download"></i> Export</button>
                     </div>
 
+                    <!-- Table -->
                     <div class="table-container">
                         <table>
                             <thead>
@@ -311,34 +312,9 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="diagrams-grid">
-                        <div class="diagram-card">
-                            <div class="diagram-title"><i class="fa-solid fa-arrows-rotate"></i> Order Status Flow</div>
-                            <div class="flow-container">
-                                <div class="flow-step" style="border-color: #FCD34D; background: #FEF3C7;"><i class="fa-solid fa-gear" style="color: #B45309; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#B45309;">Processing</strong><br>Order is received and is being processed</div>
-                                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                                <div class="flow-step" style="border-color: #93C5FD; background: #DBEAFE;"><i class="fa-solid fa-circle-check" style="color: #1D4ED8; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#1D4ED8;">Confirmed</strong><br>Order is confirmed and will be prepared</div>
-                                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                                <div class="flow-step" style="border-color: #C4B5FD; background: #F3E8FF;"><i class="fa-solid fa-truck" style="color: #6D28D9; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#6D28D9;">Shipped</strong><br>Order is shipped and on the way</div>
-                                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                                <div class="flow-step" style="border-color: #6EE7B7; background: #D1FAE5;"><i class="fa-solid fa-box-open" style="color: #047857; font-size: 20px; margin-bottom: 5px;"></i><br><strong style="color:#047857;">Delivered</strong><br>Order is delivered successfully</div>
-                            </div>
-                        </div>
-                        <div class="diagram-card">
-                            <div class="diagram-title"><i class="fa-regular fa-envelope"></i> Automatic Email Notifications</div>
-                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Emails are dispatched securely via Nodemailer API upon status update.</p>
-                            <div class="flow-container">
-                                 <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Processing to Confirmed</strong><br>Email sent to customer</div>
-                                 <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                                 <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Confirmed to Shipped</strong><br>Tracking Link Sent</div>
-                                 <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                                 <div class="flow-step"><i class="fa-solid fa-envelope" style="color: var(--primary-brand); font-size: 20px; margin-bottom: 5px;"></i><br><strong>Shipped to Delivered</strong><br>Delivery Confirmed</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
+                <!-- STUB VIEWS FOR OTHER MODULES -->
                 <div id="view-dashboard" class="view-section">
                     <div class="placeholder-content">
                         <i class="fa-solid fa-chart-line"></i>
@@ -393,6 +369,7 @@
         </div>
     </div>
 
+    <!-- SIDE PANEL: ORDER DETAILS -->
     <div class="side-panel-overlay" id="sidePanelOverlay" onclick="closeSidePanel()"></div>
     <div class="side-panel" id="sidePanel">
         <div class="panel-header">
@@ -425,7 +402,8 @@
             <div class="panel-section">
                 <div class="section-title">Order Items</div>
                 <div id="sp-items-container">
-                    </div>
+                    <!-- Items injected here -->
+                </div>
             </div>
 
             <div class="panel-section" style="border: none;">
@@ -448,6 +426,7 @@
         </div>
     </div>
 
+    <!-- UI Interaction Scripts -->
     <script>
         // --- NAVIGATION ROUTING ---
         function navigate(targetId) {
@@ -495,6 +474,7 @@
         });
     </script>
 
+    <!-- Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
