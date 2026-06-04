@@ -81,14 +81,6 @@
         .stat-label { display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .stat-val { font-weight: 600; }
 
-        /* Premium Plan Sidebar Box */
-        .premium-box { background: var(--primary-brand); color: white; border-radius: 12px; padding: 20px; margin: auto 15px 15px 15px; text-align: center; position: relative; overflow: hidden;}
-        .premium-box i { font-size: 24px; color: #FBBF24; margin-bottom: 10px; }
-        .premium-box-title { font-weight: 600; font-size: 14px; margin-bottom: 5px; }
-        .premium-box-sub { font-size: 11px; color: rgba(255,255,255,0.8); margin-bottom: 15px; line-height: 1.4; }
-        .premium-btn { background: #FDE68A; color: var(--primary-brand); border: none; width: 100%; padding: 10px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; }
-        .premium-btn:hover { background: #FBBF24; }
-
         /* Main Content Area */
         .main-content { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
         
@@ -338,13 +330,6 @@
                     <div class="stat-item"><span class="stat-label"><i class="fa-solid fa-box" style="color:#10B981;"></i> Delivered</span><span class="stat-val" id="stat-delivered">0</span></div>
                     <div class="stat-item"><span class="stat-label"><i class="fa-regular fa-circle-xmark" style="color:#EF4444;"></i> Cancelled</span><span class="stat-val" id="stat-cancelled">0</span></div>
                 </div>
-                
-                <div class="premium-box">
-                    <i class="fa-solid fa-crown"></i>
-                    <div class="premium-box-title">Premium Plan</div>
-                    <div class="premium-box-sub">You're using Premium Plan</div>
-                    <button class="premium-btn">Upgrade Now</button>
-                </div>
 
             </aside>
 
@@ -370,7 +355,7 @@
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Live Activity</div><a class="dash-card-link" onclick="toggleNotifications()">View All</a></div><ul class="live-activity-list" id="live-activity"></ul></div>
                     </div>
                     <div class="dash-grid grid-row-3">
-                        <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Recent Orders</div><a class="dash-card-link" onclick="navigate('orders')">View All</a></div><div style="overflow-x: auto; margin: 0 -20px;"><table class="dash-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody id="dash-recent-orders-body"><tr><td colspan="8" style="text-align: center;">Loading...</td></tr></tbody></table></div></div>
+                        <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Recent Orders</div><a class="dash-card-link" onclick="navigate('orders')">View All</a></div><div style="width: 100%;"><table class="dash-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody id="dash-recent-orders-body"><tr><td colspan="8" style="text-align: center;">Loading...</td></tr></tbody></table></div></div>
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Top Selling Products</div><a class="dash-card-link" onclick="navigate('reports')">View All</a></div><div class="compact-list" id="dash-top-products"></div></div>
                     </div>
                     <div class="dash-grid grid-row-4">
