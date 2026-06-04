@@ -237,6 +237,18 @@
         .btn-cancel:hover { background: #FDF2F8; }
         .btn-more { background: #fff; color: var(--text-main); border: 1px solid var(--border-light); }
         .btn-more:hover { background: #F9FAFB; }
+        /* Assuming the image has a class named 'product-thumbnail' */
+.product-thumbnail {
+    transition: transform 0.3s ease; /* Makes the zoom smooth */
+    cursor: zoom-in; /* Changes the mouse cursor to a magnifying glass */
+}
+
+.product-thumbnail:hover {
+    transform: scale(2.0); /* Increases the size to 200%. Adjust the number as needed */
+    z-index: 100; /* Ensures the magnified image pops up over other text/tables */
+    position: relative; 
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.2); /* Adds a nice shadow to the popped-out image */
+}
     </style>
 </head>
 <body>
