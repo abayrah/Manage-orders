@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -248,7 +250,7 @@
         }
 
         .header-controls { display: flex; gap: 12px; align-items: center; }
-        .control-btn { background: var(--surface-white); border: 1px solid var(--border-light); padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
+        .control-btn { background: var(--surface-white); border: 1px solid var(--border-light); padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .control-btn:hover { border-color: #D1D5DB; background: #F9FAFB; }
         .btn-export-dark { background: var(--primary-brand); color: #fff; border: 1px solid var(--primary-brand); padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-export-dark:hover { background: #330e1d; }
@@ -268,27 +270,9 @@
         .report-table tr:last-child td { border-bottom: none; }
         .report-table .totals-row td { font-weight: 600; border-top: 1px solid var(--border-light); border-bottom: none; padding-top: 15px;}
 
-        .export-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-        .export-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border: 1px solid var(--border-light); border-radius: 8px; transition: 0.2s; cursor: pointer; }
-        .export-item:hover { border-color: var(--primary-brand); background: #FDF2F8; }
-        .export-icon-box { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-right: 12px; }
-
-        .heatmap-container { display: flex; flex-direction: column; height: 100%; justify-content: space-between; margin-top: 10px;}
-        .heatmap-grid { display: grid; grid-template-columns: 40px repeat(7, 1fr); gap: 4px; align-items: center; flex: 1;}
-        .hm-label-y { font-size: 10px; color: var(--text-muted); text-align: right; padding-right: 8px; }
-        .hm-label-x { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 5px;}
-        .hm-cell { height: 25px; border-radius: 4px; background: var(--bg-color); transition: 0.2s; }
-        .hm-cell:hover { transform: scale(1.1); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .hm-legend { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted); margin-top: 15px; }
-        .hm-gradient { flex: 1; height: 6px; border-radius: 3px; background: linear-gradient(to right, #FDF2F8, #4A152B); margin: 0 10px; }
-
-        .ai-insights-header { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 15px; }
-        .ai-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .badge-new { background: #EC4899; color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 12px; font-weight: 600; letter-spacing: 0.5px;}
-        .ai-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .ai-card { background: var(--surface-white); border: 1px solid var(--border-light); padding: 15px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px; }
-        .ai-icon { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;}
-        .ai-text { font-size: 12px; color: var(--text-main); line-height: 1.5; }
+        /* Flatpickr Customization for better UI blend */
+        .flatpickr-calendar { font-family: 'Inter', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; border: 1px solid var(--border-light) !important; }
+        .flatpickr-day.selected { background: var(--primary-brand) !important; border-color: var(--primary-brand) !important; }
     </style>
 </head>
 <body>
@@ -467,8 +451,9 @@
                             <p class="page-subtitle">Detailed insights and advanced analytics of your store performance.</p>
                         </div>
                         <div class="header-controls">
-                            <div class="control-btn" style="background: #fff; cursor: pointer;">
-                                <span id="rep-date-range">Last 7 Days</span> <i class="fa-regular fa-calendar" style="margin-left: 10px; color: var(--text-muted);"></i>
+                            <div class="control-btn" style="background: #fff; cursor: pointer; padding: 0;">
+                                <i class="fa-regular fa-calendar" style="margin-left: 15px; color: var(--text-muted);"></i>
+                                <input type="text" id="reportDatePicker" placeholder="Select Date Range" style="border: none; outline: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-main); padding: 8px 15px 8px 10px; width: 220px; cursor: pointer;">
                             </div>
                             <button class="btn-export-dark" onclick="exportOrdersToCSV()"><i class="fa-solid fa-download"></i> Export Data</button>
                         </div>
@@ -480,7 +465,7 @@
                                 <div class="kpi-icon" style="background: #FEE2E2; color: #EF4444;"><i class="fa-solid fa-indian-rupee-sign"></i></div>
                                 <div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="rep-kpi-sales">₹0</div></div>
                             </div>
-                            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+                            <div class="kpi-trend"><span class="trend-up">Selected Range</span></div>
                         </div>
                         
                         <div class="kpi-card">
@@ -488,7 +473,7 @@
                                 <div class="kpi-icon" style="background: #FEF3C7; color: #F59E0B;"><i class="fa-solid fa-bag-shopping"></i></div>
                                 <div><div class="kpi-title">Total Orders</div><div class="kpi-value" id="rep-kpi-orders">0</div></div>
                             </div>
-                            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+                            <div class="kpi-trend"><span class="trend-up">Selected Range</span></div>
                         </div>
 
                         <div class="kpi-card">
@@ -496,7 +481,7 @@
                                 <div class="kpi-icon" style="background: #E0E7FF; color: #6D28D9;"><i class="fa-regular fa-clock"></i></div>
                                 <div><div class="kpi-title">Average Order Value</div><div class="kpi-value" id="rep-kpi-aov">₹0</div></div>
                             </div>
-                            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+                            <div class="kpi-trend"><span class="trend-up">Selected Range</span></div>
                         </div>
 
                         <div class="kpi-card">
@@ -512,7 +497,7 @@
                                 <div class="kpi-icon" style="background: #D1FAE5; color: #10B981;"><i class="fa-solid fa-wallet"></i></div>
                                 <div><div class="kpi-title">Net Revenue</div><div class="kpi-value" id="rep-kpi-net">₹0</div></div>
                             </div>
-                            <div class="kpi-trend"><span class="trend-up">Live Data</span></div>
+                            <div class="kpi-trend"><span class="trend-up">Selected Range</span></div>
                         </div>
                     </div>
 
@@ -520,7 +505,6 @@
                         <div class="dash-card">
                             <div class="dash-card-header">
                                 <div class="dash-card-title">Sales Overview</div>
-                                <select class="minimal-select"><option>Last 7 Days</option></select>
                             </div>
                             <div style="display:flex; justify-content:center; gap: 20px; font-size: 11px; color: var(--text-main); margin-top: -5px; font-weight: 500;">
                                 <div><span style="display:inline-block; width:12px; height:8px; background:#4A152B; border-radius:2px; margin-right:5px;"></span>Revenue (₹)</div>
@@ -713,9 +697,36 @@
 </div>
 
     <script>
-        // Make these explicitly global so both script tags can share them
         var repOverviewChart = null;
         var repCatChart = null;
+        
+        // 🔥 GLOBAL REPORT DATE VARIABLES 🔥
+        let globalReportStartDate = new Date();
+        globalReportStartDate.setDate(globalReportStartDate.getDate() - 6);
+        globalReportStartDate.setHours(0,0,0,0);
+        
+        let globalReportEndDate = new Date();
+        globalReportEndDate.setHours(23,59,59,999);
+
+        // 🔥 INITIALIZE FLATPICKR DATE RANGE PICKER 🔥
+        document.addEventListener("DOMContentLoaded", function() {
+            flatpickr("#reportDatePicker", {
+                mode: "range",
+                dateFormat: "M j, Y",
+                defaultDate: [globalReportStartDate, globalReportEndDate],
+                onChange: function(selectedDates) {
+                    if (selectedDates.length === 2) {
+                        globalReportStartDate = selectedDates[0];
+                        globalReportStartDate.setHours(0,0,0,0);
+                        globalReportEndDate = selectedDates[1];
+                        globalReportEndDate.setHours(23,59,59,999);
+                        
+                        // Instantly recalculate whenever dates change
+                        window.calculateReportsData(globalReportStartDate, globalReportEndDate);
+                    }
+                }
+            });
+        });
 
         function navigate(targetId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -727,11 +738,11 @@
                 else link.classList.remove('active');
             });
             
-            // Generate the advanced report visuals only when navigating to the Reports page
             if(targetId === 'reports') {
                 initReportVisuals();
             }
         }
+
         function focusSearch() { navigate('orders'); setTimeout(() => document.getElementById('searchInput').focus(), 100); }
         function toggleNotifications() { document.getElementById('notificationsDropdown').classList.toggle('active'); }
         function clearNotifications() { document.getElementById('notiBody').innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">All caught up.</div>'; document.getElementById('notiBadge').textContent = '0'; }
@@ -751,7 +762,6 @@
         });
         
         function initReportVisuals() {
-            // 1. Render Empty Combo Chart
             const ctxOver = document.getElementById('fullSalesOverviewChart');
             if(ctxOver && !repOverviewChart) {
                 repOverviewChart = new Chart(ctxOver.getContext('2d'), {
@@ -766,7 +776,6 @@
                 });
             }
 
-            // 2. Render Empty Category Doughnut
             const ctxCat = document.getElementById('detailedCategoryChart');
             if(ctxCat && !repCatChart) {
                 repCatChart = new Chart(ctxCat.getContext('2d'), {
@@ -776,55 +785,9 @@
                 });
             }
 
-            // 3. Render HTML Grid Heatmap
-            const hmBuilder = document.getElementById('heatmapBuilder');
-            if(hmBuilder && hmBuilder.innerHTML.trim() === '') {
-                const times = ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM'];
-                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                
-                const dataGrid = [
-                    [0.1, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1], 
-                    [0.1, 0.1, 0.1, 0.2, 0.1, 0.1, 0.1], 
-                    [0.3, 0.4, 0.5, 0.4, 0.6, 0.7, 0.5], 
-                    [0.5, 0.7, 0.8, 0.9, 1.0, 0.9, 0.8], 
-                    [0.6, 0.8, 0.9, 1.0, 1.0, 0.8, 0.7], 
-                    [0.4, 0.5, 0.6, 0.7, 0.8, 0.6, 0.5]  
-                ];
-
-                let html = '<div class="heatmap-grid">';
-                for(let r=0; r<6; r++) {
-                    html += `<div class="hm-label-y">${times[r]}</div>`;
-                    for(let c=0; c<7; c++) {
-                        html += `<div class="hm-cell" style="background-color: rgba(74, 21, 43, ${dataGrid[r][c]});"></div>`;
-                    }
-                }
-                html += '<div></div>'; 
-                for(let c=0; c<7; c++) { html += `<div class="hm-label-x">${days[c]}</div>`; }
-                html += '</div>';
-
-                html += `
-                    <div class="hm-legend">
-                        <span>Low Sales</span>
-                        <div class="hm-gradient"></div>
-                        <span>High Sales</span>
-                    </div>
-                `;
-                hmBuilder.innerHTML = html;
-            }
-
-            // 4. Update data if already fetched by the module listener
-            if (window.latestReportData) {
-                if(repCatChart) {
-                    const c = window.latestReportData.categoryMap;
-                    repCatChart.data.datasets[0].data = [c['Abayas'].r, c['Hijabs'].r, c['Niqabs'].r, c['Accessories'].r, c['Hampers'].r];
-                    repCatChart.update();
-                }
-                if(repOverviewChart) {
-                    repOverviewChart.data.labels = Object.keys(window.latestReportData.dailyRevMap);
-                    repOverviewChart.data.datasets[0].data = Object.values(window.latestReportData.dailyOrdMap);
-                    repOverviewChart.data.datasets[1].data = Object.values(window.latestReportData.dailyRevMap);
-                    repOverviewChart.update();
-                }
+            // Populate charts immediately upon opening the tab based on current selected date
+            if (window.calculateReportsData) {
+                window.calculateReportsData(globalReportStartDate, globalReportEndDate);
             }
         }
         
@@ -841,13 +804,6 @@
 
         window.printInvoice = function() {
             window.print();
-        };
-        
-        window.quickUpdateStatus = function(newStatus) {
-            const docPath = document.getElementById('sp-current-doc-path').value;
-            if(confirm(`Mark this order as ${newStatus}?`)) {
-                window.triggerUpdate(docPath, newStatus, document.getElementById('sp-current-email').value, document.getElementById('sp-current-name').value, document.getElementById('sp-current-number').value);
-            }
         };
     </script>
 
@@ -871,7 +827,7 @@
         const provider = new GoogleAuthProvider();
 
         const ADMIN_EMAIL = "abayrah.18@gmail.com";
-        let allOrdersData = []; 
+        window.allOrdersData = []; // Made global to be accessible by report calculations
         let currentFilteredOrders = []; 
         
         let currentPage = 1;
@@ -906,7 +862,6 @@
             }
         });
 
-        // FIXED: Added Null Checks before getting chart context
         function initCharts() {
             const ctxRev = document.getElementById('revenueChart');
             if(ctxRev) {
@@ -954,11 +909,142 @@
             return `https://ui-avatars.com/api/?name=${cleanName}&background=FDF2F8&color=4A152B&bold=true&font-size=0.4`;
         }
 
+        // 🔥 THE NEW, DEDICATED REPORT CALCULATOR 🔥
+        window.calculateReportsData = function(startDate, endDate) {
+            if (!startDate || !endDate || !window.allOrdersData) return;
+
+            let repRevenue = 0; let repOrders = 0; let repRefunds = 0;
+            let repDailyRevMap = {}; let repDailyOrdMap = {};
+            let repCategoryMap = { 'Abayas': {q:0, r:0}, 'Hijabs': {q:0, r:0}, 'Niqabs': {q:0, r:0}, 'Accessories': {q:0, r:0}, 'Hampers': {q:0, r:0} };
+            let repProductSales = {};
+
+            // Pre-fill dates so empty days still show on charts
+            let tempDate = new Date(startDate);
+            let endD = new Date(endDate);
+            let dayDiff = Math.ceil((endD - tempDate) / (1000 * 60 * 60 * 24));
+
+            // Prevent huge loops if someone selects a massive year range
+            if (dayDiff > 90) dayDiff = 90; 
+
+            while(tempDate <= endD && Object.keys(repDailyRevMap).length <= 90) {
+                const dStr = tempDate.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                repDailyRevMap[dStr] = 0;
+                repDailyOrdMap[dStr] = 0;
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
+
+            // Process Orders
+            window.allOrdersData.forEach(order => {
+                const dObj = new Date(order.date);
+                if (dObj >= startDate && dObj <= endD) {
+                    const amt = parseFloat(order.amount || 0);
+
+                    if (order.status === 'Cancelled') {
+                        repRefunds += amt;
+                    } else if (order.status !== 'Failed') {
+                        repRevenue += amt;
+                        repOrders++;
+
+                        const dStr = dObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                        if(repDailyRevMap[dStr] !== undefined) {
+                            repDailyRevMap[dStr] += amt;
+                            repDailyOrdMap[dStr] += 1;
+                        } else {
+                            // Catch bounds
+                            repDailyRevMap[dStr] = amt;
+                            repDailyOrdMap[dStr] = 1;
+                        }
+
+                        if(order.items) {
+                            order.items.forEach(item => {
+                                const itemRev = (parseFloat(item.price || (amt/item.quantity)) * item.quantity);
+                                const t = item.title.toLowerCase();
+                                if(t.includes('abaya') || t.includes('dress')) { repCategoryMap['Abayas'].q += item.quantity; repCategoryMap['Abayas'].r += itemRev; }
+                                else if(t.includes('hijab') || t.includes('scarf')) { repCategoryMap['Hijabs'].q += item.quantity; repCategoryMap['Hijabs'].r += itemRev; }
+                                else if(t.includes('niqab') || t.includes('naqab')) { repCategoryMap['Niqabs'].q += item.quantity; repCategoryMap['Niqabs'].r += itemRev; }
+                                else if(t.includes('hamper') || t.includes('gift')) { repCategoryMap['Hampers'].q += item.quantity; repCategoryMap['Hampers'].r += itemRev; }
+                                else { repCategoryMap['Accessories'].q += item.quantity; repCategoryMap['Accessories'].r += itemRev; }
+
+                                if(!repProductSales[item.title]) repProductSales[item.title] = { qty: 0, rev: 0, img: item.image };
+                                repProductSales[item.title].qty += item.quantity;
+                                repProductSales[item.title].rev += itemRev;
+                            });
+                        }
+                    }
+                }
+            });
+
+            // 1. Update KPI Cards
+            if(document.getElementById('rep-kpi-sales')) document.getElementById('rep-kpi-sales').textContent = `₹${repRevenue.toLocaleString('en-IN')}`;
+            if(document.getElementById('rep-kpi-orders')) document.getElementById('rep-kpi-orders').textContent = repOrders.toLocaleString();
+            if(document.getElementById('rep-kpi-aov')) document.getElementById('rep-kpi-aov').textContent = `₹${repOrders > 0 ? Math.round(repRevenue/repOrders).toLocaleString('en-IN') : 0}`;
+            if(document.getElementById('rep-kpi-refunds')) document.getElementById('rep-kpi-refunds').textContent = `₹${repRefunds.toLocaleString('en-IN')}`;
+            if(document.getElementById('rep-kpi-net')) document.getElementById('rep-kpi-net').textContent = `₹${repRevenue.toLocaleString('en-IN')}`;
+
+            // 2. Update Charts
+            if(window.repOverviewChart) {
+                window.repOverviewChart.data.labels = Object.keys(repDailyRevMap);
+                window.repOverviewChart.data.datasets[0].data = Object.values(repDailyOrdMap);
+                window.repOverviewChart.data.datasets[1].data = Object.values(repDailyRevMap);
+                window.repOverviewChart.update();
+            }
+            if(window.repCatChart) {
+                window.repCatChart.data.datasets[0].data = [repCategoryMap['Abayas'].r, repCategoryMap['Hijabs'].r, repCategoryMap['Niqabs'].r, repCategoryMap['Accessories'].r, repCategoryMap['Hampers'].r];
+                window.repCatChart.update();
+            }
+
+            // 3. Update Category List
+            let totalCatRev = Object.values(repCategoryMap).reduce((sum, cat) => sum + cat.r, 0);
+            if(document.getElementById('rep-cat-total-center')) document.getElementById('rep-cat-total-center').textContent = `₹${totalCatRev.toLocaleString('en-IN')}`;
+            
+            let rCatHtml = '';
+            const catColors = {'Abayas':'#4A152B', 'Hijabs':'#EC4899', 'Niqabs':'#34D399', 'Accessories':'#FBBF24', 'Hampers':'#8B5CF6'};
+            Object.entries(repCategoryMap).forEach(([name, data]) => {
+                let pct = totalCatRev > 0 ? ((data.r / totalCatRev) * 100).toFixed(1) : 0;
+                rCatHtml += `
+                    <div style="display:flex; justify-content:space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display:inline-block; width:10px; height:10px; background:${catColors[name]||'#ccc'}; border-radius:50%;"></span>
+                            <span style="color: var(--text-muted); font-weight: 500; font-size: 12px;">${name}</span>
+                        </div>
+                        <div style="text-align: right; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--text-main); font-weight: 600; font-size: 12px;">${pct}%</span>
+                            <span style="color: var(--text-muted); font-size: 11px; width: 60px; text-align: right;">₹${data.r.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            if(document.getElementById('rep-cat-list')) document.getElementById('rep-cat-list').innerHTML = rCatHtml;
+
+            // 4. Update Table
+            let sumHtml = '';
+            let tOrd = 0, tRev = 0;
+            Object.keys(repDailyRevMap).forEach(date => {
+                let o = repDailyOrdMap[date];
+                let r = repDailyRevMap[date];
+                tOrd += o; tRev += r;
+                sumHtml += `<tr><td>${date}</td><td>${o}</td><td>₹${r.toLocaleString('en-IN')}</td><td>₹${r.toLocaleString('en-IN')}</td></tr>`;
+            });
+            sumHtml += `<tr class="totals-row"><td>Total</td><td>${tOrd}</td><td>₹${tRev.toLocaleString('en-IN')}</td><td>₹${tRev.toLocaleString('en-IN')}</td></tr>`;
+            if(document.getElementById('rep-summary-body')) document.getElementById('rep-summary-body').innerHTML = sumHtml;
+
+            // 5. Update Top Products
+            let topRepProds = Object.entries(repProductSales).sort((a,b) => b[1].qty - a[1].qty).slice(0,5);
+            let trpHtml = '';
+            let totalProdRev = Object.values(repProductSales).reduce((sum, p) => sum + p.rev, 0);
+            topRepProds.forEach(p => {
+                let pct = totalProdRev > 0 ? ((p[1].rev / totalProdRev) * 100).toFixed(1) : 0;
+                trpHtml += `<tr><td><div style="display:flex; align-items:center; gap:10px;"><img src="${p[1].img || 'star-logo.png'}" style="width:20px; height:24px; border-radius:2px; object-fit:cover;"> ${p[0].length > 25 ? p[0].substring(0,25)+'...' : p[0]}</div></td><td>${p[1].qty}</td><td>₹${p[1].rev.toLocaleString('en-IN')}</td><td>${pct}%</td></tr>`;
+            });
+            if(document.getElementById('rep-top-prods-body')) document.getElementById('rep-top-prods-body').innerHTML = trpHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
+        };
+
+
         function initRealTimeOrders() {
             const query = collectionGroup(db, 'orders');
             
             onSnapshot(query, (snapshot) => {
-                allOrdersData = [];
+                window.allOrdersData = [];
                 let stats = { total: 0, processing: 0, confirmed: 0, shipped: 0, delivered: 0, cancelled: 0 };
                 let revenue = 0; let cancelledRevenue = 0;
                 let recentNotifications = []; 
@@ -984,7 +1070,7 @@
                     const data = docSnap.data();
                     data.docPath = docSnap.ref.path;
                     data.rawId = docSnap.id;
-                    allOrdersData.push(data);
+                    window.allOrdersData.push(data);
 
                     const amt = parseFloat(data.amount || 0);
 
@@ -1050,7 +1136,6 @@
                 if(document.getElementById('cust-new-val')) document.getElementById('cust-new-val').textContent = newCustCount.toLocaleString();
                 if(document.getElementById('cust-ret-val')) document.getElementById('cust-ret-val').textContent = retCustCount.toLocaleString();
                 
-                // FIXED: Added safe chart updates
                 if(custChartInstance) {
                     custChartInstance.data.datasets[0].data = [newCustCount, retCustCount];
                     custChartInstance.update();
@@ -1073,7 +1158,7 @@
                     catChartInstance.update();
                 }
 
-                let recentSorted = [...allOrdersData].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+                let recentSorted = [...window.allOrdersData].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
                 let rwHtml = '';
                 recentSorted.forEach(o => {
                     const id = o.orderNumber || o.rawId.substring(0,8).toUpperCase();
@@ -1192,77 +1277,10 @@
                 recentNotifications.sort((a,b) => new Date(b.date) - new Date(a.date));
                 updateNotifications(recentNotifications.slice(0, 5));
                 
-                // REAL-TIME REPORTS SYNC LOGIC
-                // Expose globally so chart visualizer can catch it if user switches tabs
-                window.latestReportData = { dailyRevMap, dailyOrdMap, categoryMap };
-       
-                // 1. Update KPI Cards
-                const d7Str = d7.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-                const todayStr = today.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-                
-                if(document.getElementById('rep-date-range')) document.getElementById('rep-date-range').textContent = `${d7Str} - ${todayStr}`;
-                if(document.getElementById('rep-kpi-sales')) document.getElementById('rep-kpi-sales').textContent = `₹${revenue.toLocaleString('en-IN')}`;
-                if(document.getElementById('rep-kpi-orders')) document.getElementById('rep-kpi-orders').textContent = stats.total.toLocaleString();
-                if(document.getElementById('rep-kpi-aov')) document.getElementById('rep-kpi-aov').textContent = `₹${stats.total > 0 ? Math.round(revenue/stats.total).toLocaleString('en-IN') : 0}`;
-                if(document.getElementById('rep-kpi-refunds')) document.getElementById('rep-kpi-refunds').textContent = `₹${cancelledRevenue.toLocaleString('en-IN')}`;
-                if(document.getElementById('rep-kpi-net')) document.getElementById('rep-kpi-net').textContent = `₹${revenue.toLocaleString('en-IN')}`;
-
-                // 2. Update Report Charts
-                if(window.repOverviewChart) {
-                    window.repOverviewChart.data.labels = Object.keys(dailyRevMap);
-                    window.repOverviewChart.data.datasets[0].data = Object.values(dailyOrdMap);
-                    window.repOverviewChart.data.datasets[1].data = Object.values(dailyRevMap);
-                    window.repOverviewChart.update();
+                // 🔥 TRIGGER REPORTS RECALCULATION USING FLATPICKR DATES 🔥
+                if (window.calculateReportsData) {
+                    window.calculateReportsData(globalReportStartDate, globalReportEndDate);
                 }
-                if(window.repCatChart) {
-                    window.repCatChart.data.datasets[0].data = [categoryMap['Abayas'].r, categoryMap['Hijabs'].r, categoryMap['Niqabs'].r, categoryMap['Accessories'].r, categoryMap['Hampers'].r];
-                    window.repCatChart.update();
-                }
-
-                // 3. Update Category Breakdown List
-                let totalCatRev = Object.values(categoryMap).reduce((sum, cat) => sum + cat.r, 0);
-                if(document.getElementById('rep-cat-total-center')) document.getElementById('rep-cat-total-center').textContent = `₹${totalCatRev.toLocaleString('en-IN')}`;
-                
-                let rCatHtml = '';
-                const catColors = {'Abayas':'#4A152B', 'Hijabs':'#EC4899', 'Niqabs':'#34D399', 'Accessories':'#FBBF24', 'Hampers':'#8B5CF6'};
-                Object.entries(categoryMap).forEach(([name, data]) => {
-                    let pct = totalCatRev > 0 ? ((data.r / totalCatRev) * 100).toFixed(1) : 0;
-                    rCatHtml += `
-                        <div style="display:flex; justify-content:space-between; align-items: center;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="display:inline-block; width:10px; height:10px; background:${catColors[name]||'#ccc'}; border-radius:50%;"></span>
-                                <span style="color: var(--text-muted); font-weight: 500; font-size: 12px;">${name}</span>
-                            </div>
-                            <div style="text-align: right; display: flex; align-items: center; gap: 8px;">
-                                <span style="color: var(--text-main); font-weight: 600; font-size: 12px;">${pct}%</span>
-                                <span style="color: var(--text-muted); font-size: 11px; width: 60px; text-align: right;">₹${data.r.toLocaleString('en-IN')}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                if(document.getElementById('rep-cat-list')) document.getElementById('rep-cat-list').innerHTML = rCatHtml;
-
-                // 4. Update Sales Summary Table
-                let sumHtml = '';
-                let tOrd = 0, tRev = 0;
-                Object.keys(dailyRevMap).forEach(date => {
-                    let o = dailyOrdMap[date];
-                    let r = dailyRevMap[date];
-                    tOrd += o; tRev += r;
-                    sumHtml += `<tr><td>${date}</td><td>${o}</td><td>₹${r.toLocaleString('en-IN')}</td><td>₹${r.toLocaleString('en-IN')}</td></tr>`;
-                });
-                sumHtml += `<tr class="totals-row"><td>Total</td><td>${tOrd}</td><td>₹${tRev.toLocaleString('en-IN')}</td><td>₹${tRev.toLocaleString('en-IN')}</td></tr>`;
-                if(document.getElementById('rep-summary-body')) document.getElementById('rep-summary-body').innerHTML = sumHtml;
-
-                // 5. Update Top Products Table
-                let topRepProds = Object.entries(productSales).sort((a,b) => b[1].qty - a[1].qty).slice(0,5);
-                let trpHtml = '';
-                let totalProdRev = Object.values(productSales).reduce((sum, p) => sum + p.rev, 0);
-                topRepProds.forEach(p => {
-                    let pct = totalProdRev > 0 ? ((p[1].rev / totalProdRev) * 100).toFixed(1) : 0;
-                    trpHtml += `<tr><td><div style="display:flex; align-items:center; gap:10px;"><img src="${p[1].img || 'star-logo.png'}" style="width:20px; height:24px; border-radius:2px; object-fit:cover;"> ${p[0].length > 25 ? p[0].substring(0,25)+'...' : p[0]}</div></td><td>${p[1].qty}</td><td>₹${p[1].rev.toLocaleString('en-IN')}</td><td>${pct}%</td></tr>`;
-                });
-                if(document.getElementById('rep-top-prods-body')) document.getElementById('rep-top-prods-body').innerHTML = trpHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
 
                 currentPage = 1; 
                 renderTable(); 
@@ -1323,7 +1341,7 @@
             const filterStat = statusFilter ? statusFilter.value : 'All';
             const filterPay = paymentFilter ? paymentFilter.value : 'All';
             
-            let filtered = allOrdersData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let filtered = window.allOrdersData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             filtered = filtered.filter(order => {
                 const s = order.shippingInfo || {};
@@ -1493,7 +1511,7 @@
         };
 
         window.handleInvoice = function(rawId) {
-            const order = allOrdersData.find(o => o.rawId === rawId);
+            const order = window.allOrdersData.find(o => o.rawId === rawId);
             if(!order) return;
 
             const ship = order.shippingInfo || {};
@@ -1542,7 +1560,7 @@
         };
 
         window.openSidePanel = function(rawId) {
-            const order = allOrdersData.find(o => o.rawId === rawId);
+            const order = window.allOrdersData.find(o => o.rawId === rawId);
             if(!order) return;
 
             const ship = order.shippingInfo || {};
