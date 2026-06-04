@@ -98,8 +98,18 @@
         .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
         .grid-cols-6 { grid-template-columns: repeat(6, 1fr); } /* Added for reports */
         .grid-row-2 { grid-template-columns: 2fr 1fr 1fr; } 
-        .grid-row-3 { grid-template-columns: repeat(3, 1fr); } 
+        .grid-row-3 { grid-template-columns: 2fr 1fr; }
         .grid-row-4 { grid-template-columns: 1fr 1fr 2fr; } 
+        .dash-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    table-layout: auto;
+}
+.dash-table th, .dash-table td { 
+    padding: 12px 10px; /* Tighter padding than the main orders page */
+    white-space: nowrap; /* Prevents text from awkwardly wrapping to the next line */
+    border-bottom: 1px solid var(--border-light);
+}
 
         .dash-card { background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .dash-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
