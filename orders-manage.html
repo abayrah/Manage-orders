@@ -979,7 +979,7 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === ADMIN_EMAIL) {
-                console.log("MY FIREBASE UID IS: ", user.uid); 
+                 
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-layout').style.display = 'flex';
                 initCharts();
