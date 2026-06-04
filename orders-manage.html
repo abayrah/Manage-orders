@@ -358,7 +358,17 @@
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-icon-box" style="background:#FFEDD5; color:#F97316;"><i class="fa-solid fa-cube"></i></div></div><div class="dash-card-title">Low Stock Items</div><div class="dash-value">23</div><div class="trend-down"><i class="fa-solid fa-arrow-down"></i> Needs Restock</div></div>
                     </div>
                     <div class="dash-grid grid-row-2">
-                        <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Revenue Overview</div><select class="filter-select" style="padding: 4px 8px; font-size: 11px;"><option>Selected Range</option></select></div><div class="chart-wrapper"><canvas id="revenueChart"></canvas></div></div>
+                        <div class="dash-card">
+                            <div class="dash-card-header">
+                                <div class="dash-card-title">Revenue Overview</div>
+                                <select class="filter-select" id="revenueDateRange" onchange="updateRevenueChartRange(this.value)" style="padding: 4px 8px; font-size: 11px;">
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="14">Last 14 Days</option>
+                                    <option value="30">Last 30 Days</option>
+                                </select>
+                            </div>
+                            <div class="chart-wrapper"><canvas id="revenueChart"></canvas></div>
+                        </div>
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Orders by Status</div></div><div class="chart-wrapper" style="height: 200px; display:flex; justify-content:center;"><canvas id="statusChart"></canvas></div></div>
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Live Activity</div><a class="dash-card-link" onclick="toggleNotifications()">View All</a></div><ul class="live-activity-list" id="live-activity"></ul></div>
                     </div>
@@ -368,7 +378,7 @@
                     </div>
                     <div class="dash-grid grid-row-4">
                         <div class="dash-card">
-                            <div class="dash-card-header"><div class="dash-card-title">Customer Overview</div><select class="filter-select" style="padding: 4px 8px; font-size: 11px;"><option>Selected Range</option></select></div>
+                            <div class="dash-card-header"><div class="dash-card-title">Customer Overview</div></div>
                             <div style="display: flex; gap: 20px; align-items: center; margin-top: 10px;">
                                 <div class="small-chart-wrapper" style="width: 120px; height: 120px;"><canvas id="customerOverviewChart"></canvas></div>
                                 <div class="cust-overview-stats"><div class="cust-stat-row"><div style="font-size: 12px; color: var(--text-muted);"><span class="cust-dot" style="background: #3B82F6;"></span>New</div><div style="font-size: 12px; font-weight: 600;" id="cust-new-val">0</div></div><div class="cust-stat-row"><div style="font-size: 12px; color: var(--text-muted);"><span class="cust-dot" style="background: #4A152B;"></span>Returning</div><div style="font-size: 12px; font-weight: 600;" id="cust-ret-val">0</div></div></div>
@@ -1164,6 +1174,46 @@
             });
             if(document.getElementById('live-activity')) document.getElementById('live-activity').innerHTML = actHtml || '<div style="font-size:12px; color:var(--text-muted);">No activity in this range.</div>';
         }
+
+        // 🔥 STANDALONE REVENUE CHART UPDATER 🔥
+        window.updateRevenueChartRange = function(days) {
+            if (!window.allOrdersData || !revChartInstance) return;
+
+            let daysInt = parseInt(days);
+            let endD = new Date();
+            endD.setHours(23,59,59,999);
+            let startD = new Date();
+            startD.setDate(startD.getDate() - daysInt + 1);
+            startD.setHours(0,0,0,0);
+
+            let dailyRevMap = {}; 
+            let dailyOrdMap = {};
+
+            let tempDate = new Date(startD);
+            while(tempDate <= endD) {
+                const dStr = tempDate.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                dailyRevMap[dStr] = 0;
+                dailyOrdMap[dStr] = 0;
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
+
+            window.allOrdersData.forEach(data => {
+                const dObj = new Date(data.date);
+                if (dObj >= startD && dObj <= endD && data.status !== 'Cancelled' && data.status !== 'Failed') {
+                    const amt = parseFloat(data.amount || 0);
+                    const dStr = dObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                    if(dailyRevMap[dStr] !== undefined) {
+                        dailyRevMap[dStr] += amt;
+                        dailyOrdMap[dStr] += 1;
+                    }
+                }
+            });
+
+            revChartInstance.data.labels = Object.keys(dailyRevMap);
+            revChartInstance.data.datasets[0].data = Object.values(dailyOrdMap);
+            revChartInstance.data.datasets[1].data = Object.values(dailyRevMap);
+            revChartInstance.update();
+        };
 
         window.calculateReportsData = function(startDate, endDate) {
             if (!startDate || !endDate || !window.allOrdersData) return;
