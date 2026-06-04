@@ -929,7 +929,7 @@
                         const extra = o.items.length > 1 ? `<div style="font-size:10px; color:var(--text-muted);">+${o.items.length - 1} more</div>` : '';
                         prodHtml = `
                             <div class="dash-product-cell">
-                                <img src="${i.image || 'star-logo.png'}" class="dash-product-img">
+                               <img src="${i.image || 'star-logo.png'}" style="width: 32px; height: 40px; min-width: 32px; max-width: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light);">
                                 <div>
                                     <div style="font-weight:500; color:var(--text-main); font-size:12px;">${i.title.length > 18 ? i.title.substring(0,18)+'...' : i.title}</div>
                                     <div style="color:var(--text-muted); font-size:11px;">Qty: ${i.quantity}</div>
@@ -973,7 +973,7 @@
                     tpHtml += `
                         <div class="compact-list-item">
                             <div class="cl-left">
-                                <img src="${p[1].img || 'star-logo.png'}" class="cl-img">
+                               <img src="${p[1].img || 'star-logo.png'}" style="width: 32px; height: 40px; min-width: 32px; max-width: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light);">
                                 <div>
                                     <div class="cl-title">${p[0].length > 20 ? p[0].substring(0,20)+'...' : p[0]}</div>
                                 </div>
@@ -1122,7 +1122,7 @@
                     const extra = order.items.length > 1 ? `<div style="font-size:10px; color:var(--text-muted);">+${order.items.length - 1} more</div>` : '';
                     prodHtml = `
                         <div class="product-cell">
-                            <img src="${i.image || 'star-logo.png'}" class="product-img">
+                            <img src="${i.image || 'star-logo.png'}" style="width: 40px; height: 50px; min-width: 40px; max-width: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-light);">
                             <div>
                                 <div style="font-weight:500;">${i.title.length > 15 ? i.title.substring(0,15)+'...' : i.title}</div>
                                 <div style="color:var(--text-muted); font-size:11px;">Qty: ${i.quantity}</div>
