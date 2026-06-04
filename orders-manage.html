@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="star-logo.png">
 
     <style>
         :root {
@@ -172,7 +171,6 @@
 </head>
 <body>
 
-    <!-- AUTH SCREEN -->
     <div id="auth-screen">
         <div class="auth-logo">Abayrah</div>
         <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 10px;">Restricted Administrative Console</p>
@@ -180,10 +178,8 @@
         <div id="auth-error" style="color: #B91C1C; margin-top: 15px; font-size: 14px; font-weight: 500;"></div>
     </div>
 
-    <!-- MAIN APP LAYOUT -->
     <div id="app-layout">
         
-        <!-- TOP NAVBAR -->
         <header class="top-navbar">
             <div style="display: flex; align-items: center; gap: 50px;">
                 <a onclick="navigate('dashboard')" class="brand-logo">Abayrah</a>
@@ -205,7 +201,6 @@
                     <span class="badge" id="notiBadge">0</span>
                 </button>
                 
-                <!-- Notifications Dropdown -->
                 <div class="notifications-dropdown" id="notificationsDropdown">
                     <div class="noti-header">
                         Recent Activity
@@ -225,7 +220,6 @@
 
         <div class="main-wrapper">
             
-            <!-- LEFT SIDEBAR -->
             <aside class="sidebar">
                 <nav class="side-nav" id="sideNavLinks">
                     <a data-target="dashboard" onclick="navigate('dashboard')"><i class="fa-solid fa-house fa-fw"></i> Dashboard</a>
@@ -249,11 +243,15 @@
                         <span class="stat-val" id="stat-processing">0</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label"><i class="fa-solid fa-truck-fast" style="color:#3B82F6;"></i> Shipped</span>
+                        <span class="stat-label"><i class="fa-solid fa-circle-check" style="color:#3B82F6;"></i> Confirmed</span>
+                        <span class="stat-val" id="stat-confirmed">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label"><i class="fa-solid fa-truck-fast" style="color:#8B5CF6;"></i> Shipped</span>
                         <span class="stat-val" id="stat-shipped">0</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label"><i class="fa-solid fa-circle-check" style="color:#10B981;"></i> Delivered</span>
+                        <span class="stat-label"><i class="fa-solid fa-box-open" style="color:#10B981;"></i> Delivered</span>
                         <span class="stat-val" id="stat-delivered">0</span>
                     </div>
                     <div class="stat-item">
@@ -263,17 +261,14 @@
                 </div>
             </aside>
 
-            <!-- MAIN CONTENT AREA (ROUTER) -->
             <main class="main-content">
                 
-                <!-- VIEW: ORDERS (Active by Default) -->
                 <div id="view-orders" class="view-section active">
                     <div class="page-header">
                         <h1 class="page-title">Manage Orders</h1>
                         <p class="page-subtitle">View and manage all customer orders</p>
                     </div>
 
-                    <!-- Filters -->
                     <div class="filter-bar">
                         <div style="flex: 1; display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; font-weight: 500;">
                             <i class="fa-solid fa-lightbulb" style="color: #EF4444;"></i> SEARCH & FILTER
@@ -293,7 +288,6 @@
                         <button class="btn-export" onclick="exportOrdersToCSV()"><i class="fa-solid fa-download"></i> Export</button>
                     </div>
 
-                    <!-- Table -->
                     <div class="table-container">
                         <table>
                             <thead>
@@ -315,7 +309,6 @@
                     </div>
                 </div>
 
-                <!-- STUB VIEWS FOR OTHER MODULES -->
                 <div id="view-dashboard" class="view-section">
                     <div class="placeholder-content">
                         <i class="fa-solid fa-chart-line"></i>
@@ -370,7 +363,6 @@
         </div>
     </div>
 
-    <!-- SIDE PANEL: ORDER DETAILS -->
     <div class="side-panel-overlay" id="sidePanelOverlay" onclick="closeSidePanel()"></div>
     <div class="side-panel" id="sidePanel">
         <div class="panel-header">
@@ -403,8 +395,7 @@
             <div class="panel-section">
                 <div class="section-title">Order Items</div>
                 <div id="sp-items-container">
-                    <!-- Items injected here -->
-                </div>
+                    </div>
             </div>
 
             <div class="panel-section" style="border: none;">
@@ -427,7 +418,6 @@
         </div>
     </div>
 
-    <!-- UI Interaction Scripts -->
     <script>
         // --- NAVIGATION ROUTING ---
         function navigate(targetId) {
@@ -475,7 +465,6 @@
         });
     </script>
 
-    <!-- Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -536,7 +525,8 @@
             
             onSnapshot(query, (snapshot) => {
                 allOrdersData = [];
-                let stats = { total: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0 };
+                // ADDED confirmed: 0 to stats object
+                let stats = { total: 0, processing: 0, confirmed: 0, shipped: 0, delivered: 0, cancelled: 0 };
                 let recentNotifications = []; // For the bell icon
 
                 snapshot.forEach(docSnap => {
@@ -547,6 +537,7 @@
 
                     stats.total++;
                     if(data.status === 'Processing') { stats.processing++; recentNotifications.push(data); }
+                    if(data.status === 'Confirmed') stats.confirmed++; // ADDED Confirmed logic
                     if(data.status === 'Shipped') stats.shipped++;
                     if(data.status === 'Delivered') stats.delivered++;
                     if(data.status === 'Cancelled') stats.cancelled++;
@@ -555,6 +546,7 @@
                 // Update Stats UI
                 document.getElementById('stat-total').textContent = stats.total;
                 document.getElementById('stat-processing').textContent = stats.processing;
+                document.getElementById('stat-confirmed').textContent = stats.confirmed; // ADDED Confirmed UI Update
                 document.getElementById('stat-shipped').textContent = stats.shipped;
                 document.getElementById('stat-delivered').textContent = stats.delivered;
                 document.getElementById('stat-cancelled').textContent = stats.cancelled;
