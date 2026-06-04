@@ -32,11 +32,16 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- AUTH SCREEN --- */
-        #auth-screen { position: fixed; inset: 0; background: var(--surface-white); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .auth-logo { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--primary-brand); margin-bottom: 10px; }
-        .auth-btn { background: var(--primary-brand); color: #fff; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; margin-top: 20px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        /* --- AUTH SCREEN (GATEKEEPER) --- */
+        #auth-screen { position: fixed; inset: 0; background: var(--bg-color); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: var(--surface-white); padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--border-light); width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
+        .auth-logo { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--primary-brand); margin-bottom: 5px; }
+        .auth-input { width: 100%; padding: 12px 15px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; outline: none; transition: 0.2s; font-family: 'Inter', sans-serif; color: var(--text-main); background: #fff;}
+        .auth-input:focus { border-color: var(--primary-brand); box-shadow: 0 0 0 3px rgba(74, 21, 43, 0.1); }
+        .auth-btn { background: var(--primary-brand); color: #fff; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; font-size: 13px;}
         .auth-btn:hover { background: #330e1d; }
+        .auth-btn-outline { background: #fff; color: var(--text-main); border: 1px solid var(--border-light); padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; font-size: 13px;}
+        .auth-btn-outline:hover { background: #F9FAFB; border-color: #D1D5DB;}
 
         /* --- LAYOUT --- */
         #app-layout { display: none; width: 100%; height: 100%; flex-direction: column; }
@@ -299,12 +304,35 @@
 <body>
 
     <div id="auth-screen">
-        <div class="auth-logo">Abayrah</div>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 10px;">Restricted Administrative Console</p>
-        <button class="auth-btn" id="loginBtn"><i class="fa-brands fa-google"></i> Secure Login via Google</button>
-        <div id="auth-error" style="color: #B91C1C; margin-top: 15px; font-size: 14px; font-weight: 500;"></div>
-    </div>
+        <div class="auth-card">
+            <div class="auth-logo">Abayrah</div>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">Restricted Administrative Console</p>
 
+            <form id="email-login-form" style="display: flex; flex-direction: column; gap: 15px; width: 100%; text-align: left;">
+                <div>
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 5px; display: block;">Email Address</label>
+                    <input type="email" id="admin-email" placeholder="admin@abayrah.com" class="auth-input" required>
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 5px; display: block;">Password</label>
+                    <input type="password" id="admin-password" placeholder="••••••••" class="auth-input" required>
+                </div>
+                <button type="submit" class="auth-btn" id="emailLoginBtn" style="margin-top: 10px;">Sign In</button>
+            </form>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin: 25px 0; width: 100%;">
+                <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+                <div style="font-size: 12px; color: var(--text-muted);">OR</div>
+                <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+            </div>
+
+            <button class="auth-btn-outline" id="googleLoginBtn">
+                <i class="fa-brands fa-google" style="color: #DB4437;"></i> Continue with Google
+            </button>
+            
+            <div id="auth-error" style="color: #B91C1C; margin-top: 15px; font-size: 13px; font-weight: 500; text-align: center;"></div>
+        </div>
+    </div>
     <div id="app-layout">
         
         <header class="top-navbar">
@@ -942,7 +970,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collectionGroup, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -971,25 +999,56 @@
         let catChartInstance = null;
         let custChartInstance = null;
 
-        document.getElementById('loginBtn').addEventListener('click', () => {
+        // --- AUTHENTICATION LOGIC ---
+
+        // 1. Google Login
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
             document.getElementById('auth-error').textContent = "";
             signInWithPopup(auth, provider).catch(() => document.getElementById('auth-error').textContent = "Google Sign-In Failed.");
         });
+
+        // 2. Email/Password Login
+        document.getElementById('email-login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const errorDiv = document.getElementById('auth-error');
+            
+            errorDiv.textContent = "Authenticating...";
+            errorDiv.style.color = "var(--primary-brand)"; // Temporarily look like a loading state
+            
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    // Success! The onAuthStateChanged listener will handle the redirect.
+                })
+                .catch((error) => {
+                    errorDiv.style.color = "#B91C1C"; // Back to red for error
+                    errorDiv.textContent = "Invalid email or password.";
+                    console.error("Login error:", error.code, error.message);
+                });
+        });
+
+        // Logout
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
+        // Gatekeeper State Listener
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === ADMIN_EMAIL) {
-                 
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-layout').style.display = 'flex';
                 initCharts();
                 initRealTimeOrders(); 
             } else if (user) {
+                // Someone logged in, but they aren't the admin. Boot them out.
                 signOut(auth);
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('app-layout').style.display = 'none';
-                document.getElementById('auth-error').textContent = `Access Denied. ${user.email} is not authorized.`;
+                
+                const errorDiv = document.getElementById('auth-error');
+                errorDiv.style.color = "#B91C1C";
+                errorDiv.textContent = `Access Denied. ${user.email} is not authorized.`;
             } else {
+                // Nobody logged in
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('app-layout').style.display = 'none';
             }
