@@ -516,7 +516,7 @@
                         </div>
                     </div>
 
-                    <div class="dash-grid grid-row-2">
+                    <div class="dash-grid grid-row-3">
                         <div class="dash-card">
                             <div class="dash-card-header">
                                 <div class="dash-card-title">Sales Overview</div>
@@ -535,21 +535,21 @@
                             <div class="dash-card-header">
                                 <div class="dash-card-title">Sales by Category</div>
                             </div>
-                            <div style="display: flex; align-items: center; height: 100%;">
-                                <div style="position: relative; width: 160px; height: 160px;">
+                            <div style="display: flex; align-items: center; height: 100%; gap: 20px;">
+                                <div style="position: relative; width: 160px; height: 160px; flex-shrink: 0;">
                                     <canvas id="detailedCategoryChart"></canvas>
                                     <div style="position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); text-align: center;">
                                         <div style="font-size: 16px; font-weight: 700; color: var(--text-main);" id="rep-cat-total-center">₹0</div>
                                         <div style="font-size: 10px; color: var(--text-muted);">Total Sales</div>
                                     </div>
                                 </div>
-                                <div style="flex: 1; padding-left: 20px; font-size: 12px; display: flex; flex-direction: column; gap: 12px;" id="rep-cat-list">
+                                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px;" id="rep-cat-list">
                                     </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="dash-grid grid-row-2">
+                    <div class="dash-grid grid-row-3">
                         <div class="dash-card">
                             <div class="dash-card-header">
                                 <div class="dash-card-title">Sales Summary</div>
@@ -810,6 +810,21 @@
                     </div>
                 `;
                 hmBuilder.innerHTML = html;
+            }
+
+            // 4. Update data if already fetched by the module listener
+            if (window.latestReportData) {
+                if(repCatChart) {
+                    const c = window.latestReportData.categoryMap;
+                    repCatChart.data.datasets[0].data = [c['Abayas'].r, c['Hijabs'].r, c['Niqabs'].r, c['Accessories'].r, c['Hampers'].r];
+                    repCatChart.update();
+                }
+                if(repOverviewChart) {
+                    repOverviewChart.data.labels = Object.keys(window.latestReportData.dailyRevMap);
+                    repOverviewChart.data.datasets[0].data = Object.values(window.latestReportData.dailyOrdMap);
+                    repOverviewChart.data.datasets[1].data = Object.values(window.latestReportData.dailyRevMap);
+                    repOverviewChart.update();
+                }
             }
         }
         
@@ -1178,6 +1193,8 @@
                 updateNotifications(recentNotifications.slice(0, 5));
                 
                 // REAL-TIME REPORTS SYNC LOGIC
+                // Expose globally so chart visualizer can catch it if user switches tabs
+                window.latestReportData = { dailyRevMap, dailyOrdMap, categoryMap };
        
                 // 1. Update KPI Cards
                 const d7Str = d7.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -1210,7 +1227,18 @@
                 const catColors = {'Abayas':'#4A152B', 'Hijabs':'#EC4899', 'Niqabs':'#34D399', 'Accessories':'#FBBF24', 'Hampers':'#8B5CF6'};
                 Object.entries(categoryMap).forEach(([name, data]) => {
                     let pct = totalCatRev > 0 ? ((data.r / totalCatRev) * 100).toFixed(1) : 0;
-                    rCatHtml += `<div style="display:flex; justify-content:space-between;"><span><span style="display:inline-block; width:8px; height:8px; background:${catColors[name]||'#ccc'}; border-radius:2px; margin-right:8px;"></span>${name}</span> <span>${pct}% (₹${data.r.toLocaleString('en-IN')})</span></div>`;
+                    rCatHtml += `
+                        <div style="display:flex; justify-content:space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="display:inline-block; width:10px; height:10px; background:${catColors[name]||'#ccc'}; border-radius:50%;"></span>
+                                <span style="color: var(--text-muted); font-weight: 500; font-size: 12px;">${name}</span>
+                            </div>
+                            <div style="text-align: right; display: flex; align-items: center; gap: 8px;">
+                                <span style="color: var(--text-main); font-weight: 600; font-size: 12px;">${pct}%</span>
+                                <span style="color: var(--text-muted); font-size: 11px; width: 60px; text-align: right;">₹${data.r.toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>
+                    `;
                 });
                 if(document.getElementById('rep-cat-list')) document.getElementById('rep-cat-list').innerHTML = rCatHtml;
 
