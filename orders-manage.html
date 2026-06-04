@@ -979,6 +979,7 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === ADMIN_EMAIL) {
+                console.log("MY FIREBASE UID IS: ", user.uid); 
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-layout').style.display = 'flex';
                 initCharts();
@@ -994,9 +995,11 @@
             }
         });
 
-        function initCharts() {
+       function initCharts() {
+            // 1. Revenue Chart
             const ctxRev = document.getElementById('revenueChart');
             if(ctxRev) {
+                if(revChartInstance) revChartInstance.destroy(); // <-- Destroys old chart first
                 revChartInstance = new Chart(ctxRev.getContext('2d'), {
                     type: 'bar',
                     data: { labels: [], datasets: [
@@ -1007,8 +1010,10 @@
                 });
             }
 
+            // 2. Status Donut Chart
             const ctxStat = document.getElementById('statusChart');
             if(ctxStat) {
+                if(statChartInstance) statChartInstance.destroy(); // <-- Destroys old chart first
                 statChartInstance = new Chart(ctxStat.getContext('2d'), {
                     type: 'doughnut',
                     data: { 
@@ -1020,30 +1025,26 @@
                         }] 
                     },
                     options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        cutout: '75%', 
+                        responsive: true, maintainAspectRatio: false, cutout: '75%', 
                         plugins: { legend: { display: false }, tooltip: { enabled: true } }
                     }
                 });
             }
 
+            // 3. Customer Overview Chart
             const ctxCust = document.getElementById('customerOverviewChart');
             if(ctxCust) {
+                if(custChartInstance) custChartInstance.destroy(); // <-- Destroys old chart first
                 custChartInstance = new Chart(ctxCust.getContext('2d'), {
                     type: 'doughnut',
                     data: { 
                         labels: ['New Customers', 'Returning Customers'], 
                         datasets: [{ 
-                            data: [0,0], 
-                            backgroundColor: ['#3B82F6', '#4A152B'], 
-                            borderWidth: 0,
+                            data: [0,0], backgroundColor: ['#3B82F6', '#4A152B'], borderWidth: 0,
                         }] 
                     },
                     options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        cutout: '75%', 
+                        responsive: true, maintainAspectRatio: false, cutout: '75%', 
                         plugins: { legend: { display: false }, tooltip: {enabled: true} } 
                     }
                 });
