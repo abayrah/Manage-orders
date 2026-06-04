@@ -847,29 +847,26 @@
                 const times = ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM'];
                 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                 
-                // Mock intensities representing the image (0.1 to 1.0)
                 const dataGrid = [
-                    [0.1, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1], // 12am
-                    [0.1, 0.1, 0.1, 0.2, 0.1, 0.1, 0.1], // 4am
-                    [0.3, 0.4, 0.5, 0.4, 0.6, 0.7, 0.5], // 8am
-                    [0.5, 0.7, 0.8, 0.9, 1.0, 0.9, 0.8], // 12pm
-                    [0.6, 0.8, 0.9, 1.0, 1.0, 0.8, 0.7], // 4pm
-                    [0.4, 0.5, 0.6, 0.7, 0.8, 0.6, 0.5]  // 8pm
+                    [0.1, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1], 
+                    [0.1, 0.1, 0.1, 0.2, 0.1, 0.1, 0.1], 
+                    [0.3, 0.4, 0.5, 0.4, 0.6, 0.7, 0.5], 
+                    [0.5, 0.7, 0.8, 0.9, 1.0, 0.9, 0.8], 
+                    [0.6, 0.8, 0.9, 1.0, 1.0, 0.8, 0.7], 
+                    [0.4, 0.5, 0.6, 0.7, 0.8, 0.6, 0.5]  
                 ];
 
                 let html = '<div class="heatmap-grid">';
                 for(let r=0; r<6; r++) {
                     html += `<div class="hm-label-y">${times[r]}</div>`;
                     for(let c=0; c<7; c++) {
-                        // Calculate color based on primary brand (#4A152B = rgb(74, 21, 43)) and opacity
                         html += `<div class="hm-cell" style="background-color: rgba(74, 21, 43, ${dataGrid[r][c]});"></div>`;
                     }
                 }
-                html += '<div></div>'; // empty bottom left corner
+                html += '<div></div>'; 
                 for(let c=0; c<7; c++) { html += `<div class="hm-label-x">${days[c]}</div>`; }
                 html += '</div>';
 
-                // Legend
                 html += `
                     <div class="hm-legend">
                         <span>Low Sales</span>
@@ -905,11 +902,9 @@
         let allOrdersData = []; 
         let currentFilteredOrders = []; 
         
-        // Pagination state
         let currentPage = 1;
         const rowsPerPage = 5;
 
-        // Chart Instances
         let revChartInstance = null;
         let statChartInstance = null;
         let catChartInstance = null;
@@ -939,47 +934,54 @@
             }
         });
 
+        // FIXED: Added Null Checks before getting chart context
         function initCharts() {
-            const ctxRev = document.getElementById('revenueChart').getContext('2d');
-            revChartInstance = new Chart(ctxRev, {
-                type: 'bar',
-                data: { labels: [], datasets: [
-                    { type: 'line', label: 'Orders Count', data: [], borderColor: '#F59E0B', tension: 0.4, yAxisID: 'y1' },
-                    { type: 'bar', label: 'Revenue (₹)', data: [], backgroundColor: '#4A152B', borderRadius: 4, yAxisID: 'y' }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }, y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } } } }
-            });
+            const ctxRev = document.getElementById('revenueChart');
+            if(ctxRev) {
+                revChartInstance = new Chart(ctxRev.getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: [], datasets: [
+                        { type: 'line', label: 'Orders Count', data: [], borderColor: '#F59E0B', tension: 0.4, yAxisID: 'y1' },
+                        { type: 'bar', label: 'Revenue (₹)', data: [], backgroundColor: '#4A152B', borderRadius: 4, yAxisID: 'y' }
+                    ]},
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }, y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } } } }
+                });
+            }
 
-            const ctxStat = document.getElementById('statusChart').getContext('2d');
-            statChartInstance = new Chart(ctxStat, {
-                type: 'doughnut',
-                data: { labels: ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#F59E0B', '#3B82F6', '#8B5CF6', '#10B981', '#EF4444'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } } }
-            });
+            const ctxStat = document.getElementById('statusChart');
+            if(ctxStat) {
+                statChartInstance = new Chart(ctxStat.getContext('2d'), {
+                    type: 'doughnut',
+                    data: { labels: ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#F59E0B', '#3B82F6', '#8B5CF6', '#10B981', '#EF4444'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                });
+            }
 
-            const ctxCust = document.getElementById('customerOverviewChart').getContext('2d');
-            custChartInstance = new Chart(ctxCust, {
-                type: 'doughnut',
-                data: { labels: ['New', 'Returning'], datasets: [{ data: [1,0], backgroundColor: ['#3B82F6', '#4A152B'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
-            });
+            const ctxCust = document.getElementById('customerOverviewChart');
+            if(ctxCust) {
+                custChartInstance = new Chart(ctxCust.getContext('2d'), {
+                    type: 'doughnut',
+                    data: { labels: ['New', 'Returning'], datasets: [{ data: [1,0], backgroundColor: ['#3B82F6', '#4A152B'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+                });
+            }
 
-            const ctxCat = document.getElementById('categoryChart').getContext('2d');
-            catChartInstance = new Chart(ctxCat, {
-                type: 'doughnut',
-                data: { labels: ['Abayas', 'Hijabs', 'Niqabs', 'Accessories', 'Hampers'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#4A152B', '#EC4899', '#34D399', '#FBBF24', '#8B5CF6'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } } }
-            });
+            const ctxCat = document.getElementById('categoryChart');
+            if(ctxCat) {
+                catChartInstance = new Chart(ctxCat.getContext('2d'), {
+                    type: 'doughnut',
+                    data: { labels: ['Abayas', 'Hijabs', 'Niqabs', 'Accessories', 'Hampers'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#4A152B', '#EC4899', '#34D399', '#FBBF24', '#8B5CF6'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                });
+            }
         }
 
         function getAvatarUrl(name, photoURL) {
-            // If the user's order contains their actual Google Photo URL, use it!
             if(photoURL && photoURL.includes('http')) return photoURL;
             const cleanName = name ? name.replace(/ /g, '+') : 'Customer';
             return `https://ui-avatars.com/api/?name=${cleanName}&background=FDF2F8&color=4A152B&bold=true&font-size=0.4`;
         }
 
-        // --- REAL-TIME DATA FETCHING & PROCESSING ---
         function initRealTimeOrders() {
             const query = collectionGroup(db, 'orders');
             
@@ -1073,21 +1075,30 @@
                 
                 document.getElementById('cust-new-val').textContent = newCustCount.toLocaleString();
                 document.getElementById('cust-ret-val').textContent = retCustCount.toLocaleString();
-                custChartInstance.data.datasets[0].data = [newCustCount, retCustCount];
-                custChartInstance.update();
+                
+                // FIXED: Added safe chart updates
+                if(custChartInstance) {
+                    custChartInstance.data.datasets[0].data = [newCustCount, retCustCount];
+                    custChartInstance.update();
+                }
 
-                revChartInstance.data.labels = Object.keys(dailyRevMap);
-                revChartInstance.data.datasets[0].data = Object.values(dailyOrdMap);
-                revChartInstance.data.datasets[1].data = Object.values(dailyRevMap);
-                revChartInstance.update();
+                if(revChartInstance) {
+                    revChartInstance.data.labels = Object.keys(dailyRevMap);
+                    revChartInstance.data.datasets[0].data = Object.values(dailyOrdMap);
+                    revChartInstance.data.datasets[1].data = Object.values(dailyRevMap);
+                    revChartInstance.update();
+                }
 
-                statChartInstance.data.datasets[0].data = [stats.processing, stats.confirmed, stats.shipped, stats.delivered, stats.cancelled];
-                statChartInstance.update();
+                if(statChartInstance) {
+                    statChartInstance.data.datasets[0].data = [stats.processing, stats.confirmed, stats.shipped, stats.delivered, stats.cancelled];
+                    statChartInstance.update();
+                }
 
-                catChartInstance.data.datasets[0].data = [categoryMap['Abayas'].q, categoryMap['Hijabs'].q, categoryMap['Niqabs'].q, categoryMap['Accessories'].q, categoryMap['Hampers'].q];
-                catChartInstance.update();
+                if(catChartInstance) {
+                    catChartInstance.data.datasets[0].data = [categoryMap['Abayas'].q, categoryMap['Hijabs'].q, categoryMap['Niqabs'].q, categoryMap['Accessories'].q, categoryMap['Hampers'].q];
+                    catChartInstance.update();
+                }
 
-                // Dashboard Small Table Fix
                 let recentSorted = [...allOrdersData].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
                 let rwHtml = '';
                 recentSorted.forEach(o => {
@@ -1207,8 +1218,7 @@
                 recentNotifications.sort((a,b) => new Date(b.date) - new Date(a.date));
                 updateNotifications(recentNotifications.slice(0, 5));
 
-                // Always re-render the main table
-                currentPage = 1; // Reset to page 1 on fresh data
+                currentPage = 1; 
                 renderTable(); 
             }, (error) => {
                 console.error(error);
@@ -1243,7 +1253,6 @@
             notiBody.innerHTML = html;
         }
 
-        // --- MAIN ORDERS TABLE WITH FILTERS & PAGINATION ---
         const searchInput = document.getElementById('searchInput');
         const statusFilter = document.getElementById('statusFilter');
         const paymentFilter = document.getElementById('paymentFilter');
@@ -1293,7 +1302,6 @@
                 return;
             }
 
-            // Pagination Logic
             const totalPages = Math.ceil(filtered.length / rowsPerPage);
             if(currentPage > totalPages) currentPage = totalPages;
             
@@ -1304,7 +1312,6 @@
             document.getElementById('pag-start').textContent = startIdx + 1;
             document.getElementById('pag-end').textContent = Math.min(endIdx, filtered.length);
 
-            // Build Pagination Buttons
             let pagHtml = `<button class="btn-icon" style="background: #F9FAFB;" onclick="goToPage(${Math.max(1, currentPage-1)})"><i class="fa-solid fa-chevron-left"></i></button>`;
             for(let i=1; i<=totalPages; i++) {
                 if(i === currentPage) {
@@ -1316,7 +1323,6 @@
             pagHtml += `<button class="btn-icon" style="background: #F9FAFB;" onclick="goToPage(${Math.min(totalPages, currentPage+1)})"><i class="fa-solid fa-chevron-right"></i></button>`;
             document.getElementById('pagination-controls').innerHTML = pagHtml;
 
-            // Render Rows
             let html = '';
             paginatedOrders.forEach(order => {
                 const dateObj = new Date(order.date);
@@ -1434,7 +1440,6 @@
             } catch (error) { alert("Failed to update status. Check permissions."); }
         };
 
-        // --- INVOICE VIEW/DOWNLOAD LOGIC ---
         window.handleInvoice = function(rawId) {
             const order = allOrdersData.find(o => o.rawId === rawId);
             if(order) {
@@ -1452,7 +1457,6 @@
             window.handleInvoice(rawId);
         }
 
-        // --- SIDE PANEL LOGIC ---
         window.openSidePanel = function(rawId) {
             const order = allOrdersData.find(o => o.rawId === rawId);
             if(!order) return;
