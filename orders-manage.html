@@ -59,9 +59,23 @@
         .action-icon-btn:hover { color: var(--primary-brand); }
         .badge { position: absolute; top:-5px; right:-5px; background:#EF4444; color:#fff; font-size:9px; width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
         
-        .admin-profile { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; cursor: pointer; padding: 5px; border-radius: 6px; transition: 0.2s; }
-        .admin-profile:hover { background: var(--bg-color); }
-        .admin-avatar { width: 32px; height: 32px; background: #D1D5DB; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+        /* Profile Dropdown Area */
+        .admin-profile { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; cursor: pointer; padding: 5px 10px; border-radius: 6px; transition: 0.2s; border: 1px solid transparent; }
+        .admin-profile:hover { background: var(--bg-color); border-color: var(--border-light); }
+        .admin-avatar { width: 32px; height: 32px; background: var(--primary-brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
+        
+        .profile-dropdown { position: absolute; top: 50px; right: 0; width: 280px; background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: none; flex-direction: column; overflow: hidden; z-index: 100; }
+        .profile-dropdown.active { display: flex; }
+        .profile-dropdown-header { padding: 20px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 15px; background: #F9FAFB; }
+        .dropdown-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; }
+        .profile-info { display: flex; flex-direction: column; overflow: hidden; }
+        .profile-name { font-weight: 600; font-size: 14px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .profile-email { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .profile-dropdown-body { padding: 10px 0; }
+        .profile-dropdown-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 500; color: var(--text-main); text-decoration: none; cursor: pointer; transition: 0.2s; }
+        .profile-dropdown-item:hover { background: var(--bg-color); color: var(--primary-brand); }
+        .profile-dropdown-item.text-danger { color: #B91C1C; border-top: 1px solid var(--border-light); margin-top: 5px; padding-top: 15px; }
+        .profile-dropdown-item.text-danger:hover { background: #FEF2F2; color: #B91C1C; }
 
         /* Notifications Dropdown */
         .notifications-dropdown { position: absolute; top: 50px; right: 100px; width: 300px; background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: none; flex-direction: column; overflow: hidden; z-index: 100; }
@@ -333,6 +347,7 @@
             <div id="auth-error" style="color: #B91C1C; margin-top: 15px; font-size: 13px; font-weight: 500; text-align: center;"></div>
         </div>
     </div>
+
     <div id="app-layout">
         
         <header class="top-navbar">
@@ -357,10 +372,34 @@
                     <div class="noti-header">Recent Activity<i class="fa-solid fa-check-double" style="color: var(--primary-brand); cursor: pointer;" title="Mark all as read" onclick="clearNotifications()"></i></div>
                     <div class="noti-body" id="notiBody"><div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No new notifications.</div></div>
                 </div>
-                <div class="admin-profile" id="logoutBtn" title="Click to Logout">
-                    <div class="admin-avatar">A</div>Admin <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted);"></i>
+                
+                <div style="position: relative;">
+                    <div class="admin-profile" id="profileBtn" title="Profile" onclick="toggleProfile()">
+                        <img src="" alt="Admin" class="admin-avatar" id="nav-profile-img" style="display: none; object-fit: cover;">
+                        <div class="admin-avatar" id="nav-profile-fallback">A</div>
+                        <span id="nav-profile-name">Admin</span> <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted);"></i>
+                    </div>
+                    
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">
+                            <img src="" alt="Admin" class="dropdown-avatar" id="drop-profile-img" style="display: none; object-fit: cover;">
+                            <div class="dropdown-avatar fallback" id="drop-profile-fallback">A</div>
+                            <div class="profile-info">
+                                <div class="profile-name" id="drop-profile-name">Admin Name</div>
+                                <div class="profile-email" id="drop-profile-email">admin@domain.com</div>
+                            </div>
+                        </div>
+                        <div class="profile-dropdown-body">
+                            <a href="https://myaccount.google.com/" target="_blank" class="profile-dropdown-item">
+                                <i class="fa-regular fa-circle-user"></i> Manage Account
+                            </a>
+                            <div class="profile-dropdown-item text-danger" id="logoutActionBtn">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                </div>
         </header>
 
         <div class="main-wrapper">
@@ -906,7 +945,17 @@
         }
 
         function focusSearch() { navigate('orders'); setTimeout(() => document.getElementById('searchInput').focus(), 100); }
-        function toggleNotifications() { document.getElementById('notificationsDropdown').classList.toggle('active'); }
+        
+        function toggleNotifications() { 
+            document.getElementById('profileDropdown').classList.remove('active'); // Close profile
+            document.getElementById('notificationsDropdown').classList.toggle('active'); 
+        }
+        
+        function toggleProfile() {
+            document.getElementById('notificationsDropdown').classList.remove('active'); // Close notis
+            document.getElementById('profileDropdown').classList.toggle('active');
+        }
+
         function clearNotifications() { document.getElementById('notiBody').innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">All caught up.</div>'; document.getElementById('notiBadge').textContent = '0'; }
         
         function closeAllModals() {
@@ -916,10 +965,18 @@
         }
 
         document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('notificationsDropdown');
+            // Notifications closing logic
+            const notiDropdown = document.getElementById('notificationsDropdown');
             const bellBtn = document.querySelector('button[title="Notifications"]');
-            if (dropdown && dropdown.classList.contains('active') && !dropdown.contains(event.target) && !bellBtn.contains(event.target)) {
-                dropdown.classList.remove('active');
+            if (notiDropdown && notiDropdown.classList.contains('active') && !notiDropdown.contains(event.target) && !bellBtn.contains(event.target)) {
+                notiDropdown.classList.remove('active');
+            }
+            
+            // Profile closing logic
+            const profDropdown = document.getElementById('profileDropdown');
+            const profBtn = document.getElementById('profileBtn');
+            if (profDropdown && profDropdown.classList.contains('active') && !profDropdown.contains(event.target) && !profBtn.contains(event.target)) {
+                profDropdown.classList.remove('active');
             }
         });
         
@@ -1001,13 +1058,11 @@
 
         // --- AUTHENTICATION LOGIC ---
 
-        // 1. Google Login
         document.getElementById('googleLoginBtn').addEventListener('click', () => {
             document.getElementById('auth-error').textContent = "";
             signInWithPopup(auth, provider).catch(() => document.getElementById('auth-error').textContent = "Google Sign-In Failed.");
         });
 
-        // 2. Email/Password Login
         document.getElementById('email-login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('admin-email').value;
@@ -1015,31 +1070,60 @@
             const errorDiv = document.getElementById('auth-error');
             
             errorDiv.textContent = "Authenticating...";
-            errorDiv.style.color = "var(--primary-brand)"; // Temporarily look like a loading state
+            errorDiv.style.color = "var(--primary-brand)"; 
             
             signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    // Success! The onAuthStateChanged listener will handle the redirect.
-                })
                 .catch((error) => {
-                    errorDiv.style.color = "#B91C1C"; // Back to red for error
+                    errorDiv.style.color = "#B91C1C"; 
                     errorDiv.textContent = "Invalid email or password.";
                     console.error("Login error:", error.code, error.message);
                 });
         });
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+        // Dropdown Logout Action
+        document.getElementById('logoutActionBtn').addEventListener('click', () => {
+            document.getElementById('profileDropdown').classList.remove('active');
+            signOut(auth);
+        });
 
-        // Gatekeeper State Listener
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === ADMIN_EMAIL) {
+                
+                // --- 🌟 UPDATE PROFILE DROPDOWN WITH USER DATA 🌟 ---
+                const displayName = user.displayName || "Admin";
+                const email = user.email;
+                const photoURL = user.photoURL;
+
+                // Update Navbar Button
+                document.getElementById('nav-profile-name').textContent = displayName.split(' ')[0]; // First name only
+                
+                // Update Dropdown Header
+                document.getElementById('drop-profile-name').textContent = displayName;
+                document.getElementById('drop-profile-email').textContent = email;
+
+                // Update Images if Google provided one
+                if (photoURL) {
+                    document.getElementById('nav-profile-img').src = photoURL;
+                    document.getElementById('nav-profile-img').style.display = 'flex';
+                    document.getElementById('nav-profile-fallback').style.display = 'none';
+
+                    document.getElementById('drop-profile-img').src = photoURL;
+                    document.getElementById('drop-profile-img').style.display = 'flex';
+                    document.getElementById('drop-profile-fallback').style.display = 'none';
+                } else {
+                    document.getElementById('nav-profile-img').style.display = 'none';
+                    document.getElementById('nav-profile-fallback').style.display = 'flex';
+                    
+                    document.getElementById('drop-profile-img').style.display = 'none';
+                    document.getElementById('drop-profile-fallback').style.display = 'flex';
+                }
+                // --- 🌟 END PROFILE UPDATE 🌟 ---
+                
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-layout').style.display = 'flex';
                 initCharts();
                 initRealTimeOrders(); 
             } else if (user) {
-                // Someone logged in, but they aren't the admin. Boot them out.
                 signOut(auth);
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('app-layout').style.display = 'none';
@@ -1048,7 +1132,6 @@
                 errorDiv.style.color = "#B91C1C";
                 errorDiv.textContent = `Access Denied. ${user.email} is not authorized.`;
             } else {
-                // Nobody logged in
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('app-layout').style.display = 'none';
             }
