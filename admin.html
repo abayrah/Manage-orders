@@ -144,7 +144,7 @@
                     <div class="admin-header">
                         <h2>Vault Entry</h2>
                     </div>
-                    <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add new products here. They will automatically be pushed to their selected catalog collection.</p>
+                    <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add new products here.</p>
 
                     <div class="form-group">
                         <label>Select Catalog / Category</label>
@@ -164,34 +164,38 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Original Price (₹)</label>
+                        <label>Standard Size Original Price (₹)</label>
                         <input type="number" id="prod-price" step="0.01" required>
                     </div>
                     
                     <div class="form-group">
-                        <label>Discount Percentage (%)</label>
-                        <input type="number" id="prod-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
+                        <label>Standard Size Discount (%)</label>
+                        <input type="number" id="prod-discount" placeholder="e.g. 10 (Leave 0 for no discount)" value="0" min="0" max="100">
                     </div>
 
                     <div class="form-group" id="hamper-pricing-section" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
                         <label style="color: var(--accent-gold); font-family: var(--font-serif); font-size: 16px; text-transform: uppercase;">Hamper Box Pricing</label>
-                        <p style="font-size: 10px; color: var(--muted-gray); margin-bottom: 15px; text-transform: uppercase;">Standard size automatically uses the main price above.</p>
+                        <p style="font-size: 10px; color: var(--muted-gray); margin-bottom: 15px; text-transform: uppercase;">Set independent pricing and discounts for larger variants.</p>
                         
                         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                             <div style="flex: 1;">
-                                <label>Large Box (Price) ₹</label>
-                                <input type="number" id="variant-large-price" placeholder="e.g. 2000">
+                                <label>Large Box Original Price (₹)</label>
+                                <input type="number" id="variant-large-original" placeholder="e.g. 2500">
                             </div>
                             <div style="flex: 1;">
-                                <label>Large Box (Original Price) ₹</label>
-                                <input type="number" id="variant-large-original" placeholder="e.g. 2500">
+                                <label>Large Box Discount (%)</label>
+                                <input type="number" id="variant-large-discount" placeholder="e.g. 14" value="0" min="0" max="100">
                             </div>
                         </div>
 
                         <div style="display: flex; gap: 10px;">
                             <div style="flex: 1;">
-                                <label>Custom Box (Base Price) ₹</label>
-                                <input type="number" id="variant-custom-price" placeholder="e.g. 2500">
+                                <label>Custom Box Original Price (₹)</label>
+                                <input type="number" id="variant-custom-original" placeholder="e.g. 3000">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Custom Box Discount (%)</label>
+                                <input type="number" id="variant-custom-discount" placeholder="e.g. 10" value="0" min="0" max="100">
                             </div>
                         </div>
                     </div>
@@ -289,31 +293,36 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Price</label>
+                        <label>Standard Size Original Price (₹)</label>
                         <input type="number" id="edit-price" step="0.01" required>
                     </div>
                     
                     <div class="form-group">
-                        <label>Discount Percentage (%)</label>
-                        <input type="number" id="edit-discount" placeholder="e.g. 20" value="0" min="0" max="100">
+                        <label>Standard Size Discount (%)</label>
+                        <input type="number" id="edit-discount" placeholder="e.g. 10" value="0" min="0" max="100">
                     </div>
 
                     <div class="form-group" id="edit-hamper-pricing-section" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
                         <label style="color: var(--accent-gold); font-family: var(--font-serif); font-size: 16px; text-transform: uppercase;">Edit Hamper Box Pricing</label>
+                        
                         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                             <div style="flex: 1;">
-                                <label>Large Box (Price) ₹</label>
-                                <input type="number" id="edit-variant-large-price">
+                                <label>Large Box Original Price (₹)</label>
+                                <input type="number" id="edit-variant-large-original">
                             </div>
                             <div style="flex: 1;">
-                                <label>Large Box (Original) ₹</label>
-                                <input type="number" id="edit-variant-large-original">
+                                <label>Large Box Discount (%)</label>
+                                <input type="number" id="edit-variant-large-discount" min="0" max="100">
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px;">
                             <div style="flex: 1;">
-                                <label>Custom Box (Base Price) ₹</label>
-                                <input type="number" id="edit-variant-custom-price">
+                                <label>Custom Box Original Price (₹)</label>
+                                <input type="number" id="edit-variant-custom-original">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Custom Box Discount (%)</label>
+                                <input type="number" id="edit-variant-custom-discount" min="0" max="100">
                             </div>
                         </div>
                     </div>
@@ -442,7 +451,6 @@
             }
         });
 
-        // --- DYNAMIC COLOR INPUTS ---
         window.addAnotherColor = function() {
             const list = document.getElementById('dynamic-color-list');
             const newRow = document.createElement('div');
@@ -455,7 +463,6 @@
             list.appendChild(newRow);
         };
 
-        // Show Color inputs or Hamper Pricing depending on category (BULLETPROOF FIX)
         categoryInput.addEventListener('change', (e) => {
             const cat = e.target.value || "";
             previewCategory.textContent = e.target.options[e.target.selectedIndex].text;
@@ -469,7 +476,6 @@
                 colorContainer.style.display = 'none';
             }
 
-            // Fix: Triggers on ANY category containing the word "Hamper"
             if (cat.includes('Hamper')) {
                 hamperPricingContainer.style.display = 'block';
             } else {
@@ -477,7 +483,6 @@
             }
         });
 
-        // Toggle hamper inputs inside Edit Modal (BULLETPROOF FIX)
         document.getElementById('edit-category').addEventListener('change', (e) => {
             const cat = e.target.value || "";
             if (cat.includes('Hamper')) {
@@ -491,12 +496,11 @@
         window.uploadProduct = async function() {
             const category = categoryInput.value;
             const title = titleInput.value.trim();
-            const basePrice = parseFloat(priceInput.value);
-            const discountPercent = parseFloat(document.getElementById('prod-discount').value) || 0;
+            const baseOriginalPrice = parseFloat(priceInput.value);
+            const baseDiscountPercent = parseFloat(document.getElementById('prod-discount').value) || 0;
             const rawImageUrl = imageInput.value.trim();
             const desc = document.getElementById('prod-desc').value.trim();
             
-            // Gather colors if they exist
             let colorsArray = [];
             document.querySelectorAll('.color-input').forEach(input => {
                 if (input.value.trim() !== '') colorsArray.push(input.value.trim());
@@ -505,38 +509,49 @@
             const submitBtn = document.getElementById('submit-btn');
             const successMsg = document.getElementById('success-msg');
 
-            if(!category || !title || isNaN(basePrice) || !rawImageUrl || !desc) {
+            if(!category || !title || isNaN(baseOriginalPrice) || !rawImageUrl || !desc) {
                 alert("Please fill in all fields."); return;
             }
 
             submitBtn.disabled = true; submitBtn.innerText = "Pushing to Vault...";
 
             try {
-                let finalPrice = basePrice; 
+                // Calculate main (Standard) final price
+                let finalPrice = baseOriginalPrice; 
                 let originalPriceToSave = null; 
                 let categories = [category]; 
                 
-                if (discountPercent > 0) {
-                    finalPrice = basePrice - (basePrice * (discountPercent / 100));
-                    originalPriceToSave = basePrice;
-                    if (discountPercent >= 50) categories.push("Archive Sale"); 
+                if (baseDiscountPercent > 0) {
+                    finalPrice = baseOriginalPrice - (baseOriginalPrice * (baseDiscountPercent / 100));
+                    originalPriceToSave = baseOriginalPrice;
+                    if (baseDiscountPercent >= 50) categories.push("Archive Sale"); 
                 }
 
-                // --- Build the variant pricing for Hampers ---
+                // Calculate variant prices independently if it's a hamper
                 let variantPricesPayload = null;
                 if (category.includes("Hamper")) {
+                    // Large Box Calculation
+                    let largeOriginal = parseFloat(document.getElementById('variant-large-original').value) || 0;
+                    let largeDiscount = parseFloat(document.getElementById('variant-large-discount').value) || 0;
+                    let largeFinal = largeOriginal > 0 ? largeOriginal - (largeOriginal * (largeDiscount / 100)) : 0;
+                    
+                    // Custom Box Calculation
+                    let customOriginal = parseFloat(document.getElementById('variant-custom-original').value) || 0;
+                    let customDiscount = parseFloat(document.getElementById('variant-custom-discount').value) || 0;
+                    let customFinal = customOriginal > 0 ? customOriginal - (customOriginal * (customDiscount / 100)) : 0;
+
                     variantPricesPayload = {
                         "Standard (10x8x4)": { 
                             price: finalPrice, 
                             originalPrice: originalPriceToSave 
                         },
                         "Large (12x10x6)": { 
-                            price: parseFloat(document.getElementById('variant-large-price').value) || finalPrice, 
-                            originalPrice: parseFloat(document.getElementById('variant-large-original').value) || originalPriceToSave 
+                            price: largeFinal > 0 ? largeFinal : finalPrice, 
+                            originalPrice: largeDiscount > 0 ? largeOriginal : null 
                         },
                         "Custom Box": { 
-                            price: parseFloat(document.getElementById('variant-custom-price').value) || finalPrice, 
-                            originalPrice: null 
+                            price: customFinal > 0 ? customFinal : finalPrice, 
+                            originalPrice: customDiscount > 0 ? customOriginal : null 
                         }
                     };
                 }
@@ -546,7 +561,7 @@
                     title: title,
                     price: finalPrice,
                     originalPrice: originalPriceToSave,
-                    variantPrices: variantPricesPayload, // Saves dynamic prices!
+                    variantPrices: variantPricesPayload, 
                     image: convertDriveLink(rawImageUrl), 
                     description: desc,
                     colors: colorsArray, 
@@ -557,16 +572,15 @@
                 
                 successMsg.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
                 
-                // Reset form
                 categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; 
                 document.getElementById('prod-discount').value = '0';
                 imageInput.value = ''; document.getElementById('prod-desc').value = '';
                 document.getElementById('color-inputs-container').style.display = 'none';
                 
-                // Clear hamper fields
-                document.getElementById('variant-large-price').value = '';
                 document.getElementById('variant-large-original').value = '';
-                document.getElementById('variant-custom-price').value = '';
+                document.getElementById('variant-large-discount').value = '0';
+                document.getElementById('variant-custom-original').value = '';
+                document.getElementById('variant-custom-discount').value = '0';
                 document.getElementById('hamper-pricing-section').style.display = 'none';
 
                 document.getElementById('dynamic-color-list').innerHTML = `<div class="color-row" style="display: flex; gap: 10px; margin-bottom: 10px;"><input type="text" class="color-input" placeholder="e.g. Dusty Rose" style="flex: 1;"><button type="button" class="action-btn" onclick="addAnotherColor()">+ Add Color</button></div>`;
@@ -655,7 +669,6 @@
             }
         };
 
-        // --- LIVE INVENTORY SEARCH ---
         window.filterInventoryList = function() {
             const term = document.getElementById('search-inventory').value.toLowerCase().trim();
             const allItems = document.querySelectorAll('.inv-item');
@@ -713,23 +726,29 @@
             document.getElementById('edit-image').value = product.image; 
             document.getElementById('edit-desc').value = product.description || '';
 
-            // Populate Hamper Variant Prices if they exist
+            // Populate Reverse-Calculated Hamper Discounts
             if (primaryCategory.includes('Hamper')) {
                 document.getElementById('edit-hamper-pricing-section').style.display = 'block';
                 if (product.variantPrices) {
-                    document.getElementById('edit-variant-large-price').value = product.variantPrices["Large (12x10x6)"]?.price || '';
-                    document.getElementById('edit-variant-large-original').value = product.variantPrices["Large (12x10x6)"]?.originalPrice || '';
-                    document.getElementById('edit-variant-custom-price').value = product.variantPrices["Custom Box"]?.price || '';
+                    let lPrice = product.variantPrices["Large (12x10x6)"]?.price || 0;
+                    let lOrig = product.variantPrices["Large (12x10x6)"]?.originalPrice || lPrice;
+                    document.getElementById('edit-variant-large-original').value = lOrig || '';
+                    document.getElementById('edit-variant-large-discount').value = (lOrig > lPrice) ? Math.round(((lOrig - lPrice) / lOrig) * 100) : 0;
+
+                    let cPrice = product.variantPrices["Custom Box"]?.price || 0;
+                    let cOrig = product.variantPrices["Custom Box"]?.originalPrice || cPrice;
+                    document.getElementById('edit-variant-custom-original').value = cOrig || '';
+                    document.getElementById('edit-variant-custom-discount').value = (cOrig > cPrice) ? Math.round(((cOrig - cPrice) / cOrig) * 100) : 0;
                 } else {
-                    document.getElementById('edit-variant-large-price').value = '';
                     document.getElementById('edit-variant-large-original').value = '';
-                    document.getElementById('edit-variant-custom-price').value = '';
+                    document.getElementById('edit-variant-large-discount').value = '0';
+                    document.getElementById('edit-variant-custom-original').value = '';
+                    document.getElementById('edit-variant-custom-discount').value = '0';
                 }
             } else {
                 document.getElementById('edit-hamper-pricing-section').style.display = 'none';
             }
 
-            // Generate clickable size/color buttons!
             const variantContainer = document.getElementById('edit-dynamic-variants');
             variantContainer.innerHTML = '';
             let availableVariants = [];
@@ -764,12 +783,12 @@
             const btn = event.target;
             const category = document.getElementById('edit-category').value || "";
             const title = document.getElementById('edit-title').value.trim();
-            const basePrice = parseFloat(document.getElementById('edit-price').value);
-            const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; 
+            const baseOriginalPrice = parseFloat(document.getElementById('edit-price').value);
+            const baseDiscountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; 
             const rawImageUrl = document.getElementById('edit-image').value.trim();
             const desc = document.getElementById('edit-desc').value.trim();
 
-            if(!title || isNaN(basePrice) || !rawImageUrl || !desc) { alert("Fill in all fields."); return; }
+            if(!title || isNaN(baseOriginalPrice) || !rawImageUrl || !desc) { alert("Fill in all fields."); return; }
 
             btn.innerText = "Saving..."; btn.disabled = true;
 
@@ -777,25 +796,32 @@
                 const outVariantBtns = document.querySelectorAll('#edit-dynamic-variants .is-out');
                 const stockOutVariants = Array.from(outVariantBtns).map(b => b.textContent);
 
-                let finalPrice = basePrice; let originalPriceToSave = null; let categories = [category];
-                if (discountPercent > 0) {
-                    finalPrice = basePrice - (basePrice * (discountPercent / 100)); 
-                    originalPriceToSave = basePrice; 
-                    if (discountPercent >= 50) categories.push("Archive Sale"); 
+                let finalPrice = baseOriginalPrice; let originalPriceToSave = null; let categories = [category];
+                if (baseDiscountPercent > 0) {
+                    finalPrice = baseOriginalPrice - (baseOriginalPrice * (baseDiscountPercent / 100)); 
+                    originalPriceToSave = baseOriginalPrice; 
+                    if (baseDiscountPercent >= 50) categories.push("Archive Sale"); 
                 }
 
-                // Handle variant pricing for existing products being edited
                 let variantPricesPayload = window.allProductsData[id].variantPrices || null;
                 if (category.includes("Hamper")) {
+                    let largeOriginal = parseFloat(document.getElementById('edit-variant-large-original').value) || 0;
+                    let largeDiscount = parseFloat(document.getElementById('edit-variant-large-discount').value) || 0;
+                    let largeFinal = largeOriginal > 0 ? largeOriginal - (largeOriginal * (largeDiscount / 100)) : 0;
+                    
+                    let customOriginal = parseFloat(document.getElementById('edit-variant-custom-original').value) || 0;
+                    let customDiscount = parseFloat(document.getElementById('edit-variant-custom-discount').value) || 0;
+                    let customFinal = customOriginal > 0 ? customOriginal - (customOriginal * (customDiscount / 100)) : 0;
+
                     variantPricesPayload = {
                         "Standard (10x8x4)": { price: finalPrice, originalPrice: originalPriceToSave },
                         "Large (12x10x6)": { 
-                            price: parseFloat(document.getElementById('edit-variant-large-price').value) || finalPrice, 
-                            originalPrice: parseFloat(document.getElementById('edit-variant-large-original').value) || originalPriceToSave 
+                            price: largeFinal > 0 ? largeFinal : finalPrice, 
+                            originalPrice: largeDiscount > 0 ? largeOriginal : null 
                         },
                         "Custom Box": { 
-                            price: parseFloat(document.getElementById('edit-variant-custom-price').value) || finalPrice, 
-                            originalPrice: null 
+                            price: customFinal > 0 ? customFinal : finalPrice, 
+                            originalPrice: customDiscount > 0 ? customOriginal : null 
                         }
                     };
                 } else {
@@ -807,7 +833,7 @@
                 await updateDoc(doc(db, "products", id), {
                     category: categories, title: title,
                     price: finalPrice, originalPrice: originalPriceToSave, 
-                    variantPrices: variantPricesPayload, // Saves updated prices
+                    variantPrices: variantPricesPayload, 
                     image: finalImage, description: desc,
                     stockOutVariants: stockOutVariants 
                 });
