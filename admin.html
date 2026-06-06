@@ -11,144 +11,36 @@
     
     <style>
         /* --- Core Admin Variables --- */
-
         :root {
             --primary-bg: #FFFFFF;       
-
-
-
             --dark-text: #1C1B1A;        
-
-
-
             --muted-gray: #7A7571;       
-
-
-
             --border-color: #ECEAE6;     
-
-
-
             --accent-gold: #C5A880;      
-
-
-
             --font-serif: 'Cormorant Garamond', serif;
-
-
-
             --font-sans: 'Montserrat', sans-serif;
-
-
-
         }
 
         body { font-family: var(--font-sans); background-color: #f8f8f8; margin: 0; color: var(--dark-text); }
 
         /* --- HEADER & NAVIGATION --- */
-
-
-
-        .site-header { 
-
-
-
-            background: var(--primary-bg); 
-
-
-
-            padding: 10px 40px;
-
-
-
-            border-bottom: 1px solid var(--border-color); 
-
-
-
-            display: grid; 
-
-
-
-            grid-template-columns: 0.5fr auto 1.5fr; 
-
-
-
-            align-items: center; 
-
-
-
-            position: sticky; 
-
-
-
-            top: 0; 
-
-
-
-            z-index: 100;
-
-
-
-        }
-
+        .site-header { background: var(--primary-bg); padding: 10px 40px; border-bottom: 1px solid var(--border-color); display: grid; grid-template-columns: 0.5fr auto 1.5fr; align-items: center; position: sticky; top: 0; z-index: 100;}
         .brand-logo-wrapper { display: flex; justify-content: center; }
-
-        .brand-logo-img { 
-
-
-
-            height: 45px;
-
-
-
-            width: auto;
-
-
-
-            object-fit: contain;
-
-
-
-            transform: scale(3.0); 
-
-
-
-        }
-
+        .brand-logo-img { height: 45px; width: auto; object-fit: contain; transform: scale(3.0); }
         input[type="number"]::-webkit-outer-spin-button,
-
-
-
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
-
-
         input[type="number"] { -moz-appearance: textfield; }
-
         .admin-nav { display: flex; gap: 30px; align-items: center; justify-content: flex-end; }
-
         .nav-btn { background: none; border: none; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; cursor: pointer; padding-bottom: 5px; color: var(--muted-gray); transition: 0.3s; }
-
-
-
         .nav-btn:hover { color: var(--dark-text); }
-
-
-
         .nav-btn.active { color: var(--dark-text); border-bottom: 1px solid var(--dark-text); font-weight: 500; }
-
         .logout-btn { background-color: transparent; color: #e24c4c; border: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-
-
-
         .logout-btn:hover { color: var(--dark-text); }
 
         /* Loading Screen */
-
         #loading-screen { text-align: center; padding-top: 15vh; font-size: 16px; color: var(--muted-gray); letter-spacing: 2px; text-transform: uppercase; }
 
         /* --- LAYOUT STRUCTURE --- */
-
         .admin-container { padding: 40px; max-width: 1200px; margin: 0 auto; }
         .admin-layout { display: flex; gap: 40px; align-items: flex-start; }
         .admin-form-section { flex: 1.2; background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); border: 1px solid var(--border-color); }
@@ -159,151 +51,45 @@
         /* Form Styles */
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; }
-        input[type="text"], input[type="number"], textarea, select { 
-
-
-
-            width: 100%; 
-
-
-
-            padding: 14px; 
-
-
-
-            border: 1px solid var(--border-color); 
-
-
-
-            border-radius: 2px; 
-
-
-
-            font-family: var(--font-sans); 
-
-
-
-            font-size: 13px; 
-
-
-
-            box-sizing: border-box; 
-
-
-
-            transition: border-color 0.3s; 
-
-
-
-            background-color: #fff;
-
-
-
-            color: var(--dark-text);
-
-
-
-        }
-
+        input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 2px; font-family: var(--font-sans); font-size: 13px; box-sizing: border-box; transition: border-color 0.3s; background-color: #fff; color: var(--dark-text);}
         input:focus, textarea:focus, select:focus { border-color: var(--accent-gold); outline: none; }
-
         button.submit-btn { width: 100%; padding: 16px; background-color: var(--dark-text); color: #fff; border: none; font-size: 11px; font-family: var(--font-sans); font-weight: 500; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; border-radius: 2px; transition: 0.3s; margin-top: 10px;}
-
         button.submit-btn:hover { background-color: var(--accent-gold); }
-
         button.submit-btn:disabled { background-color: var(--border-color); color: var(--muted-gray); cursor: not-allowed; }
-
         .success-msg { color: #4A5D4E; text-align: center; font-size: 12px; font-weight: 500; margin-top: 20px; display: none; padding: 12px; background: #e9f2ea; border: 1px solid #c3d8c5; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
 
         /* --- PREVIEW CARD --- */
-
         .preview-header { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; color: var(--muted-gray); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-
-
         .category-card { position: relative; width: 100%; max-width: 320px; background-color: var(--primary-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 2px; display: flex; flex-direction: column; margin: 0 auto; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
-
-
         .img-wrapper { width: 100%; aspect-ratio: 3 / 4; background-color: #FAFAFA; position: relative; overflow: hidden; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
-
-
         .category-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
-
-
         .img-placeholder-text { font-size: 11px; color: var(--muted-gray); letter-spacing: 1px; text-transform: uppercase; }
-
-
         .preview-catalog-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-gold); text-align: center; margin-bottom: 6px; font-weight: 500;}
-
-
-
         .category-name { font-family: var(--font-serif); font-size: 18px; font-weight: 400; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dark-text); text-align: center; }
-
-
-
         .category-price { font-size: 11px; color: var(--muted-gray); font-weight: 500; letter-spacing: 1px; text-align: center; }
 
         /* --- INVENTORY MANAGEMENT STYLES --- */
-
         .inventory-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px;}
-
-
-
         .inv-item { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px; transition: 0.3s;}
-
-
-
         .inv-item.out-of-stock { background: #fafafa; border-color: #e0e0e0; }
-
-
-
         .inv-item.out-of-stock .inv-img { opacity: 0.5; filter: grayscale(100%); }
-
-
-
         .inv-item.out-of-stock .inv-title { color: var(--muted-gray); text-decoration: line-through; }
-
-
         .inv-info { display: flex; align-items: center; gap: 20px; flex: 1; }
-
-
-
         .inv-img { width: 60px; height: 80px; object-fit: cover; background: #f0f0f0; border-radius: 2px; }
-
-
-
         .inv-details { display: flex; flex-direction: column; gap: 5px; }
-
-
-
         .inv-title { font-family: var(--font-serif); font-size: 18px; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
-
-
-
         .inv-price { font-size: 12px; color: var(--muted-gray); font-weight: 500; }
-
         .badge-group { display: flex; gap: 8px; margin-top: 5px; }
-
-
         .status-badge { display: inline-block; padding: 4px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; background: #e9f2ea; color: #4A5D4E; width: fit-content;}
-
-
         .catalog-badge { background: #f0eee9; color: var(--accent-gold); font-weight: 500; }
-
-
         .out-of-stock .status-badge { background: #fce8e8; color: #c9302c; }
-
         .inv-actions { display: flex; gap: 10px; }
-
         .action-btn { background: #fff; border: 1px solid var(--border-color); padding: 10px 15px; font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; border-radius: 2px; }
-
         .action-btn:hover { border-color: var(--dark-text); }
-
         .btn-delete { color: #c9302c; }
-
         .btn-delete:hover { background: #c9302c; color: #fff; border-color: #c9302c; }
-        /* Styling for Out of Stock Variant Buttons in Admin */
-.variant-toggle-btn { margin-bottom: 5px; }
-.variant-toggle-btn.is-out { background: #c9302c; color: #fff; border-color: #c9302c; text-decoration: line-through; }
+        .variant-toggle-btn { margin-bottom: 5px; }
+        .variant-toggle-btn.is-out { background: #c9302c; color: #fff; border-color: #c9302c; text-decoration: line-through; }
 
         @media (max-width: 900px) {
             .admin-layout { flex-direction: column; }
@@ -313,278 +99,55 @@
             .site-header { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
         }
         @media (max-width: 600px) {
-            /* Reclaim screen real estate by reducing heavy padding */
             .admin-container { padding: 20px 15px; }
             .admin-form-section { padding: 25px 20px; }
-            
-            /* Prevent the logo from stretching out of bounds */
             .brand-logo-img { transform: scale(2.0); margin: 10px 0; }
-            
-            /* Center and wrap navigation links nicely */
             .admin-nav { flex-wrap: wrap; justify-content: center; gap: 15px; }
-            
-            /* Stack the inventory items and center them for a card-like feel */
             .inv-info { flex-direction: column; align-items: center; text-align: center; width: 100%; gap: 10px; }
-            .inv-img { width: 100px; height: 130px; } /* Slightly larger image focus on mobile */
+            .inv-img { width: 100px; height: 130px; } 
             .badge-group { justify-content: center; flex-wrap: wrap; }
-            
-            /* Make action buttons full-width for easy thumb-tapping */
             .inv-actions { flex-direction: column; width: 100%; gap: 8px; }
             .action-btn { width: 100%; padding: 12px; font-size: 11px; text-align: center; }
-            
-            /* Make the Edit Modal fit perfectly on small screens */
             .modal-content { padding: 25px 20px; width: 95%; max-height: 85vh;}
             .admin-header h2 { font-size: 20px; }
         }
+
         /* --- EDIT MODAL STYLES --- */
-
-        .modal-overlay { 
-
-
-
-            display: none; 
-
-
-
-            position: fixed; 
-
-
-
-            top: 0; left: 0; 
-
-
-
-            width: 100%; height: 100%; 
-
-
-
-            background: rgba(0,0,0,0.5); 
-
-
-
-            z-index: 1000; 
-
-
-
-            align-items: center; 
-
-
-
-            justify-content: center; 
-
-
-
-            backdrop-filter: blur(3px);
-
-
-
-        }
-
-
-
-        .modal-content { 
-
-
-
-            background: #fff; 
-
-
-
-            padding: 40px; 
-
-
-
-            border-radius: 2px; 
-
-
-
-            width: 90%; 
-
-
-
-            max-width: 500px; 
-
-
-
-            max-height: 90vh; 
-
-
-
-            overflow-y: auto; 
-
-
-
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-
-
-
-        }
-
-
-
-        .modal-header { 
-
-
-
-            display: flex; 
-
-
-
-            justify-content: space-between; 
-
-
-
-            align-items: center; 
-
-
-
-            margin-bottom: 25px; 
-
-
-
-            border-bottom: 1px solid var(--border-color);
-
-
-
-            padding-bottom: 15px;
-
-
-
-        }
-
-
-
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(3px);}
+        .modal-content { background: #fff; padding: 40px; border-radius: 2px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.1);}
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
         .modal-header h2 { margin: 0; }
-
-
-
-        .close-btn { 
-
-
-
-            background: none; 
-
-
-
-            border: none; 
-
-
-
-            font-size: 24px; 
-
-
-
-            cursor: pointer; 
-
-
-
-            color: var(--muted-gray); 
-
-
-
-            transition: 0.3s;
-
-
-
-        }
-
-
-
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted-gray); transition: 0.3s;}
         .close-btn:hover { color: var(--dark-text); }
-
-
-
     </style>
-
-
-
 </head>
 
-
-
 <body>
-
     <div id="loading-screen">Verifying Secure Vault Access...</div>
-
     <div id="admin-content" style="display: none;">
 
-
         <header class="site-header">
-
-
-
             <div class="header-left"></div>
-
-
-
             <div class="brand-logo-wrapper">
-
-
-
                 <img src="header.png" alt="ABAYRAH Logo" class="brand-logo-img">
-
-
-
             </div>
-
-
-
             <nav class="admin-nav">
-
-
-
                 <button class="nav-btn active" id="tab-add" onclick="switchTab('add')">Add New Product</button>
-
-
-
                 <button class="nav-btn" id="tab-manage" onclick="switchTab('manage')">Manage Inventory</button>
-
-
-
                 <button id="logoutBtn" class="logout-btn">Log Out</button>
-
-
-
             </nav>
-
-
-
         </header>
 
         <div class="admin-container">
-
-
             <div id="view-add" class="admin-layout">
-
-
-
                 <div class="admin-form-section">
-
-
-
                     <div class="admin-header">
-
-
-
                         <h2>Vault Entry</h2>
-
-
-
                     </div>
-
-
-
                     <p class="welcome-text">Welcome, <strong id="adminName">Admin</strong>. Add new products here. They will automatically be pushed to their selected catalog collection.</p>
 
-
                     <div class="form-group">
-
-
-
                         <label>Select Catalog / Category</label>
-
-
-
                       <select id="prod-category" required>
                             <option value="" disabled selected>Choose a collection...</option>
                             <option value="Luxury Abayas">Abayas</option>
@@ -593,138 +156,84 @@
                             <option value="Essential Hijabs">Hijabs</option>
                             <option value="Signature Accessories">Accessories</option>
                         </select>
-
-
-
                     </div>
 
-
                     <div class="form-group">
-
-
-
                         <label>Product Title</label>
-
-
-
                         <input type="text" id="prod-title" placeholder="e.g., Emerald Green Silk Abaya" required>
-
-
-
-                    </div>
-
-
-                  <div class="form-group">
-    <label>Original Price (₹)</label>
-    <input type="number" id="prod-price" step="0.01" required>
-</div>
-<div class="form-group">
-    <label>Discount Percentage (%)</label>
-    <input type="number" id="prod-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
-</div>
-
-<div class="form-group" id="color-inputs-container" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
-    <label>Available Colors (For Hijabs & Accessories)</label>
-    <div id="dynamic-color-list">
-        <div class="color-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <input type="text" class="color-input" placeholder="e.g. Dusty Rose" style="flex: 1;">
-            <button type="button" class="action-btn" onclick="addAnotherColor()">+ Add Color</button>
-        </div>
-    </div>
-</div>
-
-
-
-                    <div class="form-group">
-
-
-
-                        <label>Google Drive Image Link</label>
-
-
-
-                        <input type="text" id="prod-image-url" placeholder="Paste the 'Anyone with the link can view' URL here" required>
-
-
-
                     </div>
 
                     <div class="form-group">
-
-
-
-                        <label>Product Description</label>
-
-
-
-                        <textarea id="prod-desc" rows="4" placeholder="Describe the fabric, style, and fit..." required></textarea>
-
-
-
+                        <label>Original Price (₹)</label>
+                        <input type="number" id="prod-price" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Discount Percentage (%)</label>
+                        <input type="number" id="prod-discount" placeholder="e.g. 20 (Leave 0 for no discount)" value="0" min="0" max="100">
                     </div>
 
-
-                    <button id="submit-btn" class="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
-
-
-
-                    <p id="success-msg" class="success-msg">Product Successfully Added to Database!</p>
-
-
-
-                </div>
-
-
-                <div class="admin-preview-section">
-
-
-
-                    <div class="preview-header">Live Storefront Preview</div>
-
-
-
-                    <div class="category-card">
-
-
-
-                        <div class="img-wrapper">
-
-
-
-                            <span class="img-placeholder-text" id="preview-img-text">Image Preview</span>
-
-
-
-                            <img id="preview-image" src="" alt="" class="category-img" style="display: none;">
-
-
-
+                    <div class="form-group" id="hamper-pricing-section" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
+                        <label style="color: var(--accent-gold); font-family: var(--font-serif); font-size: 16px; text-transform: uppercase;">Hamper Box Pricing</label>
+                        <p style="font-size: 10px; color: var(--muted-gray); margin-bottom: 15px; text-transform: uppercase;">Standard size automatically uses the main price above.</p>
+                        
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <div style="flex: 1;">
+                                <label>Large Box (Price) ₹</label>
+                                <input type="number" id="variant-large-price" placeholder="e.g. 2000">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Large Box (Original Price) ₹</label>
+                                <input type="number" id="variant-large-original" placeholder="e.g. 2500">
+                            </div>
                         </div>
 
-
-
-                        <div class="preview-catalog-tag" id="preview-category">Select Catalog</div>
-
-
-
-                        <h3 class="category-name" id="preview-title">Product Title</h3>
-
-
-
-                        <p class="category-price" id="preview-price">₹0.00</p>
-
-
-
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label>Custom Box (Base Price) ₹</label>
+                                <input type="number" id="variant-custom-price" placeholder="e.g. 2500">
+                            </div>
+                        </div>
                     </div>
 
+                    <div class="form-group" id="color-inputs-container" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
+                        <label>Available Colors (For Hijabs & Accessories)</label>
+                        <div id="dynamic-color-list">
+                            <div class="color-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" class="color-input" placeholder="e.g. Dusty Rose" style="flex: 1;">
+                                <button type="button" class="action-btn" onclick="addAnotherColor()">+ Add Color</button>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label>Google Drive Image Link</label>
+                        <input type="text" id="prod-image-url" placeholder="Paste the 'Anyone with the link can view' URL here" required>
+                    </div>
 
+                    <div class="form-group">
+                        <label>Product Description</label>
+                        <textarea id="prod-desc" rows="4" placeholder="Describe the fabric, style, and fit..." required></textarea>
+                    </div>
+
+                    <button id="submit-btn" class="submit-btn" onclick="uploadProduct()">Push to Live Store</button>
+                    <p id="success-msg" class="success-msg">Product Successfully Added to Database!</p>
                 </div>
 
-
-
+                <div class="admin-preview-section">
+                    <div class="preview-header">Live Storefront Preview</div>
+                    <div class="category-card">
+                        <div class="img-wrapper">
+                            <span class="img-placeholder-text" id="preview-img-text">Image Preview</span>
+                            <img id="preview-image" src="" alt="" class="category-img" style="display: none;">
+                        </div>
+                        <div class="preview-catalog-tag" id="preview-category">Select Catalog</div>
+                        <h3 class="category-name" id="preview-title">Product Title</h3>
+                        <p class="category-price" id="preview-price">₹0.00</p>
+                    </div>
+                </div>
             </div>
-<!-- MANAGE INVENTORY VIEW -->
+
             <div id="view-manage" style="display: none;">
                 <div class="admin-form-section" style="width: 100%;">
                     <div class="admin-header">
@@ -751,449 +260,186 @@
                     </div> 
 
                     <div id="inventory-list" class="inventory-list" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <div id="edit-modal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header admin-header">
+                        <h2>Edit Product</h2>
+                        <button class="close-btn" onclick="closeEditModal()">&times;</button>
+                    </div>
+
+                    <input type="hidden" id="edit-doc-id">
+
+                    <div class="form-group">
+                        <label>Catalog / Category</label>
+                       <select id="edit-category" required>
+                            <option value="Luxury Abayas">Abayas</option>
+                            <option value="Curated Hampers">Hampers</option>
+                            <option value="Premium Niqabs">Naqabs</option>
+                            <option value="Essential Hijabs">Hijabs</option>
+                            <option value="Signature Accessories">Accessories</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Product Title</label>
+                        <input type="text" id="edit-title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" id="edit-price" step="0.01" required>
+                    </div>
                     
+                    <div class="form-group">
+                        <label>Discount Percentage (%)</label>
+                        <input type="number" id="edit-discount" placeholder="e.g. 20" value="0" min="0" max="100">
+                    </div>
+
+                    <div class="form-group" id="edit-hamper-pricing-section" style="display: none; background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
+                        <label style="color: var(--accent-gold); font-family: var(--font-serif); font-size: 16px; text-transform: uppercase;">Edit Hamper Box Pricing</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <div style="flex: 1;">
+                                <label>Large Box (Price) ₹</label>
+                                <input type="number" id="edit-variant-large-price">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Large Box (Original) ₹</label>
+                                <input type="number" id="edit-variant-large-original">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label>Custom Box (Base Price) ₹</label>
+                                <input type="number" id="edit-variant-custom-price">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
+                        <label>Out of Stock Variants</label>
+                        <p style="font-size: 10px; color: var(--muted-gray); margin-bottom: 10px; text-transform: uppercase;">Click a size/color below to mark it as OUT OF STOCK.</p>
+                        <div id="edit-dynamic-variants" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image Link</label>
+                        <input type="text" id="edit-image" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="edit-desc" rows="4" required></textarea>
+                    </div>
+
+                    <button class="submit-btn" onclick="saveEditedProduct(event)">Save Changes</button>
                 </div>
             </div>
-
-        <div id="edit-modal" class="modal-overlay">
-
-
-
-            <div class="modal-content">
-
-
-
-                <div class="modal-header admin-header">
-
-
-
-                    <h2>Edit Product</h2>
-
-
-
-                    <button class="close-btn" onclick="closeEditModal()">&times;</button>
-
-
-
-                </div>
-
-                <input type="hidden" id="edit-doc-id">
-
-                <div class="form-group">
-
-
-
-                    <label>Catalog / Category</label>
-
-
-
-                   <select id="edit-category" required>
-                        <option value="Luxury Abayas">Abayas</option>
-                        <option value="Curated Hampers">Hampers</option>
-                        <option value="Premium Niqabs">Naqabs</option>
-                        <option value="Essential Hijabs">Hijabs</option>
-                        <option value="Signature Accessories">Accessories</option>
-                    </select>
-
-
-                </div>
-
-
-
-                <div class="form-group">
-
-
-
-                    <label>Product Title</label>
-
-
-
-                    <input type="text" id="edit-title" required>
-
-
-
-                </div>
-
-
-
-               <div class="form-group">
-    <label>Price</label>
-    <input type="number" id="edit-price" step="0.01" required>
-</div>
-<div class="form-group">
-    <label>Discount Percentage (%)</label>
-    <input type="number" id="edit-discount" placeholder="e.g. 20" value="0" min="0" max="100">
-</div>
-
-<div class="form-group" style="background: #FAFAFA; padding: 15px; border: 1px solid var(--border-color); border-radius: 2px;">
-    <label>Out of Stock Variants</label>
-    <p style="font-size: 10px; color: var(--muted-gray); margin-bottom: 10px; text-transform: uppercase;">Click a size/color below to mark it as OUT OF STOCK.</p>
-    <div id="edit-dynamic-variants" style="display: flex; gap: 8px; flex-wrap: wrap;">
-        </div>
-</div>
-<div class="form-group">
-    <label>Image Link</label>
-    <input type="text" id="edit-image" required>
-</div>
-                
-                <div class="form-group">
-
-
-
-                    <label>Description</label>
-
-
-
-                    <textarea id="edit-desc" rows="4" required></textarea>
-
-
-
-                </div>
-
-
-
-                <button class="submit-btn" onclick="saveEditedProduct(event)">Save Changes</button>
-
-
-
-            </div>
-
-
-
         </div>
     </div>
 
     <script type="module">
-
-
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-
-
-
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
-
-
         import { getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-
         const firebaseConfig = {
-
-
-
             apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
-
-
-
             authDomain: "abayrah-9df21.firebaseapp.com",
-
-
-
             projectId: "abayrah-9df21",
-
-
-
             storageBucket: "abayrah-9df21.firebasestorage.app",
-
-
-
             messagingSenderId: "789725334313",
-
-
-
             appId: "1:789725334313:web:b37408f42add9611730538",
-
-
-
             measurementId: "G-NLJJVVE32M"
-
-
-
         };
 
-
         const app = initializeApp(firebaseConfig);
-
-
-
         const auth = getAuth(app);
-
-
-
         const db = getFirestore(app);
 
         // UI Elements
-
-
-
         const adminContent = document.getElementById('admin-content');
-
-
-
         const loadingScreen = document.getElementById('loading-screen');
-
-
-
         const logoutBtn = document.getElementById('logoutBtn');
-
-
-
         const adminNameLabel = document.getElementById('adminName');
 
         onAuthStateChanged(auth, async (user) => {
-
-
-
             if (user) {
-
-
-
                 try {
-
-
-
                     const adminDocRef = doc(db, "admins", user.uid);
-
-
-
                     const adminDocSnap = await getDoc(adminDocRef);
-
                     if (adminDocSnap.exists() && adminDocSnap.data().role === "superadmin") {
-
-
-
                         loadingScreen.style.display = 'none';
-
-
-
                         adminContent.style.display = 'block';
-
-
-
                         adminNameLabel.innerText = user.displayName || "Admin";
-
-
-
                     } else {
-
-
-
                         alert("Access Denied: You do not have administrative privileges.");
-
-
-
                         window.location.href = 'index.html';
-
-
-
                     }
-
-
-
                 } catch (error) {
-
-
-
                     window.location.href = 'index.html';
-
-
-
                 }
-
-
-
             } else {
-
-
-
                 window.location.href = 'index.html';
-
-
-
             }
-
-
-
         });
-
 
         logoutBtn.addEventListener('click', () => {
-
-
-
             signOut(auth).then(() => { window.location.href = 'index.html'; });
-
-
-
         });
 
-
         window.switchTab = function(tabName) {
-
-
-
             document.getElementById('view-add').style.display = tabName === 'add' ? 'flex' : 'none';
-
-
-
             document.getElementById('view-manage').style.display = tabName === 'manage' ? 'block' : 'none';
-
-
             document.getElementById('tab-add').classList.toggle('active', tabName === 'add');
-
-
-
             document.getElementById('tab-manage').classList.toggle('active', tabName === 'manage');
-
-
             if(tabName === 'manage') loadInventory();
-
-
-
         };
 
-
         function convertDriveLink(url) {
-
-
-
             if (!url) return '';
-
-
-
             const match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
-
-
-
             if (match && match[1]) {
-
-
-
                 return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-
-
-
             }
-
-
-
             return url; 
-
-
-
         }
 
         // --- LIVE PREVIEW ---
-
-
-
         const categoryInput = document.getElementById('prod-category');
-
-
-
         const titleInput = document.getElementById('prod-title');
-
-
-
         const priceInput = document.getElementById('prod-price');
-
-
-
         const imageInput = document.getElementById('prod-image-url');
-
         const previewCategory = document.getElementById('preview-category');
-
-
-
         const previewTitle = document.getElementById('preview-title');
-
-
-
         const previewPrice = document.getElementById('preview-price');
-
-
-
         const previewImage = document.getElementById('preview-image');
-
-
-
         const previewImgText = document.getElementById('preview-img-text');
 
-
         categoryInput.addEventListener('change', (e) => {
-
-
-
             previewCategory.textContent = e.target.options[e.target.selectedIndex].text;
-
-
-
         });
-
 
         titleInput.addEventListener('input', (e) => previewTitle.textContent = e.target.value || 'Product Title');
 
-
-
         priceInput.addEventListener('input', (e) => {
-
-
-
             const val = parseFloat(e.target.value);
-
-
-
             previewPrice.textContent = isNaN(val) ? '₹0.00' : `₹${val.toFixed(2)}`;
-
-
-
         });
 
         imageInput.addEventListener('input', (e) => {
-
-
-
             const rawUrl = e.target.value.trim();
-
-
-
             if (rawUrl) {
-
-
-
                 previewImage.src = convertDriveLink(rawUrl);
-
-
-
                 previewImage.style.display = 'block';
-
-
-
                 previewImgText.style.display = 'none';
-
-
-
             } else {
-
-
-
                 previewImage.src = '';
-
-
-
                 previewImage.style.display = 'none';
-
-
-
                 previewImgText.style.display = 'block';
-
-
-
             }
-
-
-
         });
 
         // --- DYNAMIC COLOR INPUTS ---
@@ -1209,19 +455,39 @@
             list.appendChild(newRow);
         };
 
-        // Show Color inputs ONLY when Hijabs or Accessories are selected
+        // Show Color inputs or Hamper Pricing depending on category (BULLETPROOF FIX)
         categoryInput.addEventListener('change', (e) => {
-            const cat = e.target.value;
+            const cat = e.target.value || "";
             previewCategory.textContent = e.target.options[e.target.selectedIndex].text;
             
             const colorContainer = document.getElementById('color-inputs-container');
-            if (cat === 'Essential Hijabs' || cat === 'Signature Accessories') {
+            const hamperPricingContainer = document.getElementById('hamper-pricing-section');
+            
+            if (cat.includes('Hijab') || cat.includes('Accessories')) {
                 colorContainer.style.display = 'block';
             } else {
                 colorContainer.style.display = 'none';
             }
+
+            // Fix: Triggers on ANY category containing the word "Hamper"
+            if (cat.includes('Hamper')) {
+                hamperPricingContainer.style.display = 'block';
+            } else {
+                hamperPricingContainer.style.display = 'none';
+            }
         });
-   // --- UPLOAD PRODUCT ---
+
+        // Toggle hamper inputs inside Edit Modal (BULLETPROOF FIX)
+        document.getElementById('edit-category').addEventListener('change', (e) => {
+            const cat = e.target.value || "";
+            if (cat.includes('Hamper')) {
+                document.getElementById('edit-hamper-pricing-section').style.display = 'block';
+            } else {
+                document.getElementById('edit-hamper-pricing-section').style.display = 'none';
+            }
+        });
+
+        // --- UPLOAD PRODUCT ---
         window.uploadProduct = async function() {
             const category = categoryInput.value;
             const title = titleInput.value.trim();
@@ -1246,11 +512,33 @@
             submitBtn.disabled = true; submitBtn.innerText = "Pushing to Vault...";
 
             try {
-                let finalPrice = basePrice; let originalPriceToSave = null; let categories = [category]; 
+                let finalPrice = basePrice; 
+                let originalPriceToSave = null; 
+                let categories = [category]; 
+                
                 if (discountPercent > 0) {
                     finalPrice = basePrice - (basePrice * (discountPercent / 100));
                     originalPriceToSave = basePrice;
                     if (discountPercent >= 50) categories.push("Archive Sale"); 
+                }
+
+                // --- Build the variant pricing for Hampers ---
+                let variantPricesPayload = null;
+                if (category.includes("Hamper")) {
+                    variantPricesPayload = {
+                        "Standard (10x8x4)": { 
+                            price: finalPrice, 
+                            originalPrice: originalPriceToSave 
+                        },
+                        "Large (12x10x6)": { 
+                            price: parseFloat(document.getElementById('variant-large-price').value) || finalPrice, 
+                            originalPrice: parseFloat(document.getElementById('variant-large-original').value) || originalPriceToSave 
+                        },
+                        "Custom Box": { 
+                            price: parseFloat(document.getElementById('variant-custom-price').value) || finalPrice, 
+                            originalPrice: null 
+                        }
+                    };
                 }
 
                 await addDoc(collection(db, "products"), {
@@ -1258,20 +546,29 @@
                     title: title,
                     price: finalPrice,
                     originalPrice: originalPriceToSave,
+                    variantPrices: variantPricesPayload, // Saves dynamic prices!
                     image: convertDriveLink(rawImageUrl), 
                     description: desc,
-                    colors: colorsArray, // Save colors to DB!
-                    inStock: true, // Whole product is in stock initially
-                    stockOutVariants: [], // No variants out of stock initially
+                    colors: colorsArray, 
+                    inStock: true, 
+                    stockOutVariants: [], 
                     createdAt: new Date().toISOString()
                 });
                 
                 successMsg.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
+                
                 // Reset form
                 categoryInput.value = ''; titleInput.value = ''; priceInput.value = ''; 
                 document.getElementById('prod-discount').value = '0';
                 imageInput.value = ''; document.getElementById('prod-desc').value = '';
                 document.getElementById('color-inputs-container').style.display = 'none';
+                
+                // Clear hamper fields
+                document.getElementById('variant-large-price').value = '';
+                document.getElementById('variant-large-original').value = '';
+                document.getElementById('variant-custom-price').value = '';
+                document.getElementById('hamper-pricing-section').style.display = 'none';
+
                 document.getElementById('dynamic-color-list').innerHTML = `<div class="color-row" style="display: flex; gap: 10px; margin-bottom: 10px;"><input type="text" class="color-input" placeholder="e.g. Dusty Rose" style="flex: 1;"><button type="button" class="action-btn" onclick="addAnotherColor()">+ Add Color</button></div>`;
                 previewCategory.textContent = 'Select Catalog'; previewTitle.textContent = 'Product Title'; previewPrice.textContent = '₹0.00';
                 previewImage.src = ''; previewImage.style.display = 'none'; previewImgText.style.display = 'block';
@@ -1280,7 +577,8 @@
                 alert("Error adding product."); submitBtn.disabled = false; submitBtn.innerText = "Push to Live Store";
             }
         };
-  window.allProductsData = {}; 
+
+        window.allProductsData = {}; 
 
         window.loadInventory = async function() {
             const listContainer = document.getElementById('inventory-list');
@@ -1316,7 +614,6 @@
 
                     itemsFound++;
                     
-                    // 👇 NEW: Math formula to translate Firebase ID into a 6-digit number! 👇
                     let hashVal = 0;
                     for (let i = 0; i < id.length; i++) { hashVal = id.charCodeAt(i) + ((hashVal << 5) - hashVal); }
                     const displayId = (Math.abs(hashVal) % 900000 + 100000).toString();
@@ -1357,6 +654,7 @@
                 listContainer.innerHTML = '<p style="color:red; font-size:12px;">Error loading products.</p>';
             }
         };
+
         // --- LIVE INVENTORY SEARCH ---
         window.filterInventoryList = function() {
             const term = document.getElementById('search-inventory').value.toLowerCase().trim();
@@ -1366,7 +664,6 @@
                 const title = item.querySelector('.inv-title').textContent.toLowerCase();
                 const pid = item.getAttribute('data-id').toLowerCase();
                 
-                // If it matches the title OR the SKU, show it!
                 if(title.includes(term) || pid.includes(term)) {
                     item.style.display = 'flex';
                 } else {
@@ -1374,80 +671,29 @@
                 }
             });
         };
+
         window.toggleStockStatus = async function(docId, currentStatus) {
-
-
-
             try {
-
-
-
                 const docRef = doc(db, "products", docId);
-
-
-
                 await updateDoc(docRef, { inStock: !currentStatus });
-
-
-
                 loadInventory();
-
-
-
             } catch (error) {
-
-
-
                 alert("Error updating product status.");
-
-
-
             }
-
-
-
         };
-
 
         window.deleteProduct = async function(docId) {
-
-
-
             if(confirm("WARNING: Are you sure you want to permanently remove this product from the storefront?")) {
-
-
-
                 try {
-
-
-
                     await deleteDoc(doc(db, "products", docId));
-
-
-
                     loadInventory(); 
-
-
-
                 } catch (error) {
-
-
-
                     alert("Error deleting product.");
-
-
-
                 }
-
-
-
             }
-
-
-
         };
 
-  window.openEditModal = function(id) {
+        window.openEditModal = function(id) {
             const product = window.allProductsData[id];
             if(!product) return;
 
@@ -1467,16 +713,31 @@
             document.getElementById('edit-image').value = product.image; 
             document.getElementById('edit-desc').value = product.description || '';
 
+            // Populate Hamper Variant Prices if they exist
+            if (primaryCategory.includes('Hamper')) {
+                document.getElementById('edit-hamper-pricing-section').style.display = 'block';
+                if (product.variantPrices) {
+                    document.getElementById('edit-variant-large-price').value = product.variantPrices["Large (12x10x6)"]?.price || '';
+                    document.getElementById('edit-variant-large-original').value = product.variantPrices["Large (12x10x6)"]?.originalPrice || '';
+                    document.getElementById('edit-variant-custom-price').value = product.variantPrices["Custom Box"]?.price || '';
+                } else {
+                    document.getElementById('edit-variant-large-price').value = '';
+                    document.getElementById('edit-variant-large-original').value = '';
+                    document.getElementById('edit-variant-custom-price').value = '';
+                }
+            } else {
+                document.getElementById('edit-hamper-pricing-section').style.display = 'none';
+            }
+
             // Generate clickable size/color buttons!
             const variantContainer = document.getElementById('edit-dynamic-variants');
             variantContainer.innerHTML = '';
             let availableVariants = [];
 
-            // ADDED: 'Custom' and 'Custom Box' so you can disable custom orders if you are too busy!
-            if (primaryCategory === 'Luxury Abayas') availableVariants = ['52', '54', '56', '58', '60', 'Custom'];
-            else if (primaryCategory === 'Curated Hampers') availableVariants = ['Standard (10x8x4)', 'Large (12x10x6)', 'Custom Box'];
-            else if (primaryCategory === 'Premium Niqabs') availableVariants = ['5 inches', '7 inches', '9 inches', '12 inches', '24 inches'];
-            else if (primaryCategory === 'Essential Hijabs' || primaryCategory === 'Signature Accessories') {
+            if (primaryCategory.includes('Abaya')) availableVariants = ['52', '54', '56', '58', '60', 'Custom'];
+            else if (primaryCategory.includes('Hamper')) availableVariants = ['Standard (10x8x4)', 'Large (12x10x6)', 'Custom Box'];
+            else if (primaryCategory.includes('Niqab')) availableVariants = ['5 inches', '7 inches', '9 inches', '12 inches', '24 inches'];
+            else if (primaryCategory.includes('Hijab') || primaryCategory.includes('Accessories')) {
                 availableVariants = product.colors || [];
             }
 
@@ -1485,10 +746,9 @@
             availableVariants.forEach(variant => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                // If it is saved as out of stock, add the 'is-out' class so it turns red
                 btn.className = `action-btn variant-toggle-btn ${outVariants.includes(variant) ? 'is-out' : ''}`;
                 btn.textContent = variant;
-                btn.onclick = function() { this.classList.toggle('is-out'); }; // Toggle on click
+                btn.onclick = function() { this.classList.toggle('is-out'); }; 
                 variantContainer.appendChild(btn);
             });
 
@@ -1496,19 +756,13 @@
         };
 
         window.closeEditModal = function() {
-
-
-
             document.getElementById('edit-modal').style.display = 'none';
-
-
-
         };
 
-   window.saveEditedProduct = async function(event) {
+        window.saveEditedProduct = async function(event) {
             const id = document.getElementById('edit-doc-id').value;
             const btn = event.target;
-            const category = document.getElementById('edit-category').value;
+            const category = document.getElementById('edit-category').value || "";
             const title = document.getElementById('edit-title').value.trim();
             const basePrice = parseFloat(document.getElementById('edit-price').value);
             const discountPercent = parseFloat(document.getElementById('edit-discount').value) || 0; 
@@ -1520,7 +774,6 @@
             btn.innerText = "Saving..."; btn.disabled = true;
 
             try {
-                // Find all the buttons that are marked RED (out of stock)
                 const outVariantBtns = document.querySelectorAll('#edit-dynamic-variants .is-out');
                 const stockOutVariants = Array.from(outVariantBtns).map(b => b.textContent);
 
@@ -1531,13 +784,32 @@
                     if (discountPercent >= 50) categories.push("Archive Sale"); 
                 }
 
+                // Handle variant pricing for existing products being edited
+                let variantPricesPayload = window.allProductsData[id].variantPrices || null;
+                if (category.includes("Hamper")) {
+                    variantPricesPayload = {
+                        "Standard (10x8x4)": { price: finalPrice, originalPrice: originalPriceToSave },
+                        "Large (12x10x6)": { 
+                            price: parseFloat(document.getElementById('edit-variant-large-price').value) || finalPrice, 
+                            originalPrice: parseFloat(document.getElementById('edit-variant-large-original').value) || originalPriceToSave 
+                        },
+                        "Custom Box": { 
+                            price: parseFloat(document.getElementById('edit-variant-custom-price').value) || finalPrice, 
+                            originalPrice: null 
+                        }
+                    };
+                } else {
+                    variantPricesPayload = null; 
+                }
+
                 const finalImage = rawImageUrl.includes('drive.google.com/thumbnail') ? rawImageUrl : convertDriveLink(rawImageUrl);
 
                 await updateDoc(doc(db, "products", id), {
                     category: categories, title: title,
                     price: finalPrice, originalPrice: originalPriceToSave, 
+                    variantPrices: variantPricesPayload, // Saves updated prices
                     image: finalImage, description: desc,
-                    stockOutVariants: stockOutVariants // Save the red buttons to the database!
+                    stockOutVariants: stockOutVariants 
                 });
 
                 closeEditModal(); loadInventory(); 
@@ -1547,7 +819,6 @@
                 btn.innerText = "Save Changes"; btn.disabled = false;
             }
         };
-
     </script>
 </body>
-</html> 
+</html>
