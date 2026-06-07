@@ -330,7 +330,12 @@
                 </div>
                 <div>
                     <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 5px; display: block;">Password</label>
-                    <input type="password" id="admin-password" placeholder="••••••••" class="auth-input" required>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="admin-password" placeholder="••••••••" class="auth-input" style="padding-right: 40px;" required>
+                        <button type="button" id="togglePasswordBtn" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 14px; padding: 5px; outline: none;">
+                            <i class="fa-regular fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="auth-btn" id="emailLoginBtn" style="margin-top: 10px;">Sign In</button>
             </form>
@@ -925,6 +930,26 @@
         
         let globalDashEndDate = new Date();
         globalDashEndDate.setHours(23,59,59,999);
+        // --- PASSWORD TOGGLE LOGIC ---
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            const passInput = document.getElementById('admin-password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if(toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    if (passInput.type === 'password') {
+                        passInput.type = 'text';
+                        eyeIcon.classList.remove('fa-eye');
+                        eyeIcon.classList.add('fa-eye-slash');
+                    } else {
+                        passInput.type = 'password';
+                        eyeIcon.classList.remove('fa-eye-slash');
+                        eyeIcon.classList.add('fa-eye');
+                    }
+                });
+            }
+        });
 
         document.addEventListener("DOMContentLoaded", function() {
             flatpickr("#dashboardDatePicker", {
