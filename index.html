@@ -152,6 +152,30 @@
         .cl-sub { font-size: 11px; color: var(--text-muted); }
         .cl-val { font-weight: 600; text-align: right; }
 
+        /* ========================================================================= */
+/* COUPON MANAGEMENT UI */
+/* ========================================================================= */
+.coupon-cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+
+.coupon-code-box { display: inline-flex; align-items: center; gap: 8px; background: #F9FAFB; border: 1px dashed var(--primary-brand); padding: 6px 12px; border-radius: 6px; font-family: monospace; font-weight: 600; font-size: 14px; color: var(--primary-brand); letter-spacing: 1px; }
+.coupon-copy-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; transition: 0.2s; }
+.coupon-copy-btn:hover { color: var(--primary-brand); }
+
+.tag-badge { background: #FEF2F2; color: #B91C1C; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
+
+.action-dropdown-wrapper { position: relative; display: inline-block; }
+.action-dropdown-menu { position: absolute; right: 0; top: 100%; margin-top: 5px; background: var(--surface-white); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 140px; z-index: 100; opacity: 0; visibility: hidden; transition: 0.2s; transform: translateY(-5px); display: flex; flex-direction: column; overflow: hidden; }
+.action-dropdown-wrapper.active .action-dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+.action-dropdown-item { padding: 10px 15px; font-size: 12px; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid var(--border-light); }
+.action-dropdown-item:last-child { border-bottom: none; }
+.action-dropdown-item:hover { background: var(--bg-color); color: var(--primary-brand); }
+.action-dropdown-item.text-danger { color: #DC2626; }
+.action-dropdown-item.text-danger:hover { background: #FEF2F2; color: #B91C1C; }
+
+@media (max-width: 992px) {
+    .coupon-cards-grid { grid-template-columns: 1fr; }
+}
+
         /* --- ORDERS BY STATUS CSS --- */
         .status-legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
         .status-legend-left { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-weight: 500;}
@@ -1082,7 +1106,89 @@
         </div>
     </div>
 </div>
-                <div id="view-coupons" class="view-section"><div class="placeholder-content"><i class="fa-solid fa-ticket"></i><h2>Coupon Engine</h2></div></div>
+               <div id="view-coupons" class="view-section">
+    <div class="page-header" style="align-items: center;">
+        <div>
+            <h1 class="page-title">Coupons</h1>
+            <p class="page-subtitle">Manage all your discount coupons and offers</p>
+        </div>
+        <div class="header-controls">
+            <button class="btn-export-dark" onclick="openCreateCouponModal()"><i class="fa-solid fa-plus"></i> Create Coupon</button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="coupon-cards-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #F3E8FF; color: #6D28D9;"><i class="fa-solid fa-ticket"></i></div>
+                <div><div class="kpi-title">Total Coupons</div><div class="kpi-value" id="kpi-total-coupons">0</div></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #D1FAE5; color: #10B981;"><i class="fa-regular fa-circle-check"></i></div>
+                <div><div class="kpi-title">Active Coupons</div><div class="kpi-value" id="kpi-active-coupons">0</div></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #E0E7FF; color: #3B82F6;"><i class="fa-solid fa-users"></i></div>
+                <div><div class="kpi-title">Total Used</div><div class="kpi-value" id="kpi-total-used">0</div></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #FEF2F2; color: #EF4444;"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                <div><div class="kpi-title">Revenue Saved</div><div class="kpi-value" id="kpi-revenue-saved">₹0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="crm-filter-bar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="couponSearchInput" placeholder="Search by coupon code or description..." oninput="renderCouponsTable()">
+        </div>
+        <select class="filter-select" id="couponStatusFilter" onchange="renderCouponsTable()">
+            <option value="All">All Status</option>
+            <option value="live">Live</option>
+            <option value="paused">Paused</option>
+            <option value="expired">Expired</option>
+        </select>
+        <select class="filter-select" id="couponSortFilter" onchange="renderCouponsTable()">
+            <option value="newest">Sort by: Newest</option>
+            <option value="usage-high">Usage: High to Low</option>
+        </select>
+        <button class="btn-filter-action" onclick="exportCouponsToCSV()"><i class="fa-solid fa-download"></i> Export</button>
+    </div>
+
+    <!-- Table -->
+    <div class="main-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Coupon Code</th>
+                    <th>Description</th>
+                    <th>Discount</th>
+                    <th>Validity Period</th>
+                    <th>Usage</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="couponsTableBody">
+                <tr><td colspan="7" style="text-align: center; padding: 40px;">Loading coupons...</td></tr>
+            </tbody>
+        </table>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-top: 1px solid var(--border-light); background: #fff;">
+            <div style="font-size: 13px; color: var(--text-muted);">Showing <span id="coup-pag-start">0</span> to <span id="coup-pag-end">0</span> of <span id="coup-pag-total">0</span> coupons</div>
+            <div id="coup-pagination-controls" style="display: flex; gap: 5px;"></div>
+        </div>
+    </div>
+</div>
                 <div id="view-reviews" class="view-section"><div class="placeholder-content"><i class="fa-regular fa-comment"></i><h2>Review Moderation</h2></div></div>
                 <div id="view-settings" class="view-section"><div class="placeholder-content"><i class="fa-solid fa-gear"></i><h2>System Settings</h2></div></div>
 
@@ -3090,6 +3196,248 @@ if (currentPayStat === 'Paid') {
         console.error("Status Update Error:", error);
     }
 };
+// =========================================================================
+// COUPONS MODULE LOGIC
+// =========================================================================
+
+// Preloaded Data
+window.allCouponsData = [
+    {
+        id: "c_welcome10",
+        couponCode: "WELCOME10",
+        description: "Get flat 10% off on your first order from Abayrah.",
+        discountType: "percentage",
+        discountValue: 10,
+        usageCount: 35,
+        usageLimit: null,
+        expiryDate: null,
+        isForever: true,
+        status: "live",
+        firstOrderOnly: true,
+        createdAt: "2024-05-10T11:30:00",
+        applicableCustomers: "First Order Only"
+    }
+];
+
+let currentCouponPage = 1;
+const couponsPerPage = 7;
+
+window.renderCouponsTable = function() {
+    const tBody = document.getElementById('couponsTableBody');
+    if (!tBody || !window.allCouponsData) return;
+
+    const searchTerm = (document.getElementById('couponSearchInput')?.value || '').toLowerCase();
+    const statusFilter = document.getElementById('couponStatusFilter')?.value || 'All';
+    const sortFilter = document.getElementById('couponSortFilter')?.value || 'newest';
+
+    // Filter
+    let filtered = window.allCouponsData.filter(c => {
+        const matchesSearch = c.couponCode.toLowerCase().includes(searchTerm) || c.description.toLowerCase().includes(searchTerm);
+        const matchesStatus = statusFilter === 'All' || c.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    // Sort
+    if (sortFilter === 'newest') filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (sortFilter === 'usage-high') filtered.sort((a, b) => b.usageCount - a.usageCount);
+
+    // KPI Calculation
+    const totalCoupons = window.allCouponsData.length;
+    const activeCoupons = window.allCouponsData.filter(c => c.status === 'live').length;
+    const totalUsed = window.allCouponsData.reduce((sum, c) => sum + c.usageCount, 0);
+    // Mock Revenue Saved (Assuming Average Order Value ₹3000 for calculation if percentage)
+    let revSaved = window.allCouponsData.reduce((sum, c) => {
+        if(c.discountType === 'flat') return sum + (c.discountValue * c.usageCount);
+        return sum + ((3000 * (c.discountValue/100)) * c.usageCount); // rough estimate for %
+    }, 0);
+
+    document.getElementById('kpi-total-coupons').textContent = totalCoupons;
+    document.getElementById('kpi-active-coupons').textContent = activeCoupons;
+    document.getElementById('kpi-total-used').textContent = totalUsed;
+    document.getElementById('kpi-revenue-saved').textContent = `₹${revSaved.toLocaleString('en-IN')}`;
+
+    document.getElementById('coup-pag-total').textContent = filtered.length;
+
+    if (filtered.length === 0) {
+        tBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">No coupons found.</td></tr>';
+        return;
+    }
+
+    // Pagination
+    const totalPages = Math.ceil(filtered.length / couponsPerPage);
+    if(currentCouponPage > totalPages) currentCouponPage = Math.max(1, totalPages);
+    const startIdx = (currentCouponPage - 1) * couponsPerPage;
+    const paginated = filtered.slice(startIdx, startIdx + couponsPerPage);
+
+    document.getElementById('coup-pag-start').textContent = startIdx + 1;
+    document.getElementById('coup-pag-end').textContent = Math.min(startIdx + couponsPerPage, filtered.length);
+
+    // Build Rows
+    let html = '';
+    paginated.forEach((c) => {
+        // Design components
+        const discountText = c.discountType === 'percentage' ? `${c.discountValue}% OFF` : `₹${c.discountValue} OFF`;
+        const validityBadge = c.isForever ? `<span class="badge-status badge-status-active">Forever</span>` : `<span style="font-size:12px;">${new Date(c.expiryDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})}</span>`;
+        const tagHtml = c.firstOrderOnly ? `<div class="tag-badge">First Order Only</div>` : '';
+        
+        // Status Badge
+        let statusBadge = '';
+        if(c.status === 'live') statusBadge = '<span class="badge-status badge-status-active">Live</span>';
+        if(c.status === 'paused') statusBadge = '<span class="badge-status" style="background:#FEF3C7; color:#B45309; border-color:#FDE68A;">Paused</span>';
+        if(c.status === 'expired') statusBadge = '<span class="badge-status badge-status-inactive">Expired</span>';
+
+        // Usage Bar
+        let usageHtml = '';
+        if (c.usageLimit) {
+            let pct = Math.min((c.usageCount / c.usageLimit) * 100, 100);
+            usageHtml = `
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">${c.usageCount} / ${c.usageLimit} Used</div>
+                <div class="cust-bar-bg" style="height:6px;"><div class="cust-bar-fill" style="background:var(--primary-brand); width:${pct}%;"></div></div>
+            `;
+        } else {
+            usageHtml = `
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">${c.usageCount} Used</div>
+                <div class="cust-bar-bg" style="height:6px;"><div class="cust-bar-fill" style="background:#10B981; width:100%;"></div></div>
+            `;
+        }
+
+        html += `
+            <tr>
+                <td>
+                    <div class="coupon-code-box">
+                        ${c.couponCode}
+                        <button class="coupon-copy-btn" onclick="copyCoupon('${c.couponCode}')"><i class="fa-regular fa-copy"></i></button>
+                    </div><br>
+                    ${tagHtml}
+                </td>
+                <td>
+                    <div style="font-size: 13px; color: var(--text-main); font-weight: 500;">${c.description}</div>
+                </td>
+                <td style="font-weight: 600; color: var(--primary-brand); font-size: 14px;">${discountText}</td>
+                <td>${validityBadge}</td>
+                <td style="width: 150px;">${usageHtml}</td>
+                <td>${statusBadge}</td>
+                <td style="text-align: right;">
+                    <div class="action-dropdown-wrapper" tabindex="0" onblur="setTimeout(() => this.classList.remove('active'), 150)" onclick="this.classList.toggle('active')">
+                        <button class="btn-action-square"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        <div class="action-dropdown-menu">
+                            <div class="action-dropdown-item" onclick="editCoupon('${c.id}')"><i class="fa-solid fa-pen"></i> Edit</div>
+                            <div class="action-dropdown-item" onclick="toggleCouponStatus('${c.id}')"><i class="fa-solid ${c.status === 'live' ? 'fa-pause' : 'fa-play'}"></i> ${c.status === 'live' ? 'Pause' : 'Activate'}</div>
+                            <div class="action-dropdown-item text-danger" onclick="deleteCoupon('${c.id}')"><i class="fa-regular fa-trash-can"></i> Delete</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    tBody.innerHTML = html;
+};
+
+// Actions
+window.copyCoupon = function(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        alert(`Coupon ${code} copied to clipboard!`);
+    });
+};
+
+window.toggleCouponStatus = function(id) {
+    const coupon = window.allCouponsData.find(c => c.id === id);
+    if(coupon) {
+        coupon.status = coupon.status === 'live' ? 'paused' : 'live';
+        renderCouponsTable();
+    }
+};
+
+window.deleteCoupon = function(id) {
+    if(confirm("Are you sure you want to delete this coupon?")) {
+        window.allCouponsData = window.allCouponsData.filter(c => c.id !== id);
+        renderCouponsTable();
+    }
+};
+
+window.editCoupon = function(id) {
+    alert("Edit functionality ready to connect to Firebase.");
+};
+
+window.exportCouponsToCSV = function() {
+    if(window.allCouponsData.length === 0) return alert("No coupons to export!");
+    let csvContent = "Coupon Code,Description,Discount Type,Discount Value,Usage Count,Status,Created At\n";
+    window.allCouponsData.forEach(c => {
+        const row = [c.couponCode, `"${c.description}"`, c.discountType, c.discountValue, c.usageCount, c.status, c.createdAt];
+        csvContent += row.join(",") + "\n";
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Abayrah_Coupons_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+};
+
+// Modal Handling
+window.openCreateCouponModal = function() {
+    document.getElementById('createCouponModalOverlay').classList.add('active');
+    document.getElementById('createCouponModal').classList.add('active');
+};
+
+window.closeCreateCouponModal = function() {
+    document.getElementById('createCouponModalOverlay').classList.remove('active');
+    document.getElementById('createCouponModal').classList.remove('active');
+};
+
+window.saveNewCoupon = function() {
+    const code = document.getElementById('cc-code').value.toUpperCase();
+    const desc = document.getElementById('cc-desc').value;
+    const type = document.getElementById('cc-type').value;
+    const val = document.getElementById('cc-value').value;
+    const limit = document.getElementById('cc-limit').value;
+    const expiry = document.getElementById('cc-expiry').value;
+    const firstOrder = document.getElementById('cc-first-order').checked;
+
+    if(!code || !val) return alert("Please fill the Coupon Code and Discount Value.");
+
+    const newCoupon = {
+        id: 'c_' + Date.now(),
+        couponCode: code,
+        description: desc || 'Discount Offer',
+        discountType: type,
+        discountValue: parseFloat(val),
+        usageCount: 0,
+        usageLimit: limit ? parseInt(limit) : null,
+        expiryDate: expiry || null,
+        isForever: !expiry,
+        status: "live",
+        firstOrderOnly: firstOrder,
+        createdAt: new Date().toISOString()
+    };
+
+    window.allCouponsData.unshift(newCoupon);
+    renderCouponsTable();
+    closeCreateCouponModal();
+    
+    // Reset Form
+    document.getElementById('cc-code').value = '';
+    document.getElementById('cc-desc').value = '';
+    document.getElementById('cc-value').value = '';
+    document.getElementById('cc-limit').value = '';
+    document.getElementById('cc-expiry').value = '';
+    document.getElementById('cc-first-order').checked = false;
+};
+
+// REAL TIME SYNC MOCK FUNCTION
+// When a checkout happens in Firebase, you'd trigger something like this to update usage
+window.syncCouponUsage = function(couponCode) {
+    const coupon = window.allCouponsData.find(c => c.couponCode === couponCode);
+    if(coupon) {
+        coupon.usageCount += 1;
+        renderCouponsTable(); // Refreshes the UI instantly
+    }
+};
+
+// Initialize table when clicking the nav link
+document.querySelector('[data-target="coupons"]').addEventListener('click', () => {
+    renderCouponsTable();
+});
+        
         window.openCustomerProfile = function(email) {
             const cust = window.allCustomersData.find(c => c.email === email);
             if(!cust) return;
@@ -3154,5 +3502,58 @@ if (currentPayStat === 'Paid') {
             document.getElementById('customerSidePanel').classList.remove('active');
         };
     </script>
+    <!-- Create Coupon Modal -->
+<div class="side-panel-overlay" id="createCouponModalOverlay" onclick="closeCreateCouponModal()"></div>
+<div class="invoice-modal" id="createCouponModal" style="max-width: 500px; height: auto; padding: 0;">
+    <div class="invoice-header-controls" style="border-radius: 12px 12px 0 0;">
+        <div style="font-weight: 600; font-size: 16px;">Create New Coupon</div>
+        <button class="close-panel" onclick="closeCreateCouponModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="invoice-content" style="padding: 30px;">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Coupon Code</label>
+                <input type="text" id="cc-code" placeholder="e.g. EIDMUBARAK20" class="auth-input" style="text-transform: uppercase;">
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Description</label>
+                <input type="text" id="cc-desc" placeholder="Brief description of the offer" class="auth-input">
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Discount Type</label>
+                    <select id="cc-type" class="filter-select" style="width: 100%;">
+                        <option value="percentage">Percentage (%)</option>
+                        <option value="flat">Flat Amount (₹)</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Discount Value</label>
+                    <input type="number" id="cc-value" placeholder="e.g. 10" class="auth-input">
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Usage Limit (Optional)</label>
+                    <input type="number" id="cc-limit" placeholder="Leave blank for unlimited" class="auth-input">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Expiry Date</label>
+                    <input type="date" id="cc-expiry" class="auth-input">
+                </div>
+            </div>
+            <div>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-main); cursor: pointer;">
+                    <input type="checkbox" id="cc-first-order" style="width: 16px; height: 16px;"> Valid for First Order Only
+                </label>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <button class="auth-btn-outline" onclick="closeCreateCouponModal()" style="flex: 1;">Cancel</button>
+                <button class="auth-btn" onclick="saveNewCoupon()" style="flex: 1;"><i class="fa-solid fa-check"></i> Generate Coupon</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
