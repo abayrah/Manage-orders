@@ -2088,8 +2088,7 @@ window.renderCustomersTable = function() {
             });
             if(document.getElementById('rep-top-prods-body')) document.getElementById('rep-top-prods-body').innerHTML = trpHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
         };
-
-        function initRealTimeOrders() {
+function initRealTimeOrders() {
             const query = collectionGroup(db, 'orders');
             
             onSnapshot(query, (snapshot) => {
@@ -2118,6 +2117,12 @@ window.renderCustomersTable = function() {
 
                 currentPage = 1; 
                 renderTable(); 
+                
+                // 🌟 ADDED THIS: Triggers the Customer tab to update instantly 🌟
+                if (window.aggregateAndRenderCustomers) {
+                    window.aggregateAndRenderCustomers();
+                }
+
             }, (error) => {
                 console.error(error);
                 if(document.getElementById('ordersTableBody')) {
@@ -2125,7 +2130,6 @@ window.renderCustomersTable = function() {
                 }
             });
         }
-
         function updateNotifications(newOrders) {
             const notiBody = document.getElementById('notiBody');
             const badge = document.getElementById('notiBadge');
