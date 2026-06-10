@@ -445,7 +445,7 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <div class="auth-logo">Abayrah</div>
+            <img src="header.png" alt="Abayrah Logo" style="max-width: 220px; height: auto; margin-bottom: 15px;">
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">Restricted Administrative Console</p>
 
             <form id="email-login-form" style="display: flex; flex-direction: column; gap: 15px; width: 100%; text-align: left;">
@@ -488,7 +488,9 @@
         <i class="fa-solid fa-bars"></i>
     </button>
     
-    <a onclick="navigate('dashboard')" class="brand-logo">Abayrah</a>
+    <a onclick="navigate('dashboard')" style="cursor: pointer; display: flex; align-items: center;">
+    <img src="header.png" alt="Abayrah Logo" style="height: 35px;">
+</a>
     
     <nav class="top-nav-links" id="topNavLinks" style="margin-left: 50px;">
         <a data-target="dashboard" onclick="navigate('dashboard')" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
@@ -567,7 +569,7 @@
                 
                 <div id="view-dashboard" class="view-section active">
                     <div class="page-header">
-                        <div><h1 class="page-title">Good morning, Admin! 👋</h1><p class="page-subtitle">Here's what's happening with your store today.</p></div>
+                        <div><h1 class="page-title" id="dynamic-greeting">Good morning, Admin! 👋</h1><p class="page-subtitle">Here's what's happening with your store today.</p></div>
                         
                         <div class="control-btn" style="background: var(--surface-white); border: 1px solid var(--border-light); padding: 0; border-radius: 8px;">
                             <i class="fa-regular fa-calendar" style="margin-left: 15px; color: var(--text-muted);"></i>
@@ -1551,6 +1553,24 @@
                 // Update Dropdown Header
                 document.getElementById('drop-profile-name').textContent = displayName;
                 document.getElementById('drop-profile-email').textContent = email;
+                // --- 🌟 DYNAMIC TIME GREETING LOGIC 🌟 ---
+                const hour = new Date().getHours(); // Gets local device hour (0-23)
+                const greetingEl = document.getElementById('dynamic-greeting');
+                const firstName = displayName.split(' ')[0] || "Admin"; // Grabs their actual name
+                
+                if (greetingEl) {
+                    if (hour >= 0 && hour < 12) {
+                        // 12:00 AM to 11:59 AM
+                        greetingEl.innerHTML = `Good morning, ${firstName}! 🌅`;
+                    } else if (hour >= 12 && hour < 15) {
+                        // 12:00 PM to 2:59 PM
+                        greetingEl.innerHTML = `Good afternoon, ${firstName}! ☀️`;
+                    } else {
+                        // 3:00 PM to 11:59 PM
+                        greetingEl.innerHTML = `Good evening, ${firstName}! 🌙`;
+                    }
+                }
+                // --- 🌟 END DYNAMIC TIME GREETING 🌟 ---
 
                 // Update Images if Google provided one
                 if (photoURL) {
