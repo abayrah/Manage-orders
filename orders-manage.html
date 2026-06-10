@@ -676,11 +676,13 @@
                             <option value="Delivered">Delivered</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
-                        <select class="filter-select" id="paymentFilter" style="width: 170px;">
-                            <option value="All">All Payment Status</option>
-                            <option value="Paid">Paid</option>
-                            <option value="Failed">Failed</option>
-                        </select>
+                       <select class="filter-select" id="paymentFilter" style="width: 170px;">
+    <option value="All">All Payment Status</option>
+    <option value="Paid">Paid</option>
+    <option value="Unpaid">Unpaid</option>
+    <option value="Refunded">Refunded</option>
+    <option value="Failed">Failed</option>
+</select>
                         <div class="search-box" style="width: 200px;">
                             <i class="fa-regular fa-calendar"></i>
                             <input type="text" placeholder="Select Date Range" readonly style="cursor:pointer; background:#fff;">
@@ -2255,7 +2257,7 @@ function initRealTimeOrders() {
                 const phone = (s.phone || '').toLowerCase();
                 const email = (s.email || '').toLowerCase();
                 
-                const orderPayStat = order.status === 'Failed' ? 'Failed' : 'Paid';
+                const orderPayStat = order.paymentStatus || (order.status === 'Failed' ? 'Failed' : 'Paid');
 
                 const matchesSearch = name.includes(term) || num.includes(term) || phone.includes(term) || email.includes(term);
                 const matchesStatus = filterStat === 'All' || order.status === filterStat;
@@ -2329,6 +2331,18 @@ function initRealTimeOrders() {
                     'Processing': 'status-processing', 'Confirmed': 'status-confirmed',
                     'Shipped': 'status-shipped', 'Delivered': 'status-delivered', 'Cancelled': 'status-cancelled'
                 };
+                // Determine current payment status
+const currentPayStat = order.paymentStatus || (order.status === 'Failed' ? 'Failed' : 'Paid');
+
+// Determine what text to show under the dropdown
+let paymentSubText = '';
+if (currentPayStat === 'Paid') {
+    paymentSubText = 'Online';
+} else if (currentPayStat === 'Refunded') {
+    paymentSubText = order.refundTxnId ? `Txn: ${order.refundTxnId}` : 'Refunded';
+} else {
+    paymentSubText = ''; // Leave blank for Unpaid or Failed
+}  
 
                 html += `
                     <tr>
@@ -2345,13 +2359,13 @@ function initRealTimeOrders() {
                         </td>
                         <td>${prodHtml}</td>
                         <td style="font-weight:500;">₹${parseFloat(order.amount).toLocaleString('en-IN')}</td>
-                       <td>
-    <select class="payment-status-select" onchange="updatePaymentStatus(this, '${order.docPath}')" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
-        <option value="Paid" ${order.paymentStatus === 'Paid' || !order.paymentStatus ? 'selected' : ''}>Paid</option>
-        <option value="Unpaid" ${order.paymentStatus === 'Unpaid' ? 'selected' : ''}>Unpaid</option>
-        <option value="Refunded" ${order.paymentStatus === 'Refunded' ? 'selected' : ''}>Refunded</option>
+                      <td>
+    <select class="payment-status-select" onchange="updatePaymentStatus(this, '${order.docPath}', '${order.rawId}')" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px;">
+        <option value="Paid" ${currentPayStat === 'Paid' ? 'selected' : ''}>Paid</option>
+        <option value="Unpaid" ${currentPayStat === 'Unpaid' ? 'selected' : ''}>Unpaid</option>
+        <option value="Refunded" ${currentPayStat === 'Refunded' ? 'selected' : ''}>Refunded</option>
     </select>
-    <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">Online</div>
+    <div style="font-size: 11px; color: #6c757d; margin-top: 4px; font-weight: 500;">${paymentSubText}</div>
 </td>
                         <td>
                             <select class="status-badge ${statusClassMap[order.status] || 'status-processing'}" onchange="triggerUpdate('${order.docPath}', this.value, '${ship.email}', '${ship.firstName}', '${displayId}')">
@@ -2502,26 +2516,46 @@ function initRealTimeOrders() {
             } catch (error) { alert("Failed to update status. Check permissions."); }
         };
 
-        window.updatePaymentStatus = async function(dropdownElement, docPath) {
+        window.updatePaymentStatus = async function(dropdownElement, docPath, rawId) {
     const newPaymentStatus = dropdownElement.value;
+    let updateData = { paymentStatus: newPaymentStatus };
     
+    // If they select Refunded, trigger a popup asking for the Transaction ID
+    if (newPaymentStatus === 'Refunded') {
+        const txnId = prompt("Please enter the Refund Transaction ID:");
+        
+        // If they click "Cancel" on the popup, stop and revert the dropdown
+        if (txnId === null) {
+            renderTable(); 
+            return; 
+        }
+        updateData.refundTxnId = txnId; // Save the ID they typed
+    } else {
+        // Clear the transaction ID if they switch it back to Paid or Unpaid
+        updateData.refundTxnId = null; 
+    }
+
     try {
-        // 1. Update the 'paymentStatus' field inside Firebase Firestore
-        await updateDoc(doc(db, docPath), { paymentStatus: newPaymentStatus });
+        // 1. Update Firebase
+        await updateDoc(doc(db, docPath), updateData);
         console.log(`Database updated: Payment is now ${newPaymentStatus}`);
 
-        // 2. Sync the side-panel payment badge instantly if it is currently open
+        // 2. Update local data instantly so the UI reflects the change without refreshing
+        const orderIndex = window.allOrdersData.findIndex(o => o.rawId === rawId);
+        if (orderIndex !== -1) {
+            window.allOrdersData[orderIndex].paymentStatus = newPaymentStatus;
+            window.allOrdersData[orderIndex].refundTxnId = updateData.refundTxnId;
+        }
+        
+        // 3. Re-render the table to show/hide the "Online" or "Txn ID" text
+        renderTable();
+
+        // 4. Sync the side-panel payment badge instantly if it is currently open
         if(document.getElementById('sp-current-doc-path').value === docPath) {
             const payBadge = document.getElementById('sp-pay-status');
             if(payBadge) {
                 payBadge.textContent = newPaymentStatus;
-                
-                // Keep the color styling matching your existing dashboard theme
-                if(newPaymentStatus === 'Paid') {
-                    payBadge.className = 'payment-badge pay-paid';
-                } else {
-                    payBadge.className = 'payment-badge pay-failed'; // Red badge for Unpaid / Refunded
-                }
+                payBadge.className = newPaymentStatus === 'Paid' ? 'payment-badge pay-paid' : 'payment-badge pay-failed';
             }
         }
     } catch (error) { 
@@ -2529,7 +2563,6 @@ function initRealTimeOrders() {
         alert("Failed to update payment status. Check permissions."); 
     }
 };
-
         window.handleInvoice = function(rawId) {
             const order = window.allOrdersData.find(o => o.rawId === rawId);
             if(!order) return;
