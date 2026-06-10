@@ -367,6 +367,70 @@
 
 .badge-status-inactive { background: #FEE2E2; color: #B91C1C; border-color: #FCA5A5; }
 
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 20px; color: var(--primary-brand); cursor: pointer; margin-right: 15px; outline: none; }
+.mobile-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: 0.3s; }
+.mobile-overlay.active { display: block; opacity: 1; }
+
+@media (max-width: 992px) {
+    /* Header & Navigation */
+    .mobile-menu-btn { display: flex; align-items: center; justify-content: center; }
+    .top-nav-links { display: none !important; } /* Hide desktop links */
+    .top-navbar { padding: 0 15px; }
+    .brand-logo { font-size: 24px; }
+    
+    /* Sidebar becomes a slide-out drawer */
+    .sidebar { position: fixed; left: -260px; top: 0; z-index: 1000; height: 100vh; width: 260px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.1); }
+    .sidebar.mobile-active { transform: translateX(260px); }
+    .main-content { padding: 15px; }
+
+    /* Stack All Grids into 1 Column */
+    .dash-grid.grid-cols-6, .dash-grid.grid-cols-5, 
+    .dash-grid.grid-row-2, .dash-grid.grid-row-3, 
+    .dash-grid.grid-row-4, .cust-stats-wrapper { 
+        grid-template-columns: 1fr !important; 
+    }
+
+    /* Quick Actions look better as a 2x4 grid on mobile */
+    .quick-action-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    
+    /* Page Headers & Filter Bars */
+    .page-header { flex-direction: column; align-items: flex-start !important; gap: 15px; }
+    .header-controls, .products-filter-bar, .crm-filter-bar { 
+        flex-direction: column; width: 100%; align-items: stretch !important; gap: 10px;
+    }
+    
+    /* Make all search bars and filter dropdowns full width */
+    .search-box, .filter-select, .btn-export, .btn-export-dark, .btn-reset, input[type="text"] { 
+        width: 100% !important; max-width: 100% !important; 
+    }
+    
+    /* Make Top search/filter bar specifically stack */
+    div[style*="display: flex; gap: 15px; margin-bottom: 20px;"] {
+        flex-direction: column;
+    }
+
+    /* Tables - Allow smooth horizontal scrolling so data doesn't get squished */
+    .main-table-container { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+    table { min-width: 900px; /* Forces table to stay wide and scrollable */ }
+    
+    /* Fix specific dashboard tables */
+    .dash-card > div[style*="width: 100%;"] { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .dash-table { min-width: 700px; }
+
+    /* Modals & Side Panels */
+    .side-panel { width: 100%; right: 0; }
+    .invoice-modal { width: 95%; max-height: 90vh; }
+    .invoice-content { padding: 20px; }
+    
+    /* Custom Layout Fixes */
+    .cust-overview-layout { flex-direction: column; }
+    .chart-wrapper { height: 220px !important; }
+    #status-custom-legend { margin-left: 0 !important; margin-top: 15px; }
+    div[style*="display: flex; gap: 20px; align-items: center; justify-content: center; height: 200px;"] {
+        flex-direction: column; height: auto !important; padding: 20px 0;
+    }
+}
+
         .prod-actions { display: flex; gap: 8px; }
         .btn-action-square { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--border-light); background: #fff; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 13px; }
         .btn-action-square:hover { border-color: var(--text-main); color: var(--text-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -416,20 +480,26 @@
     </div>
 
     <div id="app-layout">
+        <div class="mobile-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
         
         <header class="top-navbar">
-            <div style="display: flex; align-items: center; gap: 50px;">
-                <a onclick="navigate('dashboard')" class="brand-logo">Abayrah</a>
-                <nav class="top-nav-links" id="topNavLinks">
-                    <a data-target="dashboard" onclick="navigate('dashboard')" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
-                    <a data-target="orders" onclick="navigate('orders')"><i class="fa-solid fa-box"></i> Orders</a>
-                    <a data-target="products" onclick="navigate('products')"><i class="fa-solid fa-tags"></i> Products</a>
-                    <a data-target="customers" onclick="navigate('customers')"><i class="fa-solid fa-users"></i> Customers</a>
-                    <a data-target="coupons" onclick="navigate('coupons')"><i class="fa-solid fa-ticket"></i> Coupons</a>
-                    <a data-target="reports" onclick="navigate('reports')"><i class="fa-solid fa-chart-simple"></i> Reports</a>
-                    <a data-target="settings" onclick="navigate('settings')"><i class="fa-solid fa-gear"></i> Settings</a>
-                </nav>
-            </div>
+            <div style="display: flex; align-items: center;">
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    
+    <a onclick="navigate('dashboard')" class="brand-logo">Abayrah</a>
+    
+    <nav class="top-nav-links" id="topNavLinks" style="margin-left: 50px;">
+        <a data-target="dashboard" onclick="navigate('dashboard')" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a data-target="orders" onclick="navigate('orders')"><i class="fa-solid fa-box"></i> Orders</a>
+        <a data-target="products" onclick="navigate('products')"><i class="fa-solid fa-tags"></i> Products</a>
+        <a data-target="customers" onclick="navigate('customers')"><i class="fa-solid fa-users"></i> Customers</a>
+        <a data-target="coupons" onclick="navigate('coupons')"><i class="fa-solid fa-ticket"></i> Coupons</a>
+        <a data-target="reports" onclick="navigate('reports')"><i class="fa-solid fa-chart-simple"></i> Reports</a>
+        <a data-target="settings" onclick="navigate('settings')"><i class="fa-solid fa-gear"></i> Settings</a>
+    </nav>
+</div>
             <div class="top-actions">
                 <button class="action-icon-btn" onclick="focusSearch()" title="Search Orders"><i class="fa-solid fa-magnifying-glass"></i></button>
                 <button class="action-icon-btn" onclick="toggleNotifications()" title="Notifications">
