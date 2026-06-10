@@ -310,6 +310,14 @@
         .report-table td { padding: 12px 10px; font-size: 13px; color: var(--text-main); border-bottom: 1px solid var(--bg-color); }
         .report-table tr:last-child td { border-bottom: none; }
         .report-table .totals-row td { font-weight: 600; border-top: 1px solid var(--border-light); border-bottom: none; padding-top: 15px;}
+        /* --- CUSTOMER GRID VIEW CSS --- */
+.cust-grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.cust-card { background: #fff; border: 1px solid var(--border-light); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 15px; transition: 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+.cust-card:hover { border-color: var(--primary-brand); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+.cust-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.cust-card-user { display: flex; align-items: center; gap: 12px; }
+.cust-card-body { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-muted); padding-top: 15px; border-top: 1px dashed var(--border-light); }
+.cust-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-light); }
 
         /* Flatpickr Customization for better UI blend */
         .flatpickr-calendar { font-family: 'Inter', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; border: 1px solid var(--border-light) !important; }
@@ -791,14 +799,11 @@
 
                 <div id="view-products" class="view-section">
                     <div class="page-header" style="align-items: center;">
-                        <div>
-                            <h1 class="page-title">Product Management</h1>
-                            <p class="page-subtitle">Manage your products and categories.</p>
-                        </div>
-                        <button class="btn-export-dark" onclick="window.location.href='admin.html'" style="padding: 10px 20px;">
-                            <i class="fa-solid fa-plus"></i> Add New Product
-                        </button>
-                    </div>
+        <div>
+            <h1 class="page-title">Customer Database</h1>
+            <p class="page-subtitle">Manage your customers and their details.</p>
+        </div>
+        </div>
 
                     <div class="products-filter-bar">
                         <div class="search-box" style="flex: 1; max-width: 400px;">
@@ -1036,32 +1041,40 @@
         <button class="btn-filter-action"><i class="fa-solid fa-filter"></i> Filters</button>
     </div>
 
-    <div class="main-table-container">
+<div class="main-table-container">
         <div class="table-header-flex">
             <div class="table-header-title">All Customers (<span id="crm-table-count">0</span>)</div>
             <div class="view-toggles">
-                <button class="view-toggle-btn active"><i class="fa-solid fa-list"></i></button>
-                <button class="view-toggle-btn"><i class="fa-solid fa-border-all"></i></button>
+                <button class="view-toggle-btn active" id="btn-view-list" onclick="setCustomerView('list')"><i class="fa-solid fa-list"></i></button>
+                <button class="view-toggle-btn" id="btn-view-grid" onclick="setCustomerView('grid')"><i class="fa-solid fa-border-all"></i></button>
             </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 40px;"><input type="checkbox"></th>
-                    <th>Customer</th>
-                    <th>Contact Info</th>
-                    <th>Location</th>
-                    <th>Total Orders</th>
-                    <th>Total Spent</th>
-                    <th>Joined On</th>
-                    <th>Status</th>
-                    <th style="text-align: right;">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="customersTableBody">
-                <tr><td colspan="9" style="text-align: center; padding: 40px;">Loading live database...</td></tr>
-            </tbody>
-        </table>
+
+        <div id="customer-list-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"><input type="checkbox"></th>
+                        <th>Customer</th>
+                        <th>Contact Info</th>
+                        <th>Location</th>
+                        <th>Total Orders</th>
+                        <th>Total Spent</th>
+                        <th>Joined On</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                    <tr><td colspan="9" style="text-align: center; padding: 40px;">Loading live database...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="customer-grid-container" style="display: none; padding: 20px; background: #F9FAFB;">
+            <div id="customersGridBody" class="cust-grid-layout">
+                </div>
+        </div>
         
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-top: 1px solid var(--border-light); background: #fff;">
             <div style="font-size: 13px; color: var(--text-muted);">Showing <span id="crm-pag-start">0</span> to <span id="crm-pag-end">0</span> of <span id="crm-pag-total">0</span> customers</div>
@@ -1748,11 +1761,27 @@ window.aggregateAndRenderCustomers = function() {
     window.allCustomersData = customersArray;
     renderCustomersTable();
 };
+window.currentCustomerView = 'list'; // Default view state
 
+window.setCustomerView = function(viewType) {
+    window.currentCustomerView = viewType;
+    
+    // Switch Active Button Colors
+    document.getElementById('btn-view-list').classList.toggle('active', viewType === 'list');
+    document.getElementById('btn-view-grid').classList.toggle('active', viewType === 'grid');
+    
+    // Show/Hide Containers
+    document.getElementById('customer-list-container').style.display = viewType === 'list' ? 'block' : 'none';
+    document.getElementById('customer-grid-container').style.display = viewType === 'grid' ? 'block' : 'none';
+    
+    // Re-render the data to fit the new view
+    renderCustomersTable();
+};
         
 window.renderCustomersTable = function() {
     const tBody = document.getElementById('customersTableBody');
-    if(!tBody || !window.allCustomersData) return;
+    const gBody = document.getElementById('customersGridBody'); // Added for grid
+    if(!tBody || !gBody || !window.allCustomersData) return;
 
     const searchTerm = (document.getElementById('crmSearchInput')?.value || '').toLowerCase();
     const statusFilter = document.getElementById('crmStatusFilter')?.value || 'All';
@@ -1777,6 +1806,7 @@ window.renderCustomersTable = function() {
 
     if(filtered.length === 0) {
         tBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">No customers found.</td></tr>';
+        gBody.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">No customers found.</div>';
         return;
     }
 
@@ -1801,52 +1831,92 @@ window.renderCustomersTable = function() {
     pagHtml += `<button class="btn-action-square" onclick="currentCustomerPage=${Math.min(totalPages, currentCustomerPage+1)}; renderCustomersTable()"><i class="fa-solid fa-chevron-right"></i></button>`;
     document.getElementById('crm-pagination-controls').innerHTML = pagHtml;
 
-    // Build Table Rows
-    let html = '';
-    paginatedCusts.forEach(cust => {
-        const joinedDateStr = cust.joinedDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
-        const joinedTimeStr = cust.joinedDate.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-        
-        // Use existing avatar function (Gmail photo or First Letter Generator)
-        const avatarUrl = getAvatarUrl(cust.name, cust.photoURL);
-        const statClass = cust.status === 'Active' ? 'badge-status-active' : 'badge-status-inactive';
+    // --- CHECK CURRENT VIEW STATE (LIST OR GRID) ---
+    if (window.currentCustomerView === 'list') {
+        // Build Table Rows
+        let html = '';
+        paginatedCusts.forEach(cust => {
+            const joinedDateStr = cust.joinedDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+            const joinedTimeStr = cust.joinedDate.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+            const avatarUrl = getAvatarUrl(cust.name, cust.photoURL);
+            const statClass = cust.status === 'Active' ? 'badge-status-active' : 'badge-status-inactive';
 
-        html += `
-            <tr>
-                <td><input type="checkbox"></td>
-                <td>
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <img src="${avatarUrl}" class="crm-avatar" alt="Avatar">
+            html += `
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="${avatarUrl}" class="crm-avatar" alt="Avatar">
+                            <div>
+                                <div class="crm-name">${cust.name}</div>
+                                <div class="crm-email">${cust.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="crm-phone">${cust.phone}</div>
+                        <div class="crm-email">${cust.email}</div>
+                    </td>
+                    <td>
+                        <div class="crm-name">${cust.city}, ${cust.state}</div>
+                        <div class="crm-email">${cust.country}</div>
+                    </td>
+                    <td style="font-weight: 500;">${cust.totalOrders}</td>
+                    <td style="font-weight: 600; color: var(--text-main);">₹${cust.totalSpent.toLocaleString('en-IN')}</td>
+                    <td>
+                        <div class="crm-name">${joinedDateStr}</div>
+                        <div class="crm-email">${joinedTimeStr}</div>
+                    </td>
+                    <td><span class="badge-status ${statClass}">${cust.status}</span></td>
+                    <td>
+                        <div class="prod-actions" style="justify-content: flex-end;">
+                            <button class="btn-action-square" onclick="openCustomerProfile('${cust.email}')" title="View Customer"><i class="fa-regular fa-eye"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        tBody.innerHTML = html;
+        
+    } else {
+        // Build Grid Cards
+        let gridHtml = '';
+        paginatedCusts.forEach(cust => {
+            const avatarUrl = getAvatarUrl(cust.name, cust.photoURL);
+            const statClass = cust.status === 'Active' ? 'badge-status-active' : 'badge-status-inactive';
+
+            gridHtml += `
+                <div class="cust-card">
+                    <div class="cust-card-header">
+                        <div class="cust-card-user">
+                            <img src="${avatarUrl}" class="crm-avatar" alt="Avatar">
+                            <div>
+                                <div class="crm-name">${cust.name}</div>
+                                <span class="badge-status ${statClass}" style="font-size: 10px; padding: 2px 8px;">${cust.status}</span>
+                            </div>
+                        </div>
+                        <button class="btn-action-square" style="border: none; background: #F3F4F6;" onclick="openCustomerProfile('${cust.email}')"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="cust-card-body">
+                        <div><i class="fa-regular fa-envelope" style="width: 16px;"></i> ${cust.email}</div>
+                        <div><i class="fa-solid fa-phone" style="width: 16px;"></i> ${cust.phone}</div>
+                        <div><i class="fa-solid fa-location-dot" style="width: 16px;"></i> ${cust.city}, ${cust.state}</div>
+                    </div>
+                    <div class="cust-card-footer">
                         <div>
-                            <div class="crm-name">${cust.name}</div>
-                            <div class="crm-email">${cust.email}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Total Spent</div>
+                            <div style="font-weight: 600; color: var(--text-main); font-size: 14px;">₹${cust.totalSpent.toLocaleString('en-IN')}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: var(--text-muted);">Total Orders</div>
+                            <div style="font-weight: 600; color: var(--text-main); font-size: 14px;">${cust.totalOrders}</div>
                         </div>
                     </div>
-                </td>
-                <td>
-                    <div class="crm-phone">${cust.phone}</div>
-                    <div class="crm-email">${cust.email}</div>
-                </td>
-                <td>
-                    <div class="crm-name">${cust.city}, ${cust.state}</div>
-                    <div class="crm-email">${cust.country}</div>
-                </td>
-                <td style="font-weight: 500;">${cust.totalOrders}</td>
-                <td style="font-weight: 600; color: var(--text-main);">₹${cust.totalSpent.toLocaleString('en-IN')}</td>
-                <td>
-                    <div class="crm-name">${joinedDateStr}</div>
-                    <div class="crm-email">${joinedTimeStr}</div>
-                </td>
-                <td><span class="badge-status ${statClass}">${cust.status}</span></td>
-                <td>
-    <div class="prod-actions" style="justify-content: flex-end;">
-        <button class="btn-action-square" onclick="openCustomerProfile('${cust.email}')" title="View Customer"><i class="fa-regular fa-eye"></i></button>
-    </div>
-</td>
-            </tr>
-        `;
-    });
-    tBody.innerHTML = html;
+                </div>
+            `;
+        });
+        gBody.innerHTML = gridHtml;
+    }
 };
 
         
