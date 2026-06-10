@@ -1176,6 +1176,45 @@
         </div>
     </div>
 </div>
+    
+<div class="side-panel-overlay" id="editCustomerModalOverlay" onclick="closeEditCustomerModal()"></div>
+<div class="invoice-modal" id="editCustomerModal" style="max-width: 450px; height: auto; padding: 0;">
+    <div class="invoice-header-controls" style="border-radius: 12px 12px 0 0;">
+        <div style="font-weight: 600; font-size: 16px;">Edit Customer Profile</div>
+        <button class="close-panel" onclick="closeEditCustomerModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="invoice-content" style="padding: 30px;">
+        <input type="hidden" id="edit-cust-email-hidden">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Full Name</label>
+                <input type="text" id="edit-cust-name-input" class="auth-input">
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Phone Number</label>
+                <input type="text" id="edit-cust-phone-input" class="auth-input">
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">City</label>
+                    <input type="text" id="edit-cust-city-input" class="auth-input">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">State</label>
+                    <input type="text" id="edit-cust-state-input" class="auth-input">
+                </div>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Account Status</label>
+                <select id="edit-cust-status-input" class="filter-select" style="width: 100%;">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <button class="auth-btn" onclick="saveCustomerProfile(event)"><i class="fa-solid fa-check"></i> Save Changes</button>
+        </div>
+    </div>
+</div>
 
     <script>
         var repOverviewChart = null;
@@ -1689,7 +1728,7 @@ window.renderCustomersTable = function() {
                 <td>
                     <div class="prod-actions" style="justify-content: flex-end;">
                         <button class="btn-action-square" onclick="openCustomerProfile('${cust.email}')" title="View Customer"><i class="fa-regular fa-eye"></i></button>
-                        <button class="btn-action-square" onclick="alert('Open Edit Modal for ${cust.name}')" title="Edit Customer"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-action-square" onclick="openEditCustomerModal('${cust.email}')" title="Edit Customer"><i class="fa-solid fa-pen"></i></button>
                     </div>
                 </td>
             </tr>
@@ -2338,6 +2377,75 @@ function initRealTimeOrders() {
             tBody.innerHTML = html;
         }
 
+        window.openEditCustomerModal = function(email) {
+            // Find customer data
+            const cust = window.allCustomersData.find(c => c.email === email);
+            if(!cust) return;
+
+            // Populate the form fields
+            document.getElementById('edit-cust-email-hidden').value = cust.email;
+            document.getElementById('edit-cust-name-input').value = cust.name;
+            document.getElementById('edit-cust-phone-input').value = cust.phone;
+            document.getElementById('edit-cust-city-input').value = cust.city;
+            document.getElementById('edit-cust-state-input').value = cust.state;
+            document.getElementById('edit-cust-status-input').value = cust.status;
+
+            // Show the modal
+            document.getElementById('editCustomerModalOverlay').classList.add('active');
+            document.getElementById('editCustomerModal').classList.add('active');
+        };
+
+        window.closeEditCustomerModal = function() {
+            document.getElementById('editCustomerModalOverlay').classList.remove('active');
+            document.getElementById('editCustomerModal').classList.remove('active');
+        };
+
+        window.saveCustomerProfile = async function(event) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            const email = document.getElementById('edit-cust-email-hidden').value;
+            const newName = document.getElementById('edit-cust-name-input').value;
+            const newPhone = document.getElementById('edit-cust-phone-input').value;
+            const newCity = document.getElementById('edit-cust-city-input').value;
+            const newState = document.getElementById('edit-cust-state-input').value;
+            const newStatus = document.getElementById('edit-cust-status-input').value;
+
+            try {
+                // Save to a dedicated 'customers' collection in Firebase using the email as the ID
+                await setDoc(doc(db, "customers", email), {
+                    name: newName,
+                    phone: newPhone,
+                    city: newCity,
+                    state: newState,
+                    status: newStatus,
+                    lastUpdated: new Date().toISOString()
+                }, { merge: true });
+
+                // Instantly update the local UI table data
+                const custIndex = window.allCustomersData.findIndex(c => c.email === email);
+                if(custIndex !== -1) {
+                    window.allCustomersData[custIndex].name = newName;
+                    window.allCustomersData[custIndex].phone = newPhone;
+                    window.allCustomersData[custIndex].city = newCity;
+                    window.allCustomersData[custIndex].state = newState;
+                    window.allCustomersData[custIndex].status = newStatus;
+                }
+                
+                renderCustomersTable(); // Refresh table
+                closeEditCustomerModal(); // Close window
+                
+            } catch (error) {
+                console.error("Error saving customer:", error);
+                alert("Failed to save changes. Check permissions.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+        
         window.exportOrdersToCSV = function() {
             if(currentFilteredOrders.length === 0) { alert("No orders to export!"); return; }
             let csvContent = "Order ID,Date,Customer Name,Email,Phone,Address,Items Summary,Total Amount,Payment Status,Order Status\n";
