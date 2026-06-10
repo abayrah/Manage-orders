@@ -1374,7 +1374,24 @@
             if(targetId === 'reports') {
                 initReportVisuals();
             }
+
+            // Auto-close the mobile menu after clicking a link
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            if (sidebar && sidebar.classList.contains('mobile-active')) {
+                sidebar.classList.remove('mobile-active');
+                if (overlay) overlay.classList.remove('active');
+            }
         }
+
+        // Mobile Sidebar Toggle Logic
+        window.toggleMobileMenu = function() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (sidebar) sidebar.classList.toggle('mobile-active');
+            if (overlay) overlay.classList.toggle('active');
+        };
 
         function focusSearch() { navigate('orders'); setTimeout(() => document.getElementById('searchInput').focus(), 100); }
         
