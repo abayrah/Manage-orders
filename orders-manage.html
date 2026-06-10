@@ -1045,6 +1045,12 @@
             </div>
         </div>
     </div>
+
+    <div class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <div style="font-size: 16px; font-weight: 600;">Order Details</div>
+            <button class="close-panel" onclick="closeAllModals()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
         
         <div style="padding: 20px 20px 10px 20px; display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 24px; font-weight: 600;" id="sp-order-id">#ABY1001</div>
@@ -1276,6 +1282,8 @@
         function closeAllModals() {
             document.getElementById('modalOverlay').classList.remove('active');
             document.getElementById('sidePanel').classList.remove('active');
+            if(document.getElementById('customerSidePanel')) document.getElementById('customerSidePanel').classList.remove('active'); 
+            
             if(document.getElementById('invoiceModalOverlay')) closeInvoiceModal();
         }
 
