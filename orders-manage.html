@@ -1726,11 +1726,10 @@ window.renderCustomersTable = function() {
                 </td>
                 <td><span class="badge-status ${statClass}">${cust.status}</span></td>
                 <td>
-                    <div class="prod-actions" style="justify-content: flex-end;">
-                        <button class="btn-action-square" onclick="openCustomerProfile('${cust.email}')" title="View Customer"><i class="fa-regular fa-eye"></i></button>
-                        <button class="btn-action-square" onclick="openEditCustomerModal('${cust.email}')" title="Edit Customer"><i class="fa-solid fa-pen"></i></button>
-                    </div>
-                </td>
+    <div class="prod-actions" style="justify-content: flex-end;">
+        <button class="btn-action-square" onclick="openCustomerProfile('${cust.email}')" title="View Customer"><i class="fa-regular fa-eye"></i></button>
+    </div>
+</td>
             </tr>
         `;
     });
