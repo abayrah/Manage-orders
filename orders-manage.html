@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-     <link rel="icon" type="image/png" href="star-logo.png">
+    <link rel="icon" type="image/png" href="star-logo.png">
 
     <style>
         :root {
@@ -314,6 +314,38 @@
         /* Flatpickr Customization for better UI blend */
         .flatpickr-calendar { font-family: 'Inter', sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; border: 1px solid var(--border-light) !important; }
         .flatpickr-day.selected { background: var(--primary-brand) !important; border-color: var(--primary-brand) !important; }
+
+        /* ========================================================================= */
+        /* PREMIUM PRODUCT MANAGEMENT UI */
+        /* ========================================================================= */
+        .products-filter-bar { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
+        .btn-reset { background: #fff; color: var(--text-main); border: 1px solid var(--border-light); padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-reset:hover { background: #F9FAFB; border-color: #D1D5DB; }
+
+        .prod-table-cell { display: flex; align-items: center; gap: 15px; }
+        .prod-img-box { width: 50px; height: 50px; min-width: 50px; border-radius: 8px; border: 1px solid var(--border-light); object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .prod-name { font-weight: 600; color: var(--text-main); font-size: 13px; margin-bottom: 3px; }
+        .prod-sku { font-size: 11px; color: var(--text-muted); }
+
+        .badge-cat { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px solid transparent; display: inline-block;}
+        .badge-cat-jewelry { background: #FEF3C7; color: #B45309; border-color: #FDE68A; }
+        .badge-cat-accessories { background: #E0F2FE; color: #0369A1; border-color: #BAE6FD; }
+        .badge-cat-bags { background: #F3E8FF; color: #6B21A8; border-color: #E9D5FF; }
+        .badge-cat-abayas { background: #FCE7F3; color: #9D174D; border-color: #FBCFE8; }
+        .badge-cat-default { background: #F3F4F6; color: #4B5563; border-color: #E5E7EB; }
+
+        .badge-status { padding: 4px 15px; border-radius: 20px; font-size: 11px; font-weight: 500; display: inline-block; border: 1px solid transparent; }
+        .badge-status-active { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
+        .badge-status-inactive { background: #F3F4F6; color: #4B5563; border-color: #E5E7EB; }
+
+        .prod-actions { display: flex; gap: 8px; }
+        .btn-action-square { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--border-light); background: #fff; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 13px; }
+        .btn-action-square:hover { border-color: var(--text-main); color: var(--text-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .btn-action-square.delete:hover { border-color: #FCA5A5; color: #DC2626; background: #FEF2F2; }
+
+        /* Skeleton Loading Animation */
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .skeleton { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; background: #E5E7EB; border-radius: 4px; height: 16px; }
     </style>
 </head>
 <body>
@@ -405,7 +437,7 @@
                         </div>
                     </div>
                 </div>
-                </div>
+            </div>
         </header>
 
         <div class="main-wrapper">
@@ -553,39 +585,42 @@
 
                         <div class="dash-card"><div class="dash-card-header"><div class="dash-card-title">Best Selling Categories</div><a class="dash-card-link" onclick="navigate('reports')">View All</a></div><div class="compact-list" id="dash-best-categories"></div></div>
                         <div class="dash-card">
-  <div class="dash-card-header">
-    <div class="dash-card-title">Quick Actions</div>
-  </div>
-  <div class="quick-action-grid">
-    <div class="qa-btn" onclick="window.location.href='admin.html'">
-      <div class="qa-icon-wrapper"><i class="fa-solid fa-box-open"></i></div>Add Product
-    </div>
-    
-    <div class="qa-btn" onclick="navigate('coupons')">
-      <div class="qa-icon-wrapper"><i class="fa-solid fa-ticket"></i></div>Create Coupon
-    </div>
-    <div class="qa-btn" onclick="alert('Feature coming soon')">
-      <div class="qa-icon-wrapper" style="background: #FEF3C7; color: #F59E0B;"><i class="fa-solid fa-tags"></i></div>Create Offer
-    </div>
-    <div class="qa-btn" onclick="navigate('orders')">
-      <div class="qa-icon-wrapper" style="background: #E0E7FF; color: #3B82F6;"><i class="fa-solid fa-file-invoice"></i></div>Manage Orders
-    </div>
-    <div class="qa-btn" onclick="alert('Feature coming soon')">
-      <div class="qa-icon-wrapper" style="background: #D1FAE5; color: #10B981;"><i class="fa-regular fa-image"></i></div>Add Banner
-    </div>
-    <div class="qa-btn" onclick="navigate('reports')">
-      <div class="qa-icon-wrapper" style="background: #F3E8FF; color: #6D28D9;"><i class="fa-solid fa-chart-column"></i></div>View Reports
-    </div>
-    <div class="qa-btn" onclick="alert('Feature coming soon')">
-      <div class="qa-icon-wrapper" style="background: #E0F2FE; color: #0EA5E9;"><i class="fa-regular fa-envelope"></i></div>Send Email
-    </div>
-  <div class="qa-btn" onclick="exportOrdersToCSV()">
-      <div class="qa-icon-wrapper" style="background: #F1F5F9; color: #475569;"><i class="fa-solid fa-download"></i></div>Export Data
-    </div>
-  </div>
-</div>
-</div> </div> <div id="view-orders" class="view-section">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                          <div class="dash-card-header">
+                            <div class="dash-card-title">Quick Actions</div>
+                          </div>
+                          <div class="quick-action-grid">
+                            <div class="qa-btn" onclick="window.location.href='admin.html'">
+                              <div class="qa-icon-wrapper"><i class="fa-solid fa-box-open"></i></div>Add Product
+                            </div>
+                            
+                            <div class="qa-btn" onclick="navigate('coupons')">
+                              <div class="qa-icon-wrapper"><i class="fa-solid fa-ticket"></i></div>Create Coupon
+                            </div>
+                            <div class="qa-btn" onclick="alert('Feature coming soon')">
+                              <div class="qa-icon-wrapper" style="background: #FEF3C7; color: #F59E0B;"><i class="fa-solid fa-tags"></i></div>Create Offer
+                            </div>
+                            <div class="qa-btn" onclick="navigate('orders')">
+                              <div class="qa-icon-wrapper" style="background: #E0E7FF; color: #3B82F6;"><i class="fa-solid fa-file-invoice"></i></div>Manage Orders
+                            </div>
+                            <div class="qa-btn" onclick="alert('Feature coming soon')">
+                              <div class="qa-icon-wrapper" style="background: #D1FAE5; color: #10B981;"><i class="fa-regular fa-image"></i></div>Add Banner
+                            </div>
+                            <div class="qa-btn" onclick="navigate('reports')">
+                              <div class="qa-icon-wrapper" style="background: #F3E8FF; color: #6D28D9;"><i class="fa-solid fa-chart-column"></i></div>View Reports
+                            </div>
+                            <div class="qa-btn" onclick="alert('Feature coming soon')">
+                              <div class="qa-icon-wrapper" style="background: #E0F2FE; color: #0EA5E9;"><i class="fa-regular fa-envelope"></i></div>Send Email
+                            </div>
+                          <div class="qa-btn" onclick="exportOrdersToCSV()">
+                              <div class="qa-icon-wrapper" style="background: #F1F5F9; color: #475569;"><i class="fa-solid fa-download"></i></div>Export Data
+                            </div>
+                          </div>
+                        </div>
+                    </div> 
+                </div> 
+
+                <div id="view-orders" class="view-section">
+                    <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
                         <div>
                             <h1 class="page-title">Manage Orders</h1>
                             <p class="page-subtitle">View and manage all customer orders</p>
@@ -651,7 +686,82 @@
                     </div>
                 </div>
 
-               <div id="view-reports" class="view-section">
+                <div id="view-products" class="view-section">
+                    <div class="page-header" style="align-items: center;">
+                        <div>
+                            <h1 class="page-title">Product Management</h1>
+                            <p class="page-subtitle">Manage your products and categories.</p>
+                        </div>
+                        <button class="btn-export-dark" onclick="window.location.href='admin.html'" style="padding: 10px 20px;">
+                            <i class="fa-solid fa-plus"></i> Add New Product
+                        </button>
+                    </div>
+
+                    <div class="products-filter-bar">
+                        <div class="search-box" style="flex: 1; max-width: 400px;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="prodSearchInput" placeholder="Search products by name, SKU...">
+                        </div>
+                        <select class="filter-select" id="prodCatFilter" style="width: 200px;">
+                            <option value="All">All Categories</option>
+                            <option value="Jewelry">Jewelry</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Bags">Bags</option>
+                            <option value="Abayas">Abayas</option>
+                            <option value="Hijabs">Hijabs</option>
+                            <option value="Niqabs">Niqabs</option>
+                            <option value="Hampers">Hampers</option>
+                        </select>
+                        <select class="filter-select" id="prodStatusFilter" style="width: 180px;">
+                            <option value="All">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                        <button class="btn-reset" onclick="resetProductFilters()">
+                            <i class="fa-solid fa-rotate-right"></i> Reset
+                        </button>
+                    </div>
+
+                    <div class="main-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <tr>
+                                    <td><div class="skeleton" style="width: 20px;"></div></td>
+                                    <td><div style="display:flex; gap:15px; align-items:center;"><div class="skeleton" style="width:50px; height:50px; border-radius:8px;"></div><div><div class="skeleton" style="width:120px; margin-bottom:5px;"></div><div class="skeleton" style="width:80px;"></div></div></div></td>
+                                    <td><div class="skeleton" style="width: 60px; border-radius:20px;"></div></td>
+                                    <td><div class="skeleton" style="width: 50px;"></div></td>
+                                    <td><div class="skeleton" style="width: 60px; border-radius:20px;"></div></td>
+                                    <td><div class="skeleton" style="width: 80px;"></div></td>
+                                    <td><div class="skeleton" style="width: 100px; float:right;"></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-top: 1px solid var(--border-light); background: #fff;">
+                            <div style="font-size: 13px; color: var(--text-muted);">Showing <span id="prod-pag-start">0</span> to <span id="prod-pag-end">0</span> of <span id="prod-pag-total">0</span> products</div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <div id="prod-pagination-controls" style="display: flex; gap: 5px;"></div>
+                                <select class="filter-select" style="padding: 6px 10px; margin-left: 10px;" id="prodRowsPerPage" onchange="changeProdRowsPerPage()">
+                                    <option value="7">7 / page</option>
+                                    <option value="15">15 / page</option>
+                                    <option value="30">30 / page</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="view-reports" class="view-section">
                     <div class="page-header">
                         <div>
                             <h1 class="page-title">Reports & Analytics <i class="fa-solid fa-chart-line" style="color: var(--primary-brand); font-size: 18px;"></i></h1>
@@ -767,7 +877,6 @@
                     </div>
                 </div>
 
-                <div id="view-products" class="view-section"><div class="placeholder-content"><i class="fa-solid fa-tags"></i><h2>Product Management</h2></div></div>
                 <div id="view-customers" class="view-section"><div class="placeholder-content"><i class="fa-solid fa-users"></i><h2>Customer Database</h2></div></div>
                 <div id="view-coupons" class="view-section"><div class="placeholder-content"><i class="fa-solid fa-ticket"></i><h2>Coupon Engine</h2></div></div>
                 <div id="view-reviews" class="view-section"><div class="placeholder-content"><i class="fa-regular fa-comment"></i><h2>Review Moderation</h2></div></div>
@@ -927,6 +1036,7 @@
         
         let globalDashEndDate = new Date();
         globalDashEndDate.setHours(23,59,59,999);
+        
         // --- PASSWORD TOGGLE LOGIC ---
         document.addEventListener("DOMContentLoaded", function() {
             const toggleBtn = document.getElementById('togglePasswordBtn');
@@ -1079,9 +1189,10 @@
     </script>
 
     <script type="module">
+        // UPDATE IMPORT TO INCLUDE `collection` and `deleteDoc`
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collectionGroup, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collectionGroup, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDxe9DeHRsCzD4vlNsknlDHN0w7txd51ic",
@@ -1100,7 +1211,6 @@
         const ADMIN_EMAIL = "abayrah.18@gmail.com";
         window.allOrdersData = []; 
         let currentFilteredOrders = []; 
-        
         let currentPage = 1;
         const rowsPerPage = 5;
 
@@ -1176,6 +1286,7 @@
                 document.getElementById('app-layout').style.display = 'flex';
                 initCharts();
                 initRealTimeOrders(); 
+                initRealTimeProducts(); // <-- LIVE SYNCING PRODUCTS ADDED HERE
             } else if (user) {
                 signOut(auth);
                 document.getElementById('auth-screen').style.display = 'flex';
@@ -1190,7 +1301,7 @@
             }
         });
 
-       function initCharts() {
+        function initCharts() {
             // 1. Revenue Chart
             const ctxRev = document.getElementById('revenueChart');
             if(ctxRev) {
@@ -2050,6 +2161,205 @@
             document.getElementById('sidePanel').classList.add('active');
         };
 
+        // =========================================================================
+        // REAL-TIME PRODUCT MANAGEMENT LOGIC
+        // =========================================================================
+        window.allProductsData = [];
+        let currentFilteredProducts = [];
+        let currentProdPage = 1;
+        let prodRowsPerPage = 7;
+
+        function initRealTimeProducts() {
+            // Live sync with your products database from admin.html
+            const productsRef = collection(db, 'products');
+            
+            onSnapshot(productsRef, (snapshot) => {
+                window.allProductsData = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    data.rawId = docSnap.id;
+                    
+                    // Standardizing formatting to display perfectly
+                    data.title = data.title || data.name || 'Unnamed Product';
+                    data.category = data.category || 'Default';
+                    data.price = parseFloat(data.price || 0);
+                    data.status = data.status || 'Active';
+                    data.sku = data.sku || `ABY-${docSnap.id.substring(0,6).toUpperCase()}`;
+                    data.createdAt = data.createdAt ? new Date(data.createdAt).getTime() : Date.now();
+                    
+                    window.allProductsData.push(data);
+                });
+
+                currentProdPage = 1; 
+                renderProductsTable(); 
+            }, (error) => {
+                console.error("Products Sync Error:", error);
+                document.getElementById('productsTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center; color:#DC2626; padding:20px;">Failed to connect to database. Check permissions.</td></tr>';
+            });
+        }
+
+        const prodSearchInput = document.getElementById('prodSearchInput');
+        const prodCatFilter = document.getElementById('prodCatFilter');
+        const prodStatusFilter = document.getElementById('prodStatusFilter');
+
+        if(prodSearchInput) prodSearchInput.addEventListener('input', () => { currentProdPage = 1; renderProductsTable(); });
+        if(prodCatFilter) prodCatFilter.addEventListener('change', () => { currentProdPage = 1; renderProductsTable(); });
+        if(prodStatusFilter) prodStatusFilter.addEventListener('change', () => { currentProdPage = 1; renderProductsTable(); });
+
+        window.resetProductFilters = function() {
+            document.getElementById('prodSearchInput').value = '';
+            document.getElementById('prodCatFilter').value = 'All';
+            document.getElementById('prodStatusFilter').value = 'All';
+            currentProdPage = 1;
+            renderProductsTable();
+        };
+
+        window.changeProdRowsPerPage = function() {
+            prodRowsPerPage = parseInt(document.getElementById('prodRowsPerPage').value);
+            currentProdPage = 1;
+            renderProductsTable();
+        };
+
+        window.goToProdPage = function(page) {
+            currentProdPage = page;
+            renderProductsTable();
+        };
+
+        function getCategoryBadgeClass(category) {
+            const cat = category.toLowerCase();
+            if (cat.includes('jewelry')) return 'badge-cat-jewelry';
+            if (cat.includes('abaya')) return 'badge-cat-abayas';
+            if (cat.includes('hijab')) return 'badge-cat-abayas';
+            if (cat.includes('bag')) return 'badge-cat-bags';
+            if (cat.includes('accessory')) return 'badge-cat-accessories';
+            return 'badge-cat-default';
+        }
+
+        function renderProductsTable() {
+            const tBody = document.getElementById('productsTableBody');
+            if(!tBody) return;
+
+            const term = prodSearchInput ? prodSearchInput.value.toLowerCase() : '';
+            const filterCat = prodCatFilter ? prodCatFilter.value : 'All';
+            const filterStat = prodStatusFilter ? prodStatusFilter.value : 'All';
+
+            // Sort newest first
+            let filtered = window.allProductsData.sort((a, b) => b.createdAt - a.createdAt);
+
+            filtered = filtered.filter(prod => {
+                const title = prod.title.toLowerCase();
+                const sku = prod.sku.toLowerCase();
+                
+                const matchesSearch = title.includes(term) || sku.includes(term);
+                const matchesCat = filterCat === 'All' || prod.category === filterCat;
+                const matchesStat = filterStat === 'All' || prod.status === filterStat;
+
+                return matchesSearch && matchesCat && matchesStat;
+            });
+
+            currentFilteredProducts = filtered;
+
+            if(document.getElementById('prod-pag-total')) document.getElementById('prod-pag-total').textContent = filtered.length;
+
+            if(filtered.length === 0) {
+                tBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-box-open" style="font-size:32px; color:#E5E7EB; margin-bottom:10px; display:block;"></i>No products found matching your filters.</td></tr>';
+                document.getElementById('prod-pag-start').textContent = 0;
+                document.getElementById('prod-pag-end').textContent = 0;
+                document.getElementById('prod-pagination-controls').innerHTML = '';
+                return;
+            }
+
+            const totalPages = Math.ceil(filtered.length / prodRowsPerPage);
+            if(currentProdPage > totalPages) currentProdPage = totalPages;
+            
+            const startIdx = (currentProdPage - 1) * prodRowsPerPage;
+            const endIdx = startIdx + prodRowsPerPage;
+            const paginatedProds = filtered.slice(startIdx, endIdx);
+
+            document.getElementById('prod-pag-start').textContent = startIdx + 1;
+            document.getElementById('prod-pag-end').textContent = Math.min(endIdx, filtered.length);
+
+            // Pagination Controls Layout
+            let pagHtml = `<button class="btn-action-square" onclick="goToProdPage(${Math.max(1, currentProdPage-1)})"><i class="fa-solid fa-chevron-left"></i></button>`;
+            for(let i=1; i<=totalPages; i++) {
+                if(i === currentProdPage) {
+                    pagHtml += `<button class="btn-action-square" style="background: var(--primary-brand); color: #fff; border-color: var(--primary-brand);">${i}</button>`;
+                } else if (i === 1 || i === totalPages || (i >= currentProdPage - 1 && i <= currentProdPage + 1)) {
+                    pagHtml += `<button class="btn-action-square" onclick="goToProdPage(${i})">${i}</button>`;
+                } else if (i === currentProdPage - 2 || i === currentProdPage + 2) {
+                    pagHtml += `<span style="padding: 0 5px; color: var(--text-muted); align-self: center;">...</span>`;
+                }
+            }
+            pagHtml += `<button class="btn-action-square" onclick="goToProdPage(${Math.min(totalPages, currentProdPage+1)})"><i class="fa-solid fa-chevron-right"></i></button>`;
+            document.getElementById('prod-pagination-controls').innerHTML = pagHtml;
+
+            // Generate Table Rows
+            let html = '';
+            paginatedProds.forEach((prod, index) => {
+                const globalIndex = startIdx + index + 1;
+                const d = new Date(prod.createdAt);
+                const dateStr = d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+                const timeStr = d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+                
+                const imgUrl = (prod.images && prod.images.length > 0) ? prod.images[0] : (prod.image || 'star-logo.png');
+                const catClass = getCategoryBadgeClass(prod.category);
+                const statClass = prod.status === 'Active' ? 'badge-status-active' : 'badge-status-inactive';
+
+                html += `
+                    <tr>
+                        <td style="color: var(--text-muted);">${globalIndex}</td>
+                        <td>
+                            <div class="prod-table-cell">
+                                <img src="${imgUrl}" class="prod-img-box" alt="Product">
+                                <div>
+                                    <div class="prod-name">${prod.title.length > 25 ? prod.title.substring(0,25)+'...' : prod.title}</div>
+                                    <div class="prod-sku">SKU: ${prod.sku}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge-cat ${catClass}">${prod.category}</span></td>
+                        <td style="font-weight: 500; color: var(--text-main);">₹${prod.price.toLocaleString('en-IN')}</td>
+                        <td><span class="badge-status ${statClass}">${prod.status}</span></td>
+                        <td>
+                            <div style="font-size: 12px; color: var(--text-main);">${dateStr}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">${timeStr}</div>
+                        </td>
+                        <td>
+                            <div class="prod-actions" style="justify-content: flex-end;">
+                                <button class="btn-action-square" onclick="editProduct('${prod.rawId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-action-square" onclick="viewProduct('${prod.rawId}')" title="View"><i class="fa-regular fa-eye"></i></button>
+                                <button class="btn-action-square delete" onclick="deleteProduct('${prod.rawId}', '${prod.title.replace(/'/g, "\\'")}')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tBody.innerHTML = html;
+        }
+
+        // Action Handlers
+        window.editProduct = function(id) {
+            window.location.href = `admin.html?edit=${id}`;
+        };
+
+        window.viewProduct = function(id) {
+            const prod = window.allProductsData.find(p => p.rawId === id);
+            if(!prod) return;
+            alert(`Previewing: ${prod.title}\nPrice: ₹${prod.price.toLocaleString('en-IN')}\nCategory: ${prod.category}\n\n(Full preview modal integration ready)`);
+        };
+
+        window.deleteProduct = async function(id, title) {
+            const confirmDelete = confirm(`⚠️ Are you sure you want to delete "${title}"?\n\nThis action cannot be undone and will instantly remove the product from the database.`);
+            if(confirmDelete) {
+                try {
+                    await deleteDoc(doc(db, 'products', id));
+                    console.log(`Product ${id} deleted successfully.`);
+                } catch(error) {
+                    alert("Failed to delete product. Ensure your admin account has the correct Firestore write permissions.");
+                    console.error("Delete Error:", error);
+                }
+            }
+        };
     </script>
 </body>
 </html>
