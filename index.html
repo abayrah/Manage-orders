@@ -985,18 +985,11 @@
                     </div>
                 </div>
 
-                <div id="view-customers" class="view-section">
+<div id="view-customers" class="view-section">
     <div class="page-header" style="align-items: center;">
         <div>
             <h1 class="page-title">Customer Database</h1>
             <p class="page-subtitle">Manage your customers and their details.</p>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn-export-dark" onclick="alert('Add Customer Modal Triggered')" style="padding: 10px 20px;">
-                <i class="fa-solid fa-plus"></i> Add New Customer
-            </button>
-            <button class="btn-export" style="background: #fff; color: var(--text-main); border: 1px solid var(--border-light);"><i class="fa-solid fa-upload"></i></button>
-            <button class="btn-export" style="background: #fff; color: var(--text-main); border: 1px solid var(--border-light);"><i class="fa-solid fa-download"></i></button>
         </div>
     </div>
 
@@ -1045,8 +1038,8 @@
         <div class="table-header-flex">
             <div class="table-header-title">All Customers (<span id="crm-table-count">0</span>)</div>
             <div class="view-toggles">
-                <button class="view-toggle-btn active" id="btn-view-list" onclick="setCustomerView('list')"><i class="fa-solid fa-list"></i></button>
-                <button class="view-toggle-btn" id="btn-view-grid" onclick="setCustomerView('grid')"><i class="fa-solid fa-border-all"></i></button>
+                <button class="view-toggle-btn active" id="btn-view-list" onclick="window.setCustomerView('list')"><i class="fa-solid fa-list"></i></button>
+                <button class="view-toggle-btn" id="btn-view-grid" onclick="window.setCustomerView('grid')"><i class="fa-solid fa-border-all"></i></button>
             </div>
         </div>
 
@@ -1775,7 +1768,7 @@ window.setCustomerView = function(viewType) {
     document.getElementById('customer-grid-container').style.display = viewType === 'grid' ? 'block' : 'none';
     
     // Re-render the data to fit the new view
-    renderCustomersTable();
+    window.renderCustomersTable();
 };
         
 window.renderCustomersTable = function() {
