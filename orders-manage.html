@@ -732,7 +732,7 @@
                                     <th>Price</th>
                                     <th>Status</th>
                                     <th>Created At</th>
-                                    
+                                    <th style="text-align: right;">Actions</th>               
                                 </tr>
                             </thead>
                             <tbody id="productsTableBody">
@@ -2333,10 +2333,12 @@
                             <div style="font-size: 11px; color: var(--text-muted);">${timeStr}</div>
                         </td>
                         <td>
-                            <div class="prod-actions" style="justify-content: flex-end;">
-                                <button class="btn-action-square" onclick="editProduct('${prod.rawId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-action-square delete" onclick="deleteProduct('${prod.rawId}', '${prod.title.replace(/'/g, "\\'")}')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
+                           <div class="prod-actions" style="justify-content: flex-end;">
+    <button class="btn-action-square" onclick="editProduct('${prod.rawId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+    <button class="btn-action-square" onclick="toggleProductStatus('${prod.rawId}', '${prod.status}')" title="${prod.status === 'Active' ? 'Deactivate Product' : 'Activate Product'}">
+        <i class="fa-solid ${prod.status === 'Active' ? 'fa-eye-slash' : 'fa-eye'}"></i>
+    </button>
+</div>
                         </td>
                     </tr>
                 `;
@@ -2367,6 +2369,22 @@
                 }
             }
         };
+        window.toggleProductStatus = async function(id, currentStatus) {
+    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+    // Keeping your 'inStock' boolean synced for your admin.html logic
+    const newInStock = newStatus === 'Active'; 
+    
+    try {
+        await updateDoc(doc(db, 'products', id), {
+            status: newStatus,
+            inStock: newInStock
+        });
+        console.log(`Product ${id} status successfully updated to ${newStatus}.`);
+    } catch(error) {
+        alert("Failed to update product status. Ensure your account has the correct permissions.");
+        console.error("Status Update Error:", error);
+    }
+};
     </script>
 </body>
 </html>
