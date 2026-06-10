@@ -1710,10 +1710,14 @@ window.aggregateAndRenderCustomers = function() {
         }
 
         // Tally order data
+        // Tally order data
         customerMap[email].totalOrders += 1;
-        customerMap[email].orderHistory.push(order); // <-- NEW: Save the specific order
+        customerMap[email].orderHistory.push(order); 
         
-        if (order.status !== 'Cancelled' && order.status !== 'Failed') {
+        const isRefunded = order.paymentStatus === 'Refunded';
+        
+        // Don't add to customer spent total if the order was refunded
+        if (order.status !== 'Cancelled' && order.status !== 'Failed' && !isRefunded) {
             customerMap[email].totalSpent += orderAmt;
             totalRevenue += orderAmt;
         }
@@ -1884,7 +1888,11 @@ window.renderCustomersTable = function() {
                     if(data.status === 'Delivered') stats.delivered++;
                     if(data.status === 'Cancelled') { stats.cancelled++; cancelledRevenue += amt; }
                     
-                    if(data.status !== 'Cancelled' && data.status !== 'Failed') revenue += amt;
+                    // NEW: Check if payment is refunded
+                    const isRefunded = data.paymentStatus === 'Refunded';
+                    
+                    // Exclude cancelled, failed, AND refunded from total revenue
+                    if(data.status !== 'Cancelled' && data.status !== 'Failed' && !isRefunded) revenue += amt;
                     
                     if(data.shippingInfo && data.shippingInfo.email) {
                         const em = data.shippingInfo.email;
@@ -1892,7 +1900,8 @@ window.renderCustomersTable = function() {
                         else customerEmailCounts[em] = 1;
                     }
 
-                    if(data.status !== 'Cancelled') {
+                    // Exclude refunded orders from daily charts and product/category sales
+                    if(data.status !== 'Cancelled' && !isRefunded) {
                         const dStr = dObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
                         if(dailyRevMap[dStr] !== undefined) {
                             dailyRevMap[dStr] += amt;
@@ -2170,10 +2179,15 @@ window.renderCustomersTable = function() {
                 const dObj = new Date(order.date);
                 if (dObj >= startDate && dObj <= endD) {
                     const amt = parseFloat(order.amount || 0);
+const isRefunded = order.paymentStatus === 'Refunded';
 
-                    if (order.status === 'Cancelled') {
+                    // Add to refunds if the order is cancelled OR refunded
+                    if (order.status === 'Cancelled' || isRefunded) {
                         repRefunds += amt;
-                    } else if (order.status !== 'Failed') {
+                    } 
+                    
+                    // Only count as revenue if it is not cancelled, failed, or refunded
+                    if (order.status !== 'Cancelled' && order.status !== 'Failed' && !isRefunded) {
                         repRevenue += amt;
                         repOrders++;
 
@@ -2655,7 +2669,15 @@ if (currentPayStat === 'Paid') {
         }
         
         // 3. Re-render the table to show/hide the "Online" or "Txn ID" text
+     // 3. Re-render the table to show/hide the "Online" or "Txn ID" text
         renderTable();
+        
+        // NEW: Trigger global recalculations so all tabs update instantly
+        if (window.calculateDashboardData) window.calculateDashboardData(globalDashStartDate, globalDashEndDate);
+        if (window.calculateReportsData) window.calculateReportsData(globalReportStartDate, globalReportEndDate);
+        if (window.aggregateAndRenderCustomers) window.aggregateAndRenderCustomers();
+
+        // 4. Sync the side-panel payment badge instantly if it is currently open
 
         // 4. Sync the side-panel payment badge instantly if it is currently open
         if(document.getElementById('sp-current-doc-path').value === docPath) {
