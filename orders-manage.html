@@ -2169,7 +2169,7 @@
         let currentProdPage = 1;
         let prodRowsPerPage = 7;
 
-        function initRealTimeProducts() {
+               function initRealTimeProducts() {
             // Live sync with your products database from admin.html
             const productsRef = collection(db, 'products');
             
@@ -2179,11 +2179,16 @@
                     const data = docSnap.data();
                     data.rawId = docSnap.id;
                     
-                    // Standardizing formatting to display perfectly
+                    // --- THE FIXES ---
+                    // 1. Handle arrays from admin.html category saves
+                    data.category = Array.isArray(data.category) ? data.category[0] : (data.category || 'Default');
+                    
+                    // 2. Map Admin's 'inStock' boolean to 'Active/Inactive' status
+                    data.status = data.inStock === false ? 'Inactive' : 'Active';
+                    
+                    // Standardizing formatting
                     data.title = data.title || data.name || 'Unnamed Product';
-                    data.category = data.category || 'Default';
                     data.price = parseFloat(data.price || 0);
-                    data.status = data.status || 'Active';
                     data.sku = data.sku || `ABY-${docSnap.id.substring(0,6).toUpperCase()}`;
                     data.createdAt = data.createdAt ? new Date(data.createdAt).getTime() : Date.now();
                     
@@ -2197,6 +2202,7 @@
                 document.getElementById('productsTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center; color:#DC2626; padding:20px;">Failed to connect to database. Check permissions.</td></tr>';
             });
         }
+
 
         const prodSearchInput = document.getElementById('prodSearchInput');
         const prodCatFilter = document.getElementById('prodCatFilter');
@@ -2235,7 +2241,7 @@
             return 'badge-cat-default';
         }
 
-        function renderProductsTable() {
+  function renderProductsTable() {
             const tBody = document.getElementById('productsTableBody');
             if(!tBody) return;
 
@@ -2251,7 +2257,9 @@
                 const sku = prod.sku.toLowerCase();
                 
                 const matchesSearch = title.includes(term) || sku.includes(term);
-                const matchesCat = filterCat === 'All' || prod.category === filterCat;
+                
+                // 3. Changed to .includes() to match "Abayas" with "Luxury Abayas"
+                const matchesCat = filterCat === 'All' || prod.category.includes(filterCat);
                 const matchesStat = filterStat === 'All' || prod.status === filterStat;
 
                 return matchesSearch && matchesCat && matchesStat;
@@ -2327,7 +2335,6 @@
                         <td>
                             <div class="prod-actions" style="justify-content: flex-end;">
                                 <button class="btn-action-square" onclick="editProduct('${prod.rawId}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-action-square" onclick="viewProduct('${prod.rawId}')" title="View"><i class="fa-regular fa-eye"></i></button>
                                 <button class="btn-action-square delete" onclick="deleteProduct('${prod.rawId}', '${prod.title.replace(/'/g, "\\'")}')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                         </td>
