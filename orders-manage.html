@@ -1012,11 +1012,39 @@
 
     <div class="side-panel-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-    <div class="side-panel" id="sidePanel">
+    <div class="side-panel" id="customerSidePanel">
         <div class="panel-header">
-            <div style="font-size: 16px; font-weight: 600;">Order Details</div>
-            <button class="close-panel" onclick="closeAllModals()"><i class="fa-solid fa-xmark"></i></button>
+            <div style="font-size: 16px; font-weight: 600;">Customer Profile</div>
+            <button class="close-panel" onclick="closeCustomerModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
+        
+        <div style="padding: 20px; text-align: center; border-bottom: 1px solid var(--border-light); background: #F9FAFB;">
+            <img src="" id="cp-avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <div style="font-size: 18px; font-weight: 600; color: var(--text-main);" id="cp-name">Customer Name</div>
+            <div style="font-size: 13px; color: var(--text-muted);" id="cp-email">email@example.com</div>
+            <div style="margin-top: 10px;"><span class="badge-status badge-status-active" id="cp-status">Active</span></div>
+        </div>
+
+        <div class="panel-content" style="padding-top: 20px;">
+            <div class="panel-section">
+                <div class="section-title">Overview</div>
+                <div class="info-grid" style="grid-template-columns: 110px 10px 1fr;">
+                    <span class="info-label">Phone</span><span>:</span> <span class="info-value" id="cp-phone"></span>
+                    <span class="info-label">Location</span><span>:</span> <span class="info-value" id="cp-location"></span>
+                    <span class="info-label">Total Spent</span><span>:</span> <span class="info-value" style="font-weight: 600; color: var(--primary-brand);" id="cp-spent"></span>
+                    <span class="info-label">Joined</span><span>:</span> <span class="info-value" id="cp-joined"></span>
+                </div>
+            </div>
+
+            <div class="panel-section" style="border-bottom: none;">
+                <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                    Order History <span style="background: var(--bg-color); padding: 2px 8px; border-radius: 12px; font-size: 11px; color: var(--text-main); font-weight: 600;" id="cp-order-count">0</span>
+                </div>
+                <div id="cp-orders-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                    </div>
+            </div>
+        </div>
+    </div>
         
         <div style="padding: 20px 20px 10px 20px; display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 24px; font-weight: 600;" id="sp-order-id">#ABY1001</div>
@@ -1520,18 +1548,20 @@ window.aggregateAndRenderCustomers = function() {
                 totalOrders: 0,
                 totalSpent: 0,
                 joinedDate: orderDate,
-                status: 'Active' // Default logic, can be overridden if you have a separate users collection
+                status: 'Active',
+                orderHistory: [] // <-- NEW: Array to hold all orders
             };
         }
 
         // Tally order data
         customerMap[email].totalOrders += 1;
+        customerMap[email].orderHistory.push(order); // <-- NEW: Save the specific order
+        
         if (order.status !== 'Cancelled' && order.status !== 'Failed') {
             customerMap[email].totalSpent += orderAmt;
             totalRevenue += orderAmt;
         }
 
-        // Track earliest date as joined date
         if (orderDate < customerMap[email].joinedDate) {
             customerMap[email].joinedDate = orderDate;
         }
@@ -1549,7 +1579,7 @@ window.aggregateAndRenderCustomers = function() {
 
     // Update Top Cards
     document.getElementById('crm-total-cust').textContent = customersArray.length;
-    document.getElementById('crm-active-cust').textContent = customersArray.length; // Assuming all active unless manually deactivated
+    document.getElementById('crm-active-cust').textContent = customersArray.length; 
     document.getElementById('crm-new-cust').textContent = newThisMonth;
     document.getElementById('crm-repeat-cust').textContent = repeatCust;
     document.getElementById('crm-total-spent').textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
@@ -1559,6 +1589,7 @@ window.aggregateAndRenderCustomers = function() {
     renderCustomersTable();
 };
 
+        
 window.renderCustomersTable = function() {
     const tBody = document.getElementById('customersTableBody');
     if(!tBody || !window.allCustomersData) return;
@@ -1649,7 +1680,7 @@ window.renderCustomersTable = function() {
                 <td><span class="badge-status ${statClass}">${cust.status}</span></td>
                 <td>
                     <div class="prod-actions" style="justify-content: flex-end;">
-                        <button class="btn-action-square" onclick="alert('Open View Profile Modal for ${cust.name}')" title="View Customer"><i class="fa-regular fa-eye"></i></button>
+                        <button class="btn-action-square" onclick="openCustomerProfile('${cust.email}')" title="View Customer"><i class="fa-regular fa-eye"></i></button>
                         <button class="btn-action-square" onclick="alert('Open Edit Modal for ${cust.name}')" title="Edit Customer"><i class="fa-solid fa-pen"></i></button>
                     </div>
                 </td>
@@ -2686,6 +2717,69 @@ function initRealTimeOrders() {
         console.error("Status Update Error:", error);
     }
 };
+        window.openCustomerProfile = function(email) {
+            const cust = window.allCustomersData.find(c => c.email === email);
+            if(!cust) return;
+
+            // Populate Main Profile
+            document.getElementById('cp-avatar').src = getAvatarUrl(cust.name, cust.photoURL);
+            document.getElementById('cp-name').textContent = cust.name;
+            document.getElementById('cp-email').textContent = cust.email;
+            document.getElementById('cp-phone').textContent = cust.phone;
+            document.getElementById('cp-location').textContent = `${cust.city}, ${cust.state}`;
+            document.getElementById('cp-spent').textContent = `₹${cust.totalSpent.toLocaleString('en-IN')}`;
+            document.getElementById('cp-joined').textContent = cust.joinedDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+            document.getElementById('cp-order-count').textContent = cust.totalOrders;
+
+            // Populate Status Badge
+            const statBadge = document.getElementById('cp-status');
+            statBadge.textContent = cust.status;
+            statBadge.className = `badge-status ${cust.status === 'Active' ? 'badge-status-active' : 'badge-status-inactive'}`;
+
+            // Build Order History List
+            const sortedOrders = cust.orderHistory.sort((a,b) => new Date(b.date) - new Date(a.date));
+            let ordersHtml = '';
+            
+            const statusClassMap = {
+                'Processing': 'status-processing', 'Confirmed': 'status-confirmed',
+                'Shipped': 'status-shipped', 'Delivered': 'status-delivered', 'Cancelled': 'status-cancelled'
+            };
+
+            sortedOrders.forEach(order => {
+                const orderId = order.orderNumber || order.rawId.substring(0,8).toUpperCase();
+                const dObj = new Date(order.date);
+                const dStr = dObj.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+                const amt = parseFloat(order.amount).toLocaleString('en-IN');
+                const sClass = statusClassMap[order.status] || 'status-processing';
+
+                ordersHtml += `
+                    <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: #fff; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='var(--primary-brand)'" onmouseout="this.style.borderColor='var(--border-light)'" onclick="closeCustomerModal(); openSidePanel('${order.rawId}')">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: var(--primary-brand); font-size: 13px;">#${orderId}</span>
+                            <span style="font-size: 11px; color: var(--text-muted);">${dStr}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 500; font-size: 13px;">₹${amt}</span>
+                            <span class="status-badge-static ${sClass}" style="font-size: 10px; padding: 2px 8px;">${order.status}</span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; border-top: 1px dashed var(--border-light); padding-top: 6px;">
+                            <i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i> Shipped to: ${order.shippingInfo?.city || 'Unknown'}, ${order.shippingInfo?.state || 'Unknown'}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('cp-orders-list').innerHTML = ordersHtml;
+
+            // Show Panel
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('customerSidePanel').classList.add('active');
+        };
+
+        window.closeCustomerModal = function() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.getElementById('customerSidePanel').classList.remove('active');
+        };
     </script>
 </body>
 </html>
