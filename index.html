@@ -2010,6 +2010,9 @@ window.renderCustomersTable = function() {
                 const dateObj = new Date(o.date);
                 const dStr = dateObj.toLocaleDateString('en-IN', {month:'short', day:'numeric', year:'numeric'});
                 const tStr = dateObj.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+                // Get true payment status
+                const currentPayStat = o.paymentStatus || (o.status === 'Failed' ? 'Failed' : 'Paid');
+                const payBadgeClass = currentPayStat === 'Paid' ? 'pay-paid' : 'pay-failed';
 
                 let prodHtml = '';
                 if(o.items && o.items[0]) {
@@ -2040,7 +2043,7 @@ window.renderCustomersTable = function() {
                         </td>
                         <td>${prodHtml}</td>
                         <td style="font-weight:500; font-size:12px;">₹${parseFloat(o.amount).toLocaleString('en-IN')}</td>
-                        <td><span class="payment-badge ${o.status === 'Failed' ? 'pay-failed' : 'pay-paid'}">${o.status === 'Failed' ? 'Failed' : 'Paid'}</span></td>
+                        <td><span class="payment-badge ${payBadgeClass}">${currentPayStat}</span></td>
                         <td><span class="status-badge-static ${statusClass}">${o.status}</span></td>
                         <td>
                             <div style="font-size:12px;">${dStr}</div>
