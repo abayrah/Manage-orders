@@ -1407,6 +1407,32 @@
         </div>
     </div>
 </div>
+    <div class="side-panel-overlay" id="couponUsageModalOverlay" onclick="closeCouponUsageModal()"></div>
+<div class="invoice-modal" id="couponUsageModal" style="max-width: 800px; height: auto; max-height: 85vh; padding: 0; display: flex; flex-direction: column;">
+    <div class="invoice-header-controls" style="border-radius: 12px 12px 0 0; flex-shrink: 0;">
+        <div style="font-weight: 600; font-size: 16px;">Usage Details: <span id="usageModalCouponCode" style="color: var(--primary-brand); border: 1px dashed var(--primary-brand); padding: 2px 8px; border-radius: 4px; margin-left: 5px;"></span></div>
+        <button class="close-panel" onclick="closeCouponUsageModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="invoice-content" style="padding: 30px; overflow-y: auto; flex: 1; background: #F9FAFB;">
+        
+        <div class="main-table-container" style="margin-bottom: 0;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Details</th>
+                        <th>Date Applied</th>
+                        <th>Order Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="couponUsageTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
 
     <script>
         var repOverviewChart = null;
@@ -2087,6 +2113,15 @@ window.renderCouponsTable = function() {
 
     if(document.getElementById('cpn-showing')) document.getElementById('cpn-showing').textContent = `1 to ${filtered.length} of ${filtered.length}`;
 
+    // --- 🌟 LIVE KPI CALCULATION FOR TOTAL USAGE 🌟 ---
+    let totalLiveUsage = 0;
+    window.allCouponsData.forEach(c => {
+        // Count all orders that used this coupon (excluding failed/cancelled ones)
+        const usage = window.allOrdersData.filter(o => o.couponUsed === c.code && o.status !== 'Cancelled' && o.status !== 'Failed').length;
+        totalLiveUsage += usage;
+    });
+    if(document.getElementById('cpn-uses')) document.getElementById('cpn-uses').textContent = totalLiveUsage;
+
     if(filtered.length === 0) {
         tBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">No coupons found.</td></tr>';
         return;
@@ -2099,21 +2134,20 @@ window.renderCouponsTable = function() {
         const timeStr = d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
         const statClass = cpn.status === 'Live' ? 'badge-status-active' : 'badge-status-inactive';
         
-        // Exact HTML replication of Screenshot 2
+        // --- 🌟 LIVE USAGE CALCULATION FOR THIS SPECIFIC ROW 🌟 ---
+        const actualUsageOrders = window.allOrdersData.filter(o => o.couponUsed === cpn.code && o.status !== 'Cancelled' && o.status !== 'Failed');
+        const trueUsageCount = actualUsageOrders.length;
+        
         html += `
             <tr>
                 <td>
                     <div style="display: inline-flex; align-items: center; gap: 8px; border: 1px dashed #10B981; background: #ECFDF5; color: #047857; padding: 8px 15px; border-radius: 6px; font-weight: 700; font-size: 14px; letter-spacing: 1px;">
                         ${cpn.code} <i class="fa-regular fa-copy" style="cursor: pointer; opacity: 0.7;" onclick="navigator.clipboard.writeText('${cpn.code}'); alert('Copied to clipboard!')"></i>
                     </div>
-                    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
-                        <span style="background: #ECFDF5; color: #10B981; padding: 4px 10px; border-radius: 12px; font-size: 10px; width: fit-content; font-weight: 500;">First Order Offer</span>
-                        <span style="background: #F3E8FF; color: #6D28D9; padding: 4px 10px; border-radius: 12px; font-size: 10px; width: fit-content; font-weight: 500;"><i class="fa-solid fa-user" style="margin-right: 4px;"></i> First Order Only</span>
-                    </div>
                 </td>
                 <td>
                     <strong style="color: var(--text-main); font-size: 14px;">${cpn.description}</strong><br>
-                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; max-width: 180px;">Get flat ${cpn.discount}% off on your first order from Abayrah.</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Get flat ${cpn.discount}% off from Abayrah.</div>
                 </td>
                 <td>
                     <strong style="color: #10B981; font-size: 18px;">${cpn.discount}%</strong><br>
@@ -2121,16 +2155,13 @@ window.renderCouponsTable = function() {
                 </td>
                 <td>
                     <i class="fa-solid fa-infinity" style="font-size: 24px; color: #10B981; margin-bottom: 5px;"></i><br>
-                    <strong style="font-size: 13px; color: var(--text-main);">No Expiry</strong><br>
-                    <span style="display: inline-block; background: #ECFDF5; color: #10B981; padding: 3px 10px; border-radius: 12px; font-size: 10px; margin-top: 4px; font-weight: 500;">Forever</span>
+                    <strong style="font-size: 13px; color: var(--text-main);">No Expiry</strong>
                 </td>
-                <td>
-                    <strong style="font-size: 16px; color: var(--text-main);">${cpn.usageCount || 0}</strong><br>
+                <td onclick="viewCouponUsage('${cpn.code}')" style="cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='transparent'">
+                    <strong style="font-size: 18px; color: var(--primary-brand); text-decoration: underline; text-underline-offset: 4px;">${trueUsageCount}</strong><br>
                     <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Customers Used</div>
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-main); font-weight: 600;"><span style="display: inline-block; width: 6px; height: 6px; background: #10B981; border-radius: 50%;"></span> Live Updates</div>
-                    <div style="width: 100px; height: 6px; background: #E5E7EB; border-radius: 4px; margin: 5px 0;"><div style="width: 100%; height: 100%; background: #10B981; border-radius: 4px;"></div></div>
-                    <div style="font-size: 11px; color: var(--text-main);">No Limit</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Unlimited Usage</div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-main); font-weight: 600;"><span style="display: inline-block; width: 6px; height: 6px; background: #10B981; border-radius: 50%; animation: pulse 2s infinite;"></span> Live Sync</div>
+                    <div style="font-size: 10px; color: var(--primary-brand); margin-top: 6px; font-weight: 500;">Click to view list &rarr;</div>
                 </td>
                 <td><span class="badge-status ${statClass}" style="padding: 6px 15px; font-size: 12px;">${cpn.status}</span></td>
                 <td>
@@ -2140,7 +2171,7 @@ window.renderCouponsTable = function() {
                 <td style="text-align: center;">
                     <div class="prod-actions" style="justify-content: center;">
                         <button class="btn-action-square" style="border: 1px solid var(--border-light); background: #fff;" onclick="toggleCouponStatus('${cpn.id}', '${cpn.status}')" title="${cpn.status === 'Live' ? 'Mark as Expired' : 'Reactivate Coupon'}">
-                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                            <i class="fa-solid fa-power-off" style="color: ${cpn.status === 'Live' ? '#EF4444' : '#10B981'};"></i>
                         </button>
                     </div>
                 </td>
@@ -2148,6 +2179,63 @@ window.renderCouponsTable = function() {
         `;
     });
     tBody.innerHTML = html;
+};
+        // --- 🌟 COUPON USAGE MODAL LOGIC 🌟 ---
+window.viewCouponUsage = function(couponCode) {
+    document.getElementById('usageModalCouponCode').textContent = couponCode;
+    
+    // Fetch and sort orders that used this specific coupon
+    const usageOrders = window.allOrdersData.filter(o => o.couponUsed === couponCode && o.status !== 'Cancelled' && o.status !== 'Failed')
+                                            .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    const tBody = document.getElementById('couponUsageTableBody');
+    
+    if (usageOrders.length === 0) {
+        tBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px;">No successful orders have used this coupon yet.</td></tr>';
+    } else {
+        let html = '';
+        usageOrders.forEach(o => {
+            const s = o.shippingInfo || {};
+            const name = `${s.firstName||''} ${s.lastName||''}`.trim() || 'Guest Customer';
+            const displayId = o.orderNumber || o.rawId.substring(0,8).toUpperCase();
+            const dateStr = new Date(o.date).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+            const timeStr = new Date(o.date).toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+            
+            const statusClassMap = {
+                'Processing': 'status-processing', 'Confirmed': 'status-confirmed',
+                'Shipped': 'status-shipped', 'Delivered': 'status-delivered'
+            };
+            const sClass = statusClassMap[o.status] || 'status-processing';
+
+            html += `
+                <tr>
+                    <td style="font-weight: 600; color: var(--primary-brand);">
+                        <a href="javascript:void(0)" onclick="closeCouponUsageModal(); navigate('orders'); openSidePanel('${o.rawId}')" style="color: inherit; text-decoration: underline; text-underline-offset: 3px;">#${displayId}</a>
+                    </td>
+                    <td>
+                        <div style="font-weight: 500; color: var(--text-main); font-size: 13px;">${name}</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${s.email || 'N/A'}</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">${s.phone || 'N/A'}</div>
+                    </td>
+                    <td>
+                        <div style="font-size: 13px; color: var(--text-main);">${dateStr}</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${timeStr}</div>
+                    </td>
+                    <td style="font-weight: 500; font-size: 13px;">₹${parseFloat(o.amount).toLocaleString('en-IN')}</td>
+                    <td><span class="status-badge-static ${sClass}" style="font-size: 11px; padding: 4px 10px;">${o.status}</span></td>
+                </tr>
+            `;
+        });
+        tBody.innerHTML = html;
+    }
+
+    document.getElementById('couponUsageModalOverlay').classList.add('active');
+    document.getElementById('couponUsageModal').classList.add('active');
+};
+
+window.closeCouponUsageModal = function() {
+    document.getElementById('couponUsageModalOverlay').classList.remove('active');
+    document.getElementById('couponUsageModal').classList.remove('active');
 };
 
 window.openCreateCouponModal = function() {
@@ -2676,6 +2764,8 @@ function initRealTimeOrders() {
 
                 currentPage = 1; 
                 renderTable(); 
+                // Add this right below renderTable(); inside initRealTimeOrders
+                if (window.renderCouponsTable) window.renderCouponsTable();
                 
                 // 🌟 ADDED THIS: Triggers the Customer tab to update instantly 🌟
                 if (window.aggregateAndRenderCustomers) {
