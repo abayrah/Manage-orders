@@ -1082,7 +1082,101 @@
         </div>
     </div>
 </div>
-                <div id="view-coupons" class="view-section"><div class="placeholder-content"><i class="fa-solid fa-ticket"></i><h2>Coupon Engine</h2></div></div>
+               <div id="view-coupons" class="view-section">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Coupon Engine <i class="fa-solid fa-ticket" style="color: var(--primary-brand); font-size: 18px;"></i></h1>
+            <p class="page-subtitle">Manage discount codes, track usage, and create new offers.</p>
+        </div>
+        <div class="header-controls">
+            <button class="btn-export-dark" onclick="openCreateCouponModal()"><i class="fa-solid fa-plus"></i> Create New Coupon</button>
+        </div>
+    </div>
+
+    <div class="dash-grid" style="grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #E0E7FF; color: #3B82F6;"><i class="fa-solid fa-ticket"></i></div>
+                <div><div class="kpi-title">Total Coupons</div><div class="kpi-value" id="cpn-total">0</div></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #D1FAE5; color: #10B981;"><i class="fa-solid fa-check-circle"></i></div>
+                <div><div class="kpi-title">Live Coupons</div><div class="kpi-value" id="cpn-live">0</div></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #FEF2F2; color: #EF4444;"><i class="fa-solid fa-ban"></i></div>
+                <div><div class="kpi-title">Expired Coupons</div><div class="kpi-value" id="cpn-expired">0</div></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="kpi-icon" style="background: #F3E8FF; color: #6D28D9;"><i class="fa-solid fa-users"></i></div>
+                <div><div class="kpi-title">Total Uses</div><div class="kpi-value" id="cpn-uses">0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="crm-filter-bar" style="margin-top: 20px;">
+        <div class="search-box" style="flex: 2;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="cpnSearchInput" placeholder="Search coupon code or description..." oninput="renderCouponsTable()">
+        </div>
+        <select class="filter-select" id="cpnStatusFilter" onchange="renderCouponsTable()" style="flex: 1;">
+            <option value="All">All Status</option>
+            <option value="Live">Live</option>
+            <option value="Expired">Expired</option>
+        </select>
+    </div>
+
+    <div class="main-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Coupon Code</th>
+                    <th>Description</th>
+                    <th>Discount</th>
+                    <th>Total Uses</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="couponsTableBody">
+                <tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">Loading live coupons...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="side-panel-overlay" id="createCouponModalOverlay" onclick="closeCreateCouponModal()"></div>
+<div class="invoice-modal" id="createCouponModal" style="max-width: 400px; height: auto; padding: 0;">
+    <div class="invoice-header-controls" style="border-radius: 12px 12px 0 0;">
+        <div style="font-weight: 600; font-size: 16px;">Create New Coupon</div>
+        <button class="close-panel" onclick="closeCreateCouponModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="invoice-content" style="padding: 30px;">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Coupon Code</label>
+                <input type="text" id="new-coupon-code" class="auth-input" placeholder="e.g. WELCOME10" style="text-transform: uppercase;">
+                <span style="font-size: 10px; color: var(--text-muted); margin-top: 4px; display: block;">Customers will enter this exact code at checkout.</span>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Discount Percentage (%)</label>
+                <input type="number" id="new-coupon-discount" class="auth-input" placeholder="e.g. 10" min="1" max="100">
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 8px; display: block;">Internal Description</label>
+                <input type="text" id="new-coupon-desc" class="auth-input" placeholder="e.g. Flat 10% off for new users">
+            </div>
+            <button class="auth-btn" id="saveCouponBtn" onclick="saveNewCoupon()"><i class="fa-solid fa-check"></i> Generate & Publish</button>
+        </div>
+    </div>
+</div>
                 <div id="view-reviews" class="view-section"><div class="placeholder-content"><i class="fa-regular fa-comment"></i><h2>Review Moderation</h2></div></div>
                 <div id="view-settings" class="view-section"><div class="placeholder-content"><i class="fa-solid fa-gear"></i><h2>System Settings</h2></div></div>
 
@@ -1601,6 +1695,7 @@
                 initCharts();
                 initRealTimeOrders(); 
                 initRealTimeProducts(); // <-- LIVE SYNCING PRODUCTS ADDED HERE
+                initRealTimeCoupons();                
             } else if (user) {
                 signOut(auth);
                 document.getElementById('auth-screen').style.display = 'flex';
@@ -1909,6 +2004,157 @@ window.renderCustomersTable = function() {
             `;
         });
         gBody.innerHTML = gridHtml;
+    }
+};
+        // =========================================================================
+// REAL-TIME COUPONS ENGINE
+// =========================================================================
+window.allCouponsData = [];
+
+function initRealTimeCoupons() {
+    const couponsRef = collection(db, 'coupons');
+    
+    onSnapshot(couponsRef, (snapshot) => {
+        window.allCouponsData = [];
+        let total = 0, live = 0, expired = 0, uses = 0;
+
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            data.id = docSnap.id;
+            window.allCouponsData.push(data);
+
+            total++;
+            if (data.status === 'Live') live++;
+            else expired++;
+            uses += (data.usageCount || 0);
+        });
+
+        // Update KPIs
+        if(document.getElementById('cpn-total')) document.getElementById('cpn-total').textContent = total;
+        if(document.getElementById('cpn-live')) document.getElementById('cpn-live').textContent = live;
+        if(document.getElementById('cpn-expired')) document.getElementById('cpn-expired').textContent = expired;
+        if(document.getElementById('cpn-uses')) document.getElementById('cpn-uses').textContent = uses;
+
+        window.renderCouponsTable();
+    }, (error) => {
+        console.error("Coupons Sync Error:", error);
+    });
+}
+
+window.renderCouponsTable = function() {
+    const tBody = document.getElementById('couponsTableBody');
+    if(!tBody) return;
+
+    const term = (document.getElementById('cpnSearchInput')?.value || '').toLowerCase();
+    const filterStat = document.getElementById('cpnStatusFilter')?.value || 'All';
+
+    let filtered = window.allCouponsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    filtered = filtered.filter(cpn => {
+        const matchesSearch = cpn.code.toLowerCase().includes(term) || cpn.description.toLowerCase().includes(term);
+        const matchesStat = filterStat === 'All' || cpn.status === filterStat;
+        return matchesSearch && matchesStat;
+    });
+
+    if(filtered.length === 0) {
+        tBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">No coupons found.</td></tr>';
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(cpn => {
+        const d = new Date(cpn.createdAt);
+        const dateStr = d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+        const statClass = cpn.status === 'Live' ? 'badge-status-active' : 'badge-status-inactive';
+        
+        html += `
+            <tr>
+                <td><span style="font-weight: 700; color: var(--primary-brand); border: 1px dashed var(--primary-brand); padding: 4px 10px; border-radius: 4px; letter-spacing: 1px;">${cpn.code}</span></td>
+                <td style="font-size: 13px; color: var(--text-main); font-weight: 500;">${cpn.description}</td>
+                <td><strong style="color: #10B981; font-size: 14px;">${cpn.discount}%</strong></td>
+                <td style="font-weight: 600;">${cpn.usageCount || 0}</td>
+                <td><span class="badge-status ${statClass}">${cpn.status}</span></td>
+                <td style="font-size: 12px; color: var(--text-muted);">${dateStr}</td>
+                <td>
+                    <div class="prod-actions" style="justify-content: flex-end;">
+                        <button class="btn-action-square" onclick="toggleCouponStatus('${cpn.id}', '${cpn.status}')" title="${cpn.status === 'Live' ? 'Expire Coupon' : 'Reactivate Coupon'}">
+                            <i class="fa-solid ${cpn.status === 'Live' ? 'fa-ban' : 'fa-check'}"></i>
+                        </button>
+                        <button class="btn-action-square delete" onclick="deleteCoupon('${cpn.id}')" title="Delete Coupon">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    tBody.innerHTML = html;
+};
+
+// Modal Logic
+window.openCreateCouponModal = function() {
+    document.getElementById('createCouponModalOverlay').classList.add('active');
+    document.getElementById('createCouponModal').classList.add('active');
+    document.getElementById('new-coupon-code').value = '';
+    document.getElementById('new-coupon-discount').value = '';
+    document.getElementById('new-coupon-desc').value = '';
+};
+
+window.closeCreateCouponModal = function() {
+    document.getElementById('createCouponModalOverlay').classList.remove('active');
+    document.getElementById('createCouponModal').classList.remove('active');
+};
+
+// Save to Firebase
+window.saveNewCoupon = async function() {
+    const code = document.getElementById('new-coupon-code').value.trim().toUpperCase();
+    const discount = parseInt(document.getElementById('new-coupon-discount').value);
+    const desc = document.getElementById('new-coupon-desc').value.trim();
+    const btn = document.getElementById('saveCouponBtn');
+
+    if (!code || !discount || !desc) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    try {
+        await setDoc(doc(db, "coupons", code), {
+            code: code,
+            discount: discount,
+            description: desc,
+            status: "Live",
+            usageCount: 0,
+            createdAt: new Date().toISOString()
+        });
+        closeCreateCouponModal();
+    } catch (error) {
+        console.error("Error saving coupon:", error);
+        alert("Failed to create coupon. Check permissions.");
+    } finally {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Generate & Publish';
+        btn.disabled = false;
+    }
+};
+
+window.toggleCouponStatus = async function(id, currentStatus) {
+    const newStatus = currentStatus === 'Live' ? 'Expired' : 'Live';
+    try {
+        await updateDoc(doc(db, 'coupons', id), { status: newStatus });
+    } catch (error) {
+        alert("Failed to update status.");
+    }
+};
+
+window.deleteCoupon = async function(id) {
+    if(confirm(`Are you sure you want to permanently delete the coupon "${id}"?`)) {
+        try {
+            await deleteDoc(doc(db, 'coupons', id));
+        } catch (error) {
+            alert("Failed to delete coupon.");
+        }
     }
 };
 
